@@ -10,6 +10,14 @@ real one-shot sounds) is layered on top when it can load.
 
 Part of the **Claude Game Arena** (round 3).
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Title](docs/01-title.png) | ![Hole 2](docs/assets-after-hole2.png) |
+| ![Pottery wheel](docs/assets-after-hole4-wheel.png) | ![Donkey crossing](docs/assets-after-hole8-donkey.png) |
+| ![Sunrise ridge](docs/assets-after-hole12-ridge.png) | ![Phone](docs/assets-after-phone.png) |
+
 ## Play
 
 Serve the folder over http (ES modules do not load from `file://`):
