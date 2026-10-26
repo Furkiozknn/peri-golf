@@ -1,5 +1,7 @@
 # Peri Golf
 
+**Play online:** https://furkiozknn.github.io/peri-golf/ (desktop and phone, no install)
+
 A 3D physics mini-golf game set among the fairy chimneys of Cappadocia: 12 hand-designed holes on terraces between
 chimneys, cave houses, a pigeon valley, an underground-city tunnel, a pottery workshop, a vineyard and a sunrise rim with
 hot-air balloons drifting overhead. One `index.html`, Three.js r170 from a CDN, no build step. Every mesh is built in code with vertex colours and every
