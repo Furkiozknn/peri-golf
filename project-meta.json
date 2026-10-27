@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0.0",
+  "id": "peri-golf",
+  "owner": "Furkiozknn",
+  "repository": "https://github.com/Furkiozknn/peri-golf",
+  "homepage": "https://furkiozknn.github.io/peri-golf/",
+  "releases": null,
+  "status": "active",
+  "category": "game",
+  "platform": [
+    "web"
+  ],
+  "primary_language": "JavaScript",
+  "technologies": [
+    "Three.js r170",
+    "Web Audio API",
+    "Blender"
+  ],
+  "version": null,
+  "license": "MIT",
+  "topics": [
+    "browser-game",
+    "threejs",
+    "mini-golf",
+    "physics-game",
+    "claude-code",
+    "claude-game-arena"
+  ],
+  "summary": "3D physics mini-golf among the fairy chimneys of Cappadocia, built by Claude Fable 5.1 · Kapadokya peribacaları arasında gerçek fizikli 3D mini golf, Claude Fable 5.1 yaptı",
+  "key_features": [
+    "12 hand-designed holes, course par 40, from Pigeon Terrace to Sunrise Ridge",
+    "Real rolling physics: slopes, ramps, jumps, wall bounces and grass, sand and stone friction",
+    "Moving obstacles: a turning pottery wheel, a rolling stone door, swinging lanterns and a donkey",
+    "Three stars per hole (under par, a hidden grape, a trick shot); the ?auto bot finishes the course in 18 strokes",
+    "60 fps on Intel UHD 620 at 1280x720 with 16-22 draw calls; one index.html, optional CC0 asset pass"
+  ],
+  "media": {
+    "hero": "docs/assets-after-hole4-wheel.png",
+    "screenshots": [
+      "docs/assets-after-title.png",
+      "docs/assets-after-hole2.png",
+      "docs/assets-after-hole4-wheel.png",
+      "docs/assets-after-hole8-donkey.png",
+      "docs/assets-after-hole12-ridge.png",
+      "docs/05-hole-result.png",
+      "docs/assets-after-phone.png"
+    ],
+    "gifs": [
+      "docs/gameplay.gif"
+    ],
+    "videos": [
+      "docs/gameplay.mp4",
+      "https://github.com/Furkiozknn/social-videos/releases/download/promo-2026-10/2026-10-27-peri-golf-en.mp4",
+      "https://github.com/Furkiozknn/social-videos/releases/download/promo-2026-10/2026-10-27-peri-golf-tr.mp4"
+    ]
+  },
+  "tests": null,
+  "ci": {
+    "workflows": [],
+    "badge": null
+  },
+  "docs": {
+    "readme": "README.md",
+    "changelog": null,
+    "version_history": null,
+    "roadmap": null,
+    "security": null,
+    "contributing": null,
+    "license_file": "LICENSE"
+  },
+  "social": {
+    "headline": "Mini-golf among the fairy chimneys of Cappadocia: 12 holes, real physics, a pottery wheel and a donkey · Kapadokya peribacaları arasında mini golf: 12 delik, gerçek fizik, çömlek tezgâhı ve eşek",
+    "hashtags": [
+      "claudecode",
+      "indiegame"
+    ],
+    "primary_link": "https://furkiozknn.github.io/peri-golf/"
+  },
+  "provenance": {
+    "generated_at": "2026-10-27",
+    "generator": "hand-written",
+    "rule": "mechanical fields read from the repository; editorial fields hand-written from the README, index.html, docs/assets.md and the video-studio analiz.md; no field is generated from a guess"
+  }
+}
