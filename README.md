@@ -20,6 +20,10 @@
 
 <p align="center"><b>Play online: <a href="https://furkiozknn.github.io/peri-golf/">https://furkiozknn.github.io/peri-golf/</a></b> (desktop and phone, no install)</p>
 
+<!-- portals:start -->
+<p align="center">Also on: <a href="https://furkiozknn.itch.io/peri-golf">itch.io</a></p>
+<!-- portals:end -->
+
 ## Highlights
 
 - **Twelve holes, par 40.** From Pigeon Terrace to Sunrise Ridge: terraces between fairy chimneys, cave houses, an
@@ -178,3 +182,5 @@ Fable 5.1 tarafından Claude Code ile tek bir prompt'tan yapıldı.
 ## License
 
 MIT, see [LICENSE](LICENSE). Third-party assets are CC0, see [CREDITS.md](CREDITS.md).
+
+Like the game? You can support new rounds on [Buy Me a Coffee](https://buymeacoffee.com/furkiozkann). The game stays free.
