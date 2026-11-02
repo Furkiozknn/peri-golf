@@ -730,7 +730,21 @@ function setMaterialSet(hi) {
   MAT = hi ? MATSET.hi : MATSET.lo;
   scene.traverse(n => { if (n.userData.mk && MAT[n.userData.mk]) n.material = MAT[n.userData.mk]; });
 }
-const COL = { grass: 0x70a048, sand: 0xe3c98f, stone: 0xcbb094, water: 0x4aa6c9, tuff: 0xd7b58f, tuffDark: 0xb8906e, cap: 0x8b6a52, wall: 0xe6d0ae, cupDark: 0x1d1611, accent: 0xE85D4A, wood: 0x7a4a2a, vine: 0x4f8a3a };
+// Redesign palette (2026-11, "fantasy miniature diorama"): tuff #E8C9A0, rose rock #C98B7A, moss #7FA36B, sky #9AD1F5, flag red #E53935
+const COL = { grass: 0x7FA36B, sand: 0xEBD6A6, stone: 0xDCCBAE, water: 0x6CC3E8, tuff: 0xE8C9A0, tuffDark: 0xC98B7A, cap: 0xA86E60, wall: 0xF4E4C8, cupDark: 0x2A1F1A, accent: 0xE53935, wood: 0x8B5A3C, vine: 0x5E8F4A,
+  moss: 0x7FA36B, rose: 0xC98B7A, roseLight: 0xDDA894, sky: 0x9AD1F5, cream: 0xFFF4E3, mint: 0xBFE8C8, blush: 0xF6C3C3, lemon: 0xFFE7A3, lilac: 0xC9B8E8 };
+// vertical gradient vertex colours (bottom -> top between y0 and y1), used for the rose-to-tuff banding of the rocks
+const _c2 = new THREE.Color();
+function colorizeY(geo, cBottom, cTop, y0, y1, jitter = 0, rnd = Math.random) {
+  const p = geo.attributes.position, n = p.count, arr = new Float32Array(n * 3); _c.set(cBottom); _c2.set(cTop);
+  for (let i = 0; i < n; i++) {
+    const k = clamp((p.getY(i) - y0) / Math.max(1e-6, y1 - y0), 0, 1), j = jitter ? (rnd() - 0.5) * jitter : 0;
+    arr[i * 3] = _c.r + (_c2.r - _c.r) * k + j; arr[i * 3 + 1] = _c.g + (_c2.g - _c.g) * k + j; arr[i * 3 + 2] = _c.b + (_c2.b - _c.b) * k + j;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  if (!geo.attributes.uv) geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(n * 2), 2));
+  return geo;
+}
 
 // grid surface of one pad, heights from the pad itself plus bumps
 function padTop(course, p, rnd) {
@@ -827,15 +841,17 @@ function buildCourseGeometry(course) {
 // Chimneys and houses are also recorded as placements (pl) so the Blender models can replace them as instances.
 function chimneyGeo(x, z, s, rnd, yBase, pl) {
   const list = []; const h = (1.6 + rnd() * 2.6) * s, rb = (0.38 + rnd() * 0.25) * s, rt = rb * (0.45 + rnd() * 0.2);
-  const ti = Math.floor(rnd() * 4), tint = [COL.tuff, 0xe2c3a0, 0xd4a98a, 0xe8d0b4][ti];
+  const ti = Math.floor(rnd() * 4), tint = [COL.tuff, 0xf0d6b2, COL.roseLight, 0xe6c6ac][ti];
   const capH = (0.5 + rnd() * 0.5) * s;
   const side = rnd() < 0.35 ? { dx: (rnd() - 0.5) * rb * 1.6, dz: (rnd() - 0.5) * rb * 1.6 } : null;
   const win = rnd() < 0.5 ? { dx: (rnd() - 0.5) * rt, y: h * (0.3 + rnd() * 0.4) } : null;
   if (pl) pl.chimneys.push({ x, z, y: yBase, h, rb, tint, v: ti % 3 });
   if (ASSETS.models) return list;
-  list.push(cyl(rt, rb, h, 7, x, yBase + h / 2, z, tint, 0.06));
+  // rose rock at the foot fading into pale tuff, a rosy-brown cap and a mossy fringe on the shoulder
+  list.push(colorizeY(cyl(rt, rb, h, 7, x, yBase + h / 2, z, tint), COL.rose, tint, yBase, yBase + h * 0.75, 0.05, rnd));
   list.push(cyl(rt * 0.35, rt * 1.35, capH, 7, x, yBase + h + capH / 2 - 0.05, z, COL.cap, 0.05));
-  if (side) { const h2 = h * 0.55, r2 = rb * 0.75; list.push(cyl(r2 * 0.6, r2, h2, 7, x + side.dx, yBase + h2 / 2, z + side.dz, tint, 0.06)); }
+  if (rnd() < 0.5) list.push(cyl(rt * 1.08, rt * 1.0, 0.08 * s, 7, x, yBase + h - 0.1 * s, z, COL.moss, 0.06));
+  if (side) { const h2 = h * 0.55, r2 = rb * 0.75; list.push(colorizeY(cyl(r2 * 0.6, r2, h2, 7, x + side.dx, yBase + h2 / 2, z + side.dz, tint), COL.rose, tint, yBase, yBase + h2 * 0.8, 0.05, rnd)); }
   if (win) list.push(box(0.22 * s, 0.3 * s, 0.1, x + win.dx, yBase + win.y, z + rb * 0.75, COL.cupDark));
   return list;
 }
@@ -907,15 +923,18 @@ function buildGrape() {
 // big low terrain with a basin where the course sits, plus far chimneys
 function buildTerrain() {
   const rnd = mulberry(99), size = 160, n = 64, pos = [], col = [], idx = [];
-  _c.set(0xdfbd95);
+  const tuff = new THREE.Color(COL.tuff), moss = new THREE.Color(COL.moss), rose = new THREE.Color(COL.rose), tmp = new THREE.Color();
   for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) {
     const x = -size / 2 + size * i / n, z = -size / 2 + size * j / n, d = Math.hypot(x, z);
     const v = Math.sin(x * 0.07 + 1.3) * Math.cos(z * 0.05 - 0.4) * 0.5 + Math.sin(x * 0.19 - z * 0.13) * 0.5; // large-scale patches
     const hill = Math.sin(x * 0.11) * Math.cos(z * 0.09) * 1.6 + Math.sin(x * 0.31 + 1) * Math.sin(z * 0.27) * 0.6 + (rnd() - 0.5) * 0.3;
     const k = THREE.MathUtils.smoothstep(d, 11, 24);
     const y = -1.35 + hill * k + (d > 55 ? (d - 55) * 0.05 : 0);
-    pos.push(x, y, z); const j2 = (rnd() - 0.5) * 0.06 + (y > 0.5 ? 0.04 : 0);
-    col.push(_c.r + j2 - (y < -1 ? 0.06 : 0) + v * 0.035, _c.g + j2 - (y < -1 ? 0.03 : 0) + v * 0.01, _c.b + j2 - v * 0.03);
+    pos.push(x, y, z);
+    // moss meadows on the patches, rose rock in the hollows and on the hill tops, a little jitter everywhere
+    const mossK = clamp((v - 0.25) / 0.5, 0, 1) * 0.8, roseK = y < -1.05 ? 0.28 : (y > 0.7 ? 0.3 : 0), j2 = (rnd() - 0.5) * 0.05;
+    tmp.copy(tuff).lerp(moss, mossK).lerp(rose, roseK);
+    col.push(tmp.r + j2, tmp.g + j2, tmp.b + j2);
   }
   for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const a = j * (n + 1) + i, b = a + 1, c = a + n + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
@@ -941,17 +960,18 @@ function buildSky() {
 // sky gradient for the time of day (progress 0 = dawn, 1 = morning) with a warm glow around the sun azimuth
 function tintSky(geo, progress, az = 0, el = 0.2) {
   const pos = geo.attributes.position, col = geo.attributes.color;
-  const horizon = new THREE.Color().lerpColors(new THREE.Color(0xffb37a), new THREE.Color(0xffe3c0), progress);
-  const mid = new THREE.Color().lerpColors(new THREE.Color(0xf29a8a), new THREE.Color(0xa8cfee), progress);
-  const zenith = new THREE.Color().lerpColors(new THREE.Color(0x6a5a9a), new THREE.Color(0x5c9fe0), progress);
+  // pastel diorama sky: peach dawn -> clear toy-sky blue; the fog colour sits between horizon and mid so the far field melts into the sky
+  const horizon = new THREE.Color().lerpColors(new THREE.Color(0xffe0c4), new THREE.Color(0xeef7fd), progress);
+  const mid = new THREE.Color().lerpColors(new THREE.Color(0xc4def2), new THREE.Color(0x9ad1f5), progress);
+  const zenith = new THREE.Color().lerpColors(new THREE.Color(0x86b9e8), new THREE.Color(0x6aaae6), progress);
   const tmp = new THREE.Color(), sx = Math.sin(az) * Math.cos(el), sy = Math.sin(el), sz = Math.cos(az) * Math.cos(el);
   for (let i = 0; i < pos.count; i++) {
     const y = pos.getY(i) / 90; let c;
-    if (y < 0.12) c = tmp.lerpColors(horizon, mid, Math.max(0, (y + 0.1) / 0.22)); else c = tmp.lerpColors(mid, zenith, Math.min(1, (y - 0.12) / 0.6));
-    const d = Math.max(0, (pos.getX(i) * sx + pos.getY(i) * sy + pos.getZ(i) * sz) / 90), glow = Math.pow(d, 5) * (0.42 - 0.22 * progress);
-    col.setXYZ(i, c.r + glow * 0.5, c.g + glow * 0.28, c.b + glow * 0.02);
+    if (y < 0.14) c = tmp.lerpColors(horizon, mid, Math.max(0, (y + 0.1) / 0.24)); else c = tmp.lerpColors(mid, zenith, Math.min(1, (y - 0.14) / 0.55));
+    const d = Math.max(0, (pos.getX(i) * sx + pos.getY(i) * sy + pos.getZ(i) * sz) / 90), glow = Math.pow(d, 7) * (0.3 - 0.16 * progress);
+    col.setXYZ(i, c.r + glow * 0.4, c.g + glow * 0.26, c.b + glow * 0.08);
   }
-  col.needsUpdate = true; return horizon;
+  col.needsUpdate = true; return horizon.lerp(mid, 0.3);
 }
 function softSprite() {
   const cv = document.createElement('canvas'); cv.width = cv.height = 64; const x = cv.getContext('2d');
@@ -1345,15 +1365,15 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 220);
-const hemi = new THREE.HemisphereLight(0xffdcc0, 0xb88a62, 0.95); scene.add(hemi);
-const sun = new THREE.DirectionalLight(0xffc48e, 1.7);
+const hemi = new THREE.HemisphereLight(0xcfe8ff, 0xd9b894, 1.0); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xfff0d8, 1.8);
 sun.shadow.mapSize.set(1024, 1024); sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.03; sun.shadow.camera.near = 1; sun.shadow.camera.far = 80;
 scene.add(sun, sun.target);
 const sky = new THREE.Mesh(buildSky(), new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, toneMapped: false })); scene.add(sky);
 const terrain = mesh(boxUV(buildTerrain(), 4.5), 'ground'); terrain.receiveShadow = true; scene.add(terrain);
 const far = buildFarChimneys();
 const farMesh = mesh(far.geo, 'rock'); scene.add(farMesh);
-scene.fog = new THREE.Fog(0xffb37a, 34, 95);
+scene.fog = new THREE.Fog(0xd6e9f7, 16, 66); // tilt-shift depth fog: the course stays crisp, the far field melts into the sky
 const envOn = () => settings.quality === 'high' && !!ASSETS.env;
 
 let PMAX = 260;
@@ -1376,13 +1396,13 @@ function applySun() {
   sun.position.set(course.bbox.cx + Math.cos(el) * Math.sin(az) * 40, Math.sin(el) * 40, course.bbox.cz + Math.cos(el) * Math.cos(az) * 40);
   sun.target.position.set(course.bbox.cx, 0, course.bbox.cz);
   const env = envOn();
-  sun.color.lerpColors(new THREE.Color(0xffc48e), new THREE.Color(0xffeccf), p); sun.intensity = (1.7 + 0.7 * p) * (env ? 0.8 - 0.25 * p : 1);
-  hemi.color.lerpColors(new THREE.Color(0xffdcc0), new THREE.Color(0xd2e8ff), p); hemi.groundColor.set(0xb88a62); hemi.intensity = (0.95 + 0.3 * p) * (env ? 0.7 - 0.2 * p : 1);
+  sun.color.lerpColors(new THREE.Color(0xffdcb0), new THREE.Color(0xfff6e8), p); sun.intensity = (1.8 + 0.5 * p) * (env ? 0.8 - 0.25 * p : 1);
+  hemi.color.lerpColors(new THREE.Color(0xffe4cc), new THREE.Color(0xcfe8ff), p); hemi.groundColor.lerpColors(new THREE.Color(0xd9b894), new THREE.Color(0xcdb89a), p); hemi.intensity = (1.0 + 0.3 * p) * (env ? 0.7 - 0.2 * p : 1);
   scene.environmentRotation.set(0, az - Math.PI / 2, 0); // the HDRI sun sits on +x
   scene.environmentIntensity = (FLAG.env || 0.22) * (0.75 + 0.35 * p);
   const half = Math.max(course.bbox.x1 - course.bbox.x0, course.bbox.z1 - course.bbox.z0) / 2 + 2.5;
   const sc = sun.shadow.camera; sc.left = -half; sc.right = half; sc.top = half; sc.bottom = -half; sc.updateProjectionMatrix();
-  const horizon = tintSky(sky.geometry, p, az, el); scene.fog.color.copy(horizon); renderer.setClearColor(horizon);
+  const fogCol = tintSky(sky.geometry, p, az, el); scene.fog.color.copy(fogCol); renderer.setClearColor(fogCol);
 }
 
 // ---- balloons (instanced) ----
@@ -1401,7 +1421,7 @@ balloons.frustumCulled = false; baskets.frustumCulled = false; scene.add(balloon
 let balloonModel = false; // true once the Blender balloon (basket geometry already hangs 3.1 m below the envelope) is in use
 const balloonState = [];
 {
-  const r = mulberry(42); const palette = [COL.accent, COL.accent, COL.accent, COL.accent, 0xf7c873, 0xf2e6d0, 0x5fa8c8, 0xe89a5a, 0xf7c873, 0x9ec7a0, COL.accent];
+  const r = mulberry(42); const palette = [COL.accent, COL.mint, COL.lemon, COL.blush, COL.accent, COL.lilac, 0x7fc4ec, COL.lemon, COL.accent, COL.mint, COL.blush];
   for (let i = 0; i < BALLOON_N; i++) {
     const a = r() * Math.PI * 2, d = 9 + r() * 26;
     balloonState.push({ x: Math.cos(a) * d, y: 3 + r() * 12, z: Math.sin(a) * d, s: 1.0 + r() * 0.7, ph: r() * 6, rise: 0.12 + r() * 0.18 });
@@ -1990,7 +2010,7 @@ function updateDebug() {
 applyQuality();
 camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
 { // title backdrop before any hole is loaded: sunrise sky, camera over the chimney field
-  const horizon = tintSky(sky.geometry, 0, Math.atan2(20, 30), 0.25); scene.fog.color.copy(horizon); renderer.setClearColor(horizon);
+  const fogCol = tintSky(sky.geometry, 0.55, Math.atan2(20, 30), 0.25); scene.fog.color.copy(fogCol); renderer.setClearColor(fogCol);
   sun.position.set(20, 9, 30); sun.target.position.set(0, 0, 0);
   scene.environmentRotation.set(0, Math.atan2(20, 30) - Math.PI / 2, 0); scene.environmentIntensity = (FLAG.env || 0.22) * 0.75;
   camera.position.set(6, 3, 12); camera.lookAt(-4, 1, -6);
