@@ -16,3 +16,6 @@ the scripts in `assets/src/` by Claude Fable 5.1 and are MIT like the rest of th
   files: assets/sfx/putt.mp3 (impactWood_light_000), assets/sfx/wall.mp3 (impactWood_medium_000), assets/sfx/obstacle.mp3 (impactSoft_heavy_000), assets/sfx/cup.mp3 (impactTin_medium_000)
 - **Kenney Interface Sounds** (Kenney, CC0) by Kenney (kenney.nl): https://kenney.nl/assets/interface-sounds  
   files: assets/sfx/click.mp3 (click_001), assets/sfx/back.mp3 (back_001)
+- **Fredoka** (Google Fonts, SIL Open Font License 1.1) by Milena Brandão, Jeff Kellem:
+  https://fonts.google.com/specimen/Fredoka  
+  files: assets/fonts/fredoka-latin.woff2, assets/fonts/fredoka-latin-ext.woff2 (variable 400-700, Google Fonts subsets; the UI type of the 2026-11 redesign)
