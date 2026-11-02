@@ -138,10 +138,14 @@ What changed (the physics, controls, scoring, 12 holes, bot, saves and both lang
 
 - **Palette and lighting:** pastel vertex colours, warm sun plus a sky-tinted hemisphere, nearer fog so the far chimneys fade
   like a model landscape, a lighter procedural sky with clouds.
-- **Environment:** mossier terrain with meadows in the basin, rounded rock arches with mossy crowns over the tunnels and cave
-  houses, tiny wooden bridges with railings over the water, drifting fairy-light motes.
-- **Objects:** toy-like props (round bushes with blossoms, toadstools, flower patches, a signpost beside every tee),
-  pop-in animation when a hole loads, a sparkle trail behind the ball and pastel splash and cup FX.
+- **Environment:** a diorama base around every hole (moss and grass patches with dark rims, a pebble path that rings the
+  course and runs back to the tee, instanced tuff boulders, toadstool clusters and pebbles), the course terrace as layered
+  tuff strata with a mossy lip and a contact shadow on the ground, hero fairy chimneys at hole scale past the cup, rounded
+  rock arches with mossy crowns over the tunnels and cave houses, tiny wooden bridges with railings over the water,
+  drifting fairy-light motes, a flatter tee camera so the chimneys and the pastel sky show behind the course.
+- **Objects:** toy-like props (round bushes with blossoms, flower patches, a signpost beside every tee that shows the hole
+  number and par on a painted board), pop-in animation when a hole loads, a sparkle trail behind the ball and pastel
+  splash and cup FX.
 - **UI skin:** wooden signpost boards with a cream face for every panel (title, hole card, pause, settings, hole result,
   scorecard, course complete), pastel toy buttons with a 3D edge, Fredoka as the self-hosted UI face
   (`assets/fonts/`), 44 px touch targets, visible focus rings, phone portrait and landscape layouts.
@@ -151,11 +155,11 @@ Measured on the Intel UHD 620 (headless Chrome, 1280x720, High tier, with assets
 | | v1 (2026-10) | Redesign (2026-11) |
 |---|---|---|
 | title fps / draw calls | 60 / 16 | 60 / 18 |
-| hole 4 fps / draw calls | 56 / 19 | 60 / 21 |
-| hole 12 fps / draw calls | 60 / 20 | 60 / 22 |
-| hole 7 and hole 9 | - | 60 / 22 and 60 / 20 |
-| phone 500x900 (Low tier) | - | 60 / 21 |
-| `?low` on desktop, `?noassets` | - | 60 / 20, 60 / 16 |
+| hole 4 fps / draw calls | 56 / 19 | 58-60 / 26 |
+| hole 12 fps / draw calls | 60 / 20 | 60 / 27 |
+| hole 7 and hole 9 | - | 60 / 27 and 60 / 25 |
+| phone 500x900 (Low tier) | - | 60 / 26 |
+| `?low` on desktop, `?noassets` | - | 60 / 25, 60 / 18 |
 | `?auto` bot, 12 holes | 18 strokes, 0 errors | 18 strokes, 23 stars, 0 errors (with assets and `?noassets`) |
 
 ## Balance

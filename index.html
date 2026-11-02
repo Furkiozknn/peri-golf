@@ -800,18 +800,32 @@ function padTop(course, p, rnd) {
   return g.toNonIndexed();
 }
 // skirt from the pad edge down to the course base (the carved tuff terrace side)
+// Redesign: the terrace side is layered tuff strata (each band bulges out a little), a mossy lip on top and a dark
+// contact-shadow apron where the terrace meets the diorama ground. Faces wind outward so the near side is lit, not culled.
+const SKIRT_BANDS = [[0, 0x6F9460, 0.0], [0.07, 0xF6E8CE, 0.05], [0.24, 0xE8C9A0, 0.0], [0.42, 0xDDA894, 0.07], [0.58, 0xE4C4A0, 0.02], [0.76, 0xC98B7A, 0.09], [1, 0xB0776A, 0.04]];
 function padSkirt(course, p, rnd) {
-  const pos = [], col = [], base = course.base; const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+  const pos = [], col = [], base = course.base, corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]], gy = terrainY(p.x, p.z) + 0.015;
+  const dark = new THREE.Color(0x8E7458), ground = new THREE.Color(COL.tuff);
+  const V = (x, y, z, c, j) => { pos.push(x, y, z); col.push(c.r + j, c.g + j, c.b + j); };
   for (let k = 0; k < 4; k++) {
     const a = corners[k], b = corners[(k + 1) % 4];
     const ax = p.x + a[0] * p.w / 2, az = p.z + a[1] * p.d / 2, bx = p.x + b[0] * p.w / 2, bz = p.z + b[1] * p.d / 2;
-    const n = Math.max(1, Math.round(Math.hypot(bx - ax, bz - az) / 0.5));
+    const ex = bx - ax, ez = bz - az, L = Math.hypot(ex, ez), ox = ez / L, oz = -ex / L; // (ox, oz) points away from the pad
+    const n = Math.max(1, Math.round(L / 0.5));
     for (let i = 0; i < n; i++) {
-      const x0 = ax + (bx - ax) * i / n, z0 = az + (bz - az) * i / n, x1 = ax + (bx - ax) * (i + 1) / n, z1 = az + (bz - az) * (i + 1) / n;
-      const y0 = padH(p, x0, z0) + course.bumpH(x0, z0), y1 = padH(p, x1, z1) + course.bumpH(x1, z1);
-      pos.push(x0, y0, z0, x0, base, z0, x1, y1, z1, x1, y1, z1, x0, base, z0, x1, base, z1);
-      _c.set(COL.tuff); _c2.set(COL.rose); const j = (rnd() - 0.5) * 0.08; // tuff top, rose rock at the foot of the terrace
-      for (let q = 0; q < 6; q++) { const k = (q === 1 || q === 4 || q === 5) ? 1 : 0; col.push(_c.r + (_c2.r - _c.r) * k + j, _c.g + (_c2.g - _c.g) * k + j, _c.b + (_c2.b - _c.b) * k + j); }
+      const x0 = ax + ex * i / n, z0 = az + ez * i / n, x1 = ax + ex * (i + 1) / n, z1 = az + ez * (i + 1) / n;
+      const t0 = padH(p, x0, z0) + course.bumpH(x0, z0), t1 = padH(p, x1, z1) + course.bumpH(x1, z1);
+      for (let r = 0; r < SKIRT_BANDS.length - 1; r++) {
+        const [f0, cBand, b0] = SKIRT_BANDS[r], b1 = SKIRT_BANDS[r + 1][2], f1 = SKIRT_BANDS[r + 1][0], j = (rnd() - 0.5) * 0.07;
+        _c.set(cBand);
+        const A0 = [x0 + ox * b0, t0 - (t0 - base) * f0, z0 + oz * b0], A1 = [x1 + ox * b0, t1 - (t1 - base) * f0, z1 + oz * b0];
+        const B0 = [x0 + ox * b1, t0 - (t0 - base) * f1, z0 + oz * b1], B1 = [x1 + ox * b1, t1 - (t1 - base) * f1, z1 + oz * b1];
+        for (const v of [A0, A1, B0, A1, B1, B0]) V(v[0], v[1], v[2], _c, j);
+      }
+      // contact shadow: dark at the foot, fading to the ground colour 0.7 m out
+      const fb = SKIRT_BANDS[SKIRT_BANDS.length - 1][2], I0 = [x0 + ox * fb, gy, z0 + oz * fb], I1 = [x1 + ox * fb, gy, z1 + oz * fb];
+      const O0 = [x0 + ox * 0.7, gy, z0 + oz * 0.7], O1 = [x1 + ox * 0.7, gy, z1 + oz * 0.7];
+      V(...I0, dark, 0); V(...I1, dark, 0); V(...O0, ground, 0); V(...I1, dark, 0); V(...O1, ground, 0); V(...O0, ground, 0);
     }
   }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
@@ -898,12 +912,13 @@ function buildCourseGeometry(course) {
   // tee marker and a little wooden signpost beside the tee terrace
   const th = course.height(def.tee[0], def.tee[1]) || 0;
   flat.push(cyl(0.26, 0.26, 0.012, 12, def.tee[0], th + 0.004, def.tee[1], 0x98c26c));
+  let sign = null;
   { const tp = course.ground(def.tee[0], def.tee[1]); if (tp) {
-    // the board faces the tee camera (+z) and turns a little towards the course; cream face on both sides with a red flag stripe
-    const sx = tp.pad.x - tp.pad.w / 2 - 0.4, sz = def.tee[1] + 0.3, y0 = course.base + 0.2, y1 = th + 0.56, ry = -0.35, nx = Math.sin(ry), nz = Math.cos(ry);
+    // the board faces the tee camera (+z) and turns a little towards the course; its painted face (hole number) is a separate textured mesh
+    const sx = tp.pad.x - tp.pad.w / 2 - 0.4, sz = def.tee[1] + 0.3, y0 = terrainY(sx, sz) - 0.1, y1 = th + 0.56, ry = -0.35;
     flat.push(cyl(0.03, 0.04, y1 - y0, 6, sx, (y0 + y1) / 2, sz, COL.wood));
-    flat.push(box(0.4, 0.24, 0.05, sx, y1 - 0.1, sz, COL.wood, ry));
-    for (const s of [1, -1]) { flat.push(box(0.34, 0.18, 0.012, sx + nx * 0.03 * s, y1 - 0.1, sz + nz * 0.03 * s, COL.cream, ry)); flat.push(box(0.12, 0.05, 0.012, sx + nx * 0.037 * s - nz * 0.08, y1 - 0.1, sz + nz * 0.037 * s + nx * 0.08, COL.accent, ry)); }
+    flat.push(box(0.42, 0.26, 0.05, sx, y1 - 0.1, sz, COL.wood, ry));
+    sign = { x: sx, y: y1 - 0.1, z: sz, ry };
   } }
   // tunnels / cave houses over the course: rounded rock arches, rose at the foot and tuff above
   for (const tn of (def.tunnels || [])) {
@@ -934,7 +949,7 @@ function buildCourseGeometry(course) {
   // rock (tuff terraces, walls, stone pads), grass and sand are separate meshes so each can carry its own detail texture
   const rock = merged(list), g = merged(grass), s = merged(sand);
   if (rock) boxUV(rock, 2.2); if (g) boxUV(g, 1.1); if (s) { boxUV(s, 1.3); s.translate(0, 0.004, 0); } // sand sits 4 mm proud of the grass it overlaps (visual only)
-  return { rock, grass: g, sand: s, flat: merged(flat), water: water.length ? merged(water) : null };
+  return { rock, grass: g, sand: s, flat: merged(flat), water: water.length ? merged(water) : null, sign };
 }
 
 // Scenery around one hole: fairy chimneys, cave houses, vines, pottery, roosts.
@@ -969,54 +984,56 @@ function houseGeo(x, z, rnd, yBase, ry, pl) {
 function buildScenery(course) {
   const rnd = mulberry(500 + course.index * 13), def = course.def, deco = def.deco || {}, bb = course.bbox, list = [], pl = { chimneys: [], houses: [] };
   const inside = (x, z, m) => x > bb.x0 - m && x < bb.x1 + m && z > bb.z0 - m && z < bb.z1 + m;
-  const groundY = course.base + 0.2;
+  const gY = (x, z) => terrainY(x, z) + 0.01; // props stand on the diorama ground, not on the course base
   let placed = 0, tries = 0;
   while (placed < (deco.chimneys || 10) && tries++ < 400) {
     const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 20), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 20);
-    if (inside(x, z, 2.6)) continue;
+    if (inside(x, z, 2.6) || pathDist(course, x, z) < 1.0) continue;
     const far = !inside(x, z, 6);
-    list.push(...chimneyGeo(x, z, far ? 0.9 + rnd() * 0.9 : 0.45 + rnd() * 0.5, rnd, groundY - 0.3, pl)); placed++;
+    list.push(...chimneyGeo(x, z, far ? 0.9 + rnd() * 0.9 : 0.45 + rnd() * 0.5, rnd, gY(x, z) - 0.3, pl)); placed++;
   }
   placed = 0; tries = 0;
   while (placed < (deco.houses || 1) && tries++ < 200) {
     const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 12), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 12);
-    if (inside(x, z, 2.2)) continue;
-    list.push(...houseGeo(x, z, rnd, groundY - 0.2, (rnd() - 0.5) * 0.8, pl)); placed++;
+    if (inside(x, z, 2.2) || pathDist(course, x, z) < 1.4) continue;
+    list.push(...houseGeo(x, z, rnd, gY(x, z) - 0.2, (rnd() - 0.5) * 0.8, pl)); placed++;
   }
-  for (const l of (deco.landmarks || [])) list.push(...chimneyGeo(l.x, l.z, l.s, rnd, groundY - 0.3, pl));
+  for (const l of (deco.landmarks || [])) list.push(...chimneyGeo(l.x, l.z, l.s, rnd, gY(l.x, l.z) - 0.3, pl));
+  // hero chimneys at hole scale just past the cup, inside the tee camera's view, so the diorama has a near skyline
+  for (const [x, z, s] of [[def.cup[0] - 3.4, bb.z0 - 3.6, 1.35], [def.cup[0] + 3.0, bb.z0 - 5.4, 1.05], [bb.x1 + 3.4, bb.z0 + 1.6, 0.8]]) {
+    if (!inside(x, z, 2.6)) list.push(...chimneyGeo(x, z, s, rnd, gY(x, z) - 0.3, pl));
+  }
   if (deco.vines) { // rows of vine posts and bushes along the course
     for (const side of [-1, 1]) for (let i = 0; i < 9; i++) {
       const x = bb.x0 - 1.2 + (bb.x1 - bb.x0 + 2.4) * i / 8, z = side < 0 ? bb.z0 - 1.6 - (i % 2) * 0.5 : bb.z1 + 1.6 + (i % 2) * 0.5;
       if (inside(x, z, 0.9)) continue;
-      list.push(cyl(0.03, 0.04, 0.9, 5, x, groundY + 0.45, z, COL.wood));
-      const g = new THREE.IcosahedronGeometry(0.32 + rnd() * 0.15, 0); g.translate(x, groundY + 0.75, z); list.push(colorize(g, COL.vine, 0.1, rnd));
-      if (rnd() < 0.5) list.push(sph(0.07, x + 0.2, groundY + 0.55, z + 0.15, 0x6a3b8c, 5));
+      const g0 = gY(x, z);
+      list.push(cyl(0.03, 0.04, 0.9, 5, x, g0 + 0.45, z, COL.wood));
+      const g = new THREE.IcosahedronGeometry(0.32 + rnd() * 0.15, 0); g.translate(x, g0 + 0.75, z); list.push(colorize(g, COL.vine, 0.1, rnd));
+      if (rnd() < 0.5) list.push(sph(0.07, x + 0.2, g0 + 0.55, z + 0.15, 0x6a3b8c, 5));
     }
   }
-  // diorama props: round bushes with blossoms, toadstools, flower patches and one tiny footbridge over a puddle
+  // diorama props: round bushes with blossoms, flower patches and one tiny footbridge over a puddle
+  // (toadstool clusters, boulders and the pebble path are instanced in buildDioramaProps)
   for (let i = 0, nb = 12 + Math.floor(rnd() * 6); i < nb; i++) {
-    const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 14), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 14); if (inside(x, z, 1.5)) continue;
-    const r = 0.22 + rnd() * 0.24; const g = new THREE.IcosahedronGeometry(r, 1); g.scale(1, 0.8, 1); g.translate(x, groundY + r * 0.55, z);
-    list.push(colorizeY(g, 0x4d7d44, COL.moss, groundY, groundY + r * 1.3, 0.08, rnd));
-    if (rnd() < 0.6) for (let k = 0; k < 3; k++) list.push(sph(0.045, x + (rnd() - 0.5) * r * 1.4, groundY + r * 0.9 + rnd() * r * 0.4, z + (rnd() - 0.5) * r * 1.4, [COL.blush, COL.lemon, 0xffffff, COL.lilac][Math.floor(rnd() * 4)], 4));
-  }
-  for (let i = 0, nm = 5 + Math.floor(rnd() * 4); i < nm; i++) {
-    const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 10), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 10); if (inside(x, z, 1.2)) continue;
-    const s = 0.7 + rnd() * 0.7; list.push(cyl(0.035 * s, 0.05 * s, 0.18 * s, 6, x, groundY + 0.09 * s, z, COL.cream, 0.04));
-    const cap = new THREE.SphereGeometry(0.11 * s, 8, 5, 0, Math.PI * 2, 0, Math.PI / 2); cap.scale(1, 0.7, 1); cap.translate(x, groundY + 0.17 * s, z); list.push(colorize(cap, rnd() < 0.6 ? COL.accent : COL.lilac, 0.05, rnd));
-    for (let k = 0; k < 3; k++) { const a = rnd() * 6.28, rr = 0.05 * s; list.push(sph(0.022 * s, x + Math.cos(a) * rr, groundY + 0.22 * s, z + Math.sin(a) * rr, 0xffffff, 4)); }
+    const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 14), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 14); if (inside(x, z, 1.5) || pathDist(course, x, z) < 0.9) continue;
+    const g0 = gY(x, z), r = 0.22 + rnd() * 0.24; const g = new THREE.IcosahedronGeometry(r, 1); g.scale(1, 0.8, 1); g.translate(x, g0 + r * 0.55, z);
+    list.push(colorizeY(g, 0x4d7d44, COL.moss, g0, g0 + r * 1.3, 0.08, rnd));
+    if (rnd() < 0.6) for (let k = 0; k < 3; k++) list.push(sph(0.045, x + (rnd() - 0.5) * r * 1.4, g0 + r * 0.9 + rnd() * r * 0.4, z + (rnd() - 0.5) * r * 1.4, [COL.blush, COL.lemon, 0xffffff, COL.lilac][Math.floor(rnd() * 4)], 4));
   }
   for (let i = 0; i < 7; i++) {
-    const cx = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 12), cz = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 12); if (inside(cx, cz, 1.0)) continue;
-    for (let k = 0; k < 6; k++) { const x = cx + (rnd() - 0.5) * 0.9, z = cz + (rnd() - 0.5) * 0.9; list.push(cyl(0.008, 0.01, 0.12, 4, x, groundY + 0.06, z, COL.vine), sph(0.038, x, groundY + 0.13, z, [COL.blush, COL.lemon, COL.lilac, 0xffffff, COL.accent][Math.floor(rnd() * 5)], 4)); }
+    const cx = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 12), cz = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 12); if (inside(cx, cz, 1.0) || pathDist(course, cx, cz) < 0.9) continue;
+    const g0 = gY(cx, cz);
+    for (let k = 0; k < 6; k++) { const x = cx + (rnd() - 0.5) * 0.9, z = cz + (rnd() - 0.5) * 0.9; list.push(cyl(0.008, 0.01, 0.12, 4, x, g0 + 0.06, z, COL.vine), sph(0.038, x, g0 + 0.13, z, [COL.blush, COL.lemon, COL.lilac, 0xffffff, COL.accent][Math.floor(rnd() * 5)], 4)); }
   }
-  { let tries = 0; while (tries++ < 40) { const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 11), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 11); if (inside(x, z, 2.4) || !inside(x, z, 6)) continue; list.push(...bridgeGeo(x, groundY, z, rnd() * Math.PI, rnd)); break; } }
+  { let tries = 0; while (tries++ < 40) { const x = bb.cx + (rnd() - 0.5) * (bb.x1 - bb.x0 + 11), z = bb.cz + (rnd() - 0.5) * (bb.z1 - bb.z0 + 11); if (inside(x, z, 2.4) || !inside(x, z, 6) || pathDist(course, x, z) < 1.4) continue; list.push(...bridgeGeo(x, gY(x, z), z, rnd() * Math.PI, rnd)); break; } }
   if (deco.pots) { // shelves with pottery around the workshop
+    const g0 = gY(bb.x1 + 1.3, bb.z0 + 2.8);
     for (let i = 0; i < 6; i++) {
       const x = bb.x1 + 1.0 + (i % 2) * 0.6, z = bb.z0 + 1 + i * 0.7;
-      list.push(sph(0.16, x, groundY + 0.18, z, [0xd07a5c, COL.blush, COL.rose][i % 3], 7), cyl(0.07, 0.09, 0.14, 7, x, groundY + 0.38, z, 0xd07a5c));
+      list.push(sph(0.16, x, g0 + 0.18, z, [0xd07a5c, COL.blush, COL.rose][i % 3], 7), cyl(0.07, 0.09, 0.14, 7, x, g0 + 0.38, z, 0xd07a5c));
     }
-    list.push(box(1.6, 0.1, 4.6, bb.x1 + 1.3, groundY + 0.02, bb.z0 + 2.8, COL.wood));
+    list.push(box(1.6, 0.1, 4.6, bb.x1 + 1.3, g0 + 0.02, bb.z0 + 2.8, COL.wood));
   }
   if (def.pigeons) { // pigeon loft: a carved cliff with holes
     const [x, z] = def.pigeons; const gh = course.height(x, z) ?? (course.base + 0.2);
@@ -1043,6 +1060,102 @@ function buildGrape() {
   const leaf = new THREE.BoxGeometry(0.22, 0.02, 0.16); leaf.translate(0.06, 0.3, 0); list.push(colorize(leaf, COL.vine));
   return merged(list);
 }
+// Diorama ground around the course (redesign): a fine 32x32 m base on the flat basin with moss and grass patches,
+// a pebble path that rings the course and runs back to the tee camera, plus instanced boulders, toadstool clusters and pebbles.
+const BASIN_Y = -1.35;
+function terrainY(x, z) { // analytic terrain height (no jitter): the basin is flat, hills start 11 m out
+  const d = Math.hypot(x, z), hill = Math.sin(x * 0.11) * Math.cos(z * 0.09) * 1.6 + Math.sin(x * 0.31 + 1) * Math.sin(z * 0.27) * 0.6;
+  return BASIN_Y + hill * THREE.MathUtils.smoothstep(d, 11, 24) + (d > 55 ? (d - 55) * 0.05 : 0);
+}
+function vnoise(x, z, seed) { // smooth value noise in [0,1]
+  const xi = Math.floor(x), zi = Math.floor(z), fx = x - xi, fz = z - zi, sx = fx * fx * (3 - 2 * fx), sz = fz * fz * (3 - 2 * fz);
+  const h = (i, j) => { const s = Math.sin(i * 127.1 + j * 311.7 + seed * 0.37) * 43758.5453; return s - Math.floor(s); };
+  return (h(xi, zi) * (1 - sx) + h(xi + 1, zi) * sx) * (1 - sz) + (h(xi, zi + 1) * (1 - sx) + h(xi + 1, zi + 1) * sx) * sz;
+}
+// distance to the pebble path: a rounded ring 1.7 m outside the course plus a spur towards the tee camera
+function pathDist(course, x, z) {
+  const bb = course.bbox, m = 1.7, r = 1.3, hx = (bb.x1 - bb.x0) / 2 + m - r, hz = (bb.z1 - bb.z0) / 2 + m - r;
+  const qx = Math.abs(x - bb.cx) - hx, qz = Math.abs(z - bb.cz) - hz;
+  const ring = Math.hypot(Math.max(qx, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qz), 0) - r;
+  const sx = course.def.tee[0] + 2.1, z0 = bb.z1 + m, spur = Math.hypot(x - sx, z - clamp(z, z0, z0 + 7));
+  return Math.min(Math.abs(ring), spur);
+}
+function buildBaseGround(course) {
+  const seed = 7 + course.index * 3, size = 32, n = 64, pos = [], col = [], idx = [];
+  const tuff = new THREE.Color(COL.tuff), sand = new THREE.Color(0xF0DDB2), moss = new THREE.Color(COL.moss), grass = new THREE.Color(0x9DBE78), dark = new THREE.Color(0x628C55), stone = new THREE.Color(0xD9CBB0), tmp = new THREE.Color();
+  const rnd = mulberry(seed);
+  for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) {
+    const x = -size / 2 + size * i / n, z = -size / 2 + size * j / n;
+    pos.push(x, terrainY(x, z) + 0.05, z);
+    const f = vnoise(x * 0.33, z * 0.33, seed) * 0.6 + vnoise(x * 0.9 + 7, z * 0.9, seed) * 0.3 + vnoise(x * 2.3, z * 2.3 + 3, seed) * 0.1;
+    tmp.lerpColors(tuff, sand, vnoise(x * 0.12, z * 0.12 + 50, seed));
+    const mossK = THREE.MathUtils.smoothstep(f, 0.46, 0.64), edge = THREE.MathUtils.smoothstep(f, 0.40, 0.50) * (1 - mossK); // dark moss rim round each patch
+    tmp.lerp(f > 0.58 ? grass : moss, mossK).lerp(dark, edge * 0.55);
+    const pd = pathDist(course, x, z), pathK = 1 - THREE.MathUtils.smoothstep(pd, 0.4, 0.85);
+    tmp.lerp(stone, pathK * 0.9);
+    const jit = (rnd() - 0.5) * (pathK > 0.5 ? 0.09 : 0.04);
+    col.push(tmp.r + jit, tmp.g + jit, tmp.b + jit);
+  }
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const a = j * (n + 1) + i, b = a + 1, c = a + n + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
+  return boxUV(g.toNonIndexed(), 4.5);
+}
+// shared instanced prop geometries: a toadstool cluster, a tuff boulder and a pebble
+let PROP_GEO = null;
+function propGeos() { // built on first use (colorizeY needs helpers declared later in the module)
+  if (PROP_GEO) return PROP_GEO;
+  const rnd = mulberry(77), stool = [];
+  for (const [dx, dz, s, c] of [[0, 0, 1, COL.accent], [0.19, 0.08, 0.66, COL.accent], [-0.14, 0.15, 0.5, COL.lilac]]) {
+    stool.push(cyl(0.035 * s, 0.05 * s, 0.18 * s, 6, dx, 0.09 * s, dz, COL.cream, 0.04));
+    const cap = new THREE.SphereGeometry(0.12 * s, 8, 5, 0, Math.PI * 2, 0, Math.PI / 2); cap.scale(1, 0.7, 1); cap.translate(dx, 0.17 * s, dz); stool.push(colorize(cap, c, 0.05, rnd));
+    for (let k = 0; k < 3; k++) { const a = rnd() * 6.28, rr = 0.055 * s; stool.push(sph(0.024 * s, dx + Math.cos(a) * rr, 0.23 * s, dz + Math.sin(a) * rr, 0xffffff, 4)); }
+  }
+  const boulder = new THREE.IcosahedronGeometry(0.5, 2); { const p = boulder.attributes.position; for (let i = 0; i < p.count; i++) p.setXYZ(i, p.getX(i) * (0.9 + rnd() * 0.25), p.getY(i) * 0.75, p.getZ(i) * (0.9 + rnd() * 0.25)); }
+  boulder.computeVertexNormals(); colorizeY(boulder, COL.rose, 0xEFD7B8, -0.4, 0.35, 0.06, rnd);
+  const pebble = new THREE.IcosahedronGeometry(0.06, 0); pebble.scale(1.3, 0.55, 1); colorize(pebble, 0xC9B79A, 0.12, rnd);
+  const out = { stool: merged(stool), boulder, pebble };
+  for (const g of Object.values(out)) g.userData.shared = true;
+  return (PROP_GEO = out);
+}
+function buildDioramaProps(course) {
+  const rnd = mulberry(900 + course.index * 7), bb = course.bbox, meshes = [], PG = propGeos();
+  const inside = (x, z, m) => x > bb.x0 - m && x < bb.x1 + m && z > bb.z0 - m && z < bb.z1 + m;
+  const sample = (n, keep, place) => { // rejection-sample positions on the 32 m base, then fill an InstancedMesh
+    const pts = []; let tries = 0;
+    while (pts.length < n && tries++ < n * 60) { const x = (rnd() - 0.5) * 30, z = (rnd() - 0.5) * 30; if (keep(x, z, pathDist(course, x, z))) pts.push([x, z]); }
+    return pts;
+  };
+  const fill = (geo, pts, place, shadow) => {
+    const m = mesh(geo, 'flat', THREE.InstancedMesh, pts.length); m.castShadow = shadow;
+    pts.forEach((p, i) => { place(p[0], p[1]); m.setMatrixAt(i, _m.compose(_p, _q, _s)); });
+    m.instanceMatrix.needsUpdate = true; meshes.push(m);
+  };
+  fill(PG.pebble, sample(170, (x, z, pd) => pd < 0.42 && !inside(x, z, 0.9)), (x, z) => {
+    const s = 0.55 + rnd() * 1.1; _p.set(x, terrainY(x, z) + 0.05 + 0.02 * s, z); _q.setFromEuler(_e.set(0, rnd() * 6.28, 0)); _s.set(s, s, s);
+  }, false);
+  fill(PG.boulder, sample(26, (x, z, pd) => pd > 0.9 && !inside(x, z, 1.4) && Math.hypot(x, z) < 15), (x, z) => {
+    const s = 0.28 + rnd() * 0.55; _p.set(x, terrainY(x, z) + 0.05 + s * 0.2, z); _q.setFromEuler(_e.set(0, rnd() * 6.28, 0)); _s.set(s * (0.8 + rnd() * 0.5), s, s * (0.8 + rnd() * 0.5));
+  }, true);
+  fill(PG.stool, sample(20, (x, z, pd) => pd > 0.8 && !inside(x, z, 1.1) && Math.hypot(x, z) < 14), (x, z) => {
+    const s = 0.8 + rnd() * 0.6; _p.set(x, terrainY(x, z) + 0.055, z); _q.setFromEuler(_e.set(0, rnd() * 6.28, 0)); _s.set(s, s, s);
+  }, true);
+  return meshes;
+}
+// painted face of the tee signpost: hole number and par on a cream board
+function signTexture(n, par) {
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 144; const x = cv.getContext('2d');
+  x.fillStyle = '#FFF4E3'; x.fillRect(0, 0, 256, 144); x.fillStyle = '#E53935'; x.fillRect(0, 0, 256, 18); x.fillRect(0, 126, 256, 18);
+  x.fillStyle = '#4A2E1E'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.font = '700 84px Fredoka, "Segoe UI", system-ui, sans-serif'; x.fillText(String(n), 92, 72);
+  x.fillStyle = '#E53935'; x.font = '700 28px Fredoka, "Segoe UI", system-ui, sans-serif'; x.fillText('PAR', 192, 50);
+  x.font = '700 50px Fredoka, "Segoe UI", system-ui, sans-serif'; x.fillText(String(par), 192, 92);
+  const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; tx.anisotropy = 4; return tx;
+}
+function buildSign(s, hole, par) {
+  const faces = [];
+  for (const side of [0, Math.PI]) { const g = new THREE.PlaneGeometry(0.36, 0.2); g.rotateY(s.ry + side); const nx = Math.sin(s.ry + side), nz = Math.cos(s.ry + side); g.translate(s.x + nx * 0.028, s.y, s.z + nz * 0.028); faces.push(g); }
+  const m = new THREE.Mesh(mergeGeometries(faces, false), new THREE.MeshLambertMaterial({ map: signTexture(hole, par) })); m.castShadow = true; return m;
+}
 // big low terrain with a basin where the course sits, plus far chimneys
 function buildTerrain() {
   const rnd = mulberry(99), size = 160, n = 64, pos = [], col = [], idx = [];
@@ -1050,9 +1163,7 @@ function buildTerrain() {
   for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) {
     const x = -size / 2 + size * i / n, z = -size / 2 + size * j / n, d = Math.hypot(x, z);
     const v = Math.sin(x * 0.07 + 1.3) * Math.cos(z * 0.05 - 0.4) * 0.5 + Math.sin(x * 0.19 - z * 0.13) * 0.5; // large-scale patches
-    const hill = Math.sin(x * 0.11) * Math.cos(z * 0.09) * 1.6 + Math.sin(x * 0.31 + 1) * Math.sin(z * 0.27) * 0.6 + (rnd() - 0.5) * 0.3;
-    const k = THREE.MathUtils.smoothstep(d, 11, 24);
-    const y = -1.35 + hill * k + (d > 55 ? (d - 55) * 0.05 : 0);
+    const y = terrainY(x, z) + (rnd() - 0.5) * 0.3 * THREE.MathUtils.smoothstep(d, 24, 30); // jitter only beyond the fine diorama base
     pos.push(x, y, z);
     // moss meadows (a finer noise so patches also reach the flat basin round the course), rose rock in the hollows and on the hill tops
     const v2 = Math.sin(x * 0.43 + z * 0.21 + 0.8) * Math.cos(z * 0.37 - x * 0.12) + v * 0.6;
@@ -1060,7 +1171,11 @@ function buildTerrain() {
     tmp.copy(tuff).lerp(moss, mossK).lerp(rose, roseK);
     col.push(tmp.r + j2, tmp.g + j2, tmp.b + j2);
   }
-  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const a = j * (n + 1) + i, b = a + 1, c = a + n + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const cx = -size / 2 + size * (i + 0.5) / n, cz = -size / 2 + size * (j + 0.5) / n;
+    if (Math.abs(cx) < 15 && Math.abs(cz) < 15) continue; // the fine diorama base covers the centre: no double ground there
+    const a = j * (n + 1) + i, b = a + 1, c = a + n + 1, d = c + 1; idx.push(a, c, b, b, c, d);
+  }
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx); g.computeVertexNormals();
   g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(pos.length / 3 * 2), 2));
   return g.toNonIndexed();
@@ -1068,9 +1183,7 @@ function buildTerrain() {
 function buildFarChimneys() {
   const rnd = mulberry(1234), list = [], pl = { chimneys: [], houses: [] };
   for (let i = 0; i < 140; i++) {
-    const a = rnd() * Math.PI * 2, d = 20 + rnd() * 48, x = Math.cos(a) * d, z = Math.sin(a) * d;
-    const hill = Math.sin(x * 0.11) * Math.cos(z * 0.09) * 1.6 + Math.sin(x * 0.31 + 1) * Math.sin(z * 0.27) * 0.6;
-    const y = -1.35 + hill * THREE.MathUtils.smoothstep(d, 11, 24) + (d > 55 ? (d - 55) * 0.05 : 0);
+    const a = rnd() * Math.PI * 2, d = 20 + rnd() * 48, x = Math.cos(a) * d, z = Math.sin(a) * d, y = terrainY(x, z);
     list.push(...chimneyGeo(x, z, 1.2 + rnd() * 2.2, rnd, y - 0.5, pl));
     if (rnd() < 0.25) list.push(...houseGeo(x + 2, z + 1, rnd, y - 0.3, rnd(), pl));
   }
@@ -1085,7 +1198,7 @@ function buildSky() {
 function tintSky(geo, progress, az = 0, el = 0.2) {
   const pos = geo.attributes.position, col = geo.attributes.color;
   // pastel diorama sky: peach dawn -> clear toy-sky blue; the fog colour sits between horizon and mid so the far field melts into the sky
-  const horizon = new THREE.Color().lerpColors(new THREE.Color(0xffe0c4), new THREE.Color(0xeef7fd), progress);
+  const horizon = new THREE.Color().lerpColors(new THREE.Color(0xffe0c4), new THREE.Color(0xf9e6d2), progress);
   const mid = new THREE.Color().lerpColors(new THREE.Color(0xc4def2), new THREE.Color(0x9ad1f5), progress);
   const zenith = new THREE.Color().lerpColors(new THREE.Color(0x86b9e8), new THREE.Color(0x6aaae6), progress);
   const tmp = new THREE.Color(), sx = Math.sin(az) * Math.cos(el), sy = Math.sin(el), sz = Math.cos(az) * Math.cos(el);
@@ -1095,7 +1208,7 @@ function tintSky(geo, progress, az = 0, el = 0.2) {
     const d = Math.max(0, (pos.getX(i) * sx + pos.getY(i) * sy + pos.getZ(i) * sz) / 90), glow = Math.pow(d, 7) * (0.3 - 0.16 * progress);
     col.setXYZ(i, c.r + glow * 0.4, c.g + glow * 0.26, c.b + glow * 0.08);
   }
-  col.needsUpdate = true; return horizon.lerp(mid, 0.3);
+  col.needsUpdate = true; return horizon.lerp(mid, 0.18); // warm haze: the fog sits close to the peach horizon
 }
 function softSprite() {
   const cv = document.createElement('canvas'); cv.width = cv.height = 64; const x = cv.getContext('2d');
@@ -1497,7 +1610,7 @@ const sky = new THREE.Mesh(buildSky(), new THREE.MeshBasicMaterial({ vertexColor
 const terrain = mesh(boxUV(buildTerrain(), 4.5), 'ground'); terrain.receiveShadow = true; scene.add(terrain);
 const far = buildFarChimneys();
 const farMesh = mesh(far.geo, 'rock'); scene.add(farMesh);
-scene.fog = new THREE.Fog(0xd6e9f7, 16, 66); // tilt-shift depth fog: the course stays crisp, the far field melts into the sky
+scene.fog = new THREE.Fog(0xf3e2d2, 13, 56); // tilt-shift depth fog: the course and hero chimneys stay crisp, the far field melts into the warm haze
 const envOn = () => settings.quality === 'high' && !!ASSETS.env;
 
 let PMAX = 260;
@@ -1750,7 +1863,7 @@ function buildHoleScenery(course) {
   fillInstances();
 }
 function clearHole() {
-  if (holeGroup) { disposeTree(holeGroup); scene.remove(holeGroup); }
+  if (holeGroup) { const s = holeGroup.userData.sign; if (s) { s.material.map.dispose(); s.material.dispose(); } disposeTree(holeGroup); scene.remove(holeGroup); }
   holeGroup = null; sceneryGroup = null; holeScenery = null; obstacleMeshes = []; ghostLine = null; waterMesh = null;
 }
 view.onHole = function () {
@@ -1760,6 +1873,9 @@ view.onHole = function () {
   const geo = buildCourseGeometry(course);
   for (const k of ['rock', 'grass', 'sand', 'flat']) if (geo[k]) { const m = mesh(geo[k], k); m.receiveShadow = true; m.castShadow = true; holeGroup.add(m); }
   if (geo.water) { waterMesh = mesh(geo.water, 'water'); waterMesh.receiveShadow = true; holeGroup.add(waterMesh); }
+  { const base = mesh(buildBaseGround(course), 'ground'); base.receiveShadow = true; holeGroup.add(base); }
+  for (const m of buildDioramaProps(course)) holeGroup.add(m);
+  if (geo.sign) { const s = buildSign(geo.sign, i + 1, def.par); holeGroup.userData.sign = s; holeGroup.add(s); }
   buildHoleScenery(course);
   flagMesh = mesh(buildFlag(course), 'flat'); flagMesh.position.set(def.cup[0], course.height(def.cup[0], def.cup[1]) || 0, def.cup[1]); flagMesh.castShadow = true; holeGroup.add(flagMesh);
   grapeMesh = mesh(grapeGeo, 'smooth'); grapeMesh.position.set(def.grape[0], (course.height(def.grape[0], def.grape[1]) ?? 0) + 0.05, def.grape[1]); grapeMesh.castShadow = true; holeGroup.add(grapeMesh);
@@ -1773,7 +1889,7 @@ view.onHole = function () {
   }
   setPigeons(course); setMotes(course);
   applySun();
-  cam.yaw = game.aim.angle; cam.cyaw = cam.yaw; cam.pitch = cam.cpitch = 0.52; cam.dist = cam.cdist = 4.8; game.top = false; ui.topBtn();
+  cam.yaw = game.aim.angle; cam.cyaw = cam.yaw; cam.pitch = cam.cpitch = 0.45; cam.dist = cam.cdist = 4.8; game.top = false; ui.topBtn(); // a flatter tee camera shows the hero chimneys and the sky
   ballMesh.visible = true; ballMesh.position.set(game.ball.x, game.ball.y, game.ball.z);
 };
 
@@ -1873,7 +1989,7 @@ view.fx = fx;
 // ---------------------------------------------------------------------------
 // Camera
 // ---------------------------------------------------------------------------
-const cam = { yaw: 0, pitch: 0.52, dist: 4.8, cyaw: 0, cpitch: 0.52, cdist: 4.8, tx: 0, ty: 0, tz: 0, init: false };
+const cam = { yaw: 0, pitch: 0.45, dist: 4.8, cyaw: 0, cpitch: 0.45, cdist: 4.8, tx: 0, ty: 0, tz: 0, init: false };
 const easeInOut = (u) => u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
 const _look = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
 function cameraUpdate(dt) {
