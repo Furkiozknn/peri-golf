@@ -150,6 +150,9 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
 .kv div:nth-child(2n){background:var(--mint)}
 .kv b{display:block;font-size:26px;color:var(--ink);font-weight:700}
 .kv span{font-size:13px;color:var(--ink2)}
+/* short desktop viewports: the course-complete board must fit without clipping its buttons */
+@media (max-height:760px){.kv{grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}.kv div{padding:6px 4px}.kv b{font-size:20px}
+  #ov-end .panel{padding:14px 18px}#ov-end table.card th,#ov-end table.card td{padding:1px 4px;font-size:13px}}
 .rec{color:var(--mossD);font-weight:700;text-align:center;margin:4px 0;font-size:17px}
 .starlist{list-style:none;margin:8px 0 0;padding:0;font-size:15px;color:var(--ink2);text-align:left}
 .starlist li{display:flex;align-items:center;gap:8px;padding:3px 0}
