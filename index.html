@@ -896,10 +896,11 @@ function buildCourseGeometry(course) {
   const th = course.height(def.tee[0], def.tee[1]) || 0;
   flat.push(cyl(0.26, 0.26, 0.012, 12, def.tee[0], th + 0.004, def.tee[1], 0x98c26c));
   { const tp = course.ground(def.tee[0], def.tee[1]); if (tp) {
-    const sx = tp.pad.x - tp.pad.w / 2 - 0.42, sz = def.tee[1] + 0.2, y0 = course.base + 0.2, y1 = th + 0.62, ry = 0.55;
+    // the board faces the tee camera (+z) and turns a little towards the course; cream face on both sides with a red flag stripe
+    const sx = tp.pad.x - tp.pad.w / 2 - 0.4, sz = def.tee[1] + 0.3, y0 = course.base + 0.2, y1 = th + 0.56, ry = -0.35, nx = Math.sin(ry), nz = Math.cos(ry);
     flat.push(cyl(0.03, 0.04, y1 - y0, 6, sx, (y0 + y1) / 2, sz, COL.wood));
-    flat.push(box(0.46, 0.28, 0.05, sx, y1 - 0.12, sz, COL.wood, ry), box(0.4, 0.22, 0.02, sx + Math.cos(ry) * 0.03, y1 - 0.12, sz - Math.sin(ry) * 0.03, COL.cream, ry));
-    flat.push(box(0.14, 0.04, 0.025, sx + Math.cos(ry) * 0.045, y1 - 0.12, sz - Math.sin(ry) * 0.045, COL.accent, ry));
+    flat.push(box(0.4, 0.24, 0.05, sx, y1 - 0.1, sz, COL.wood, ry));
+    for (const s of [1, -1]) { flat.push(box(0.34, 0.18, 0.012, sx + nx * 0.03 * s, y1 - 0.1, sz + nz * 0.03 * s, COL.cream, ry)); flat.push(box(0.12, 0.05, 0.012, sx + nx * 0.037 * s - nz * 0.08, y1 - 0.1, sz + nz * 0.037 * s + nx * 0.08, COL.accent, ry)); }
   } }
   // tunnels / cave houses over the course: rounded rock arches, rose at the foot and tuff above
   for (const tn of (def.tunnels || [])) {
@@ -1050,8 +1051,9 @@ function buildTerrain() {
     const k = THREE.MathUtils.smoothstep(d, 11, 24);
     const y = -1.35 + hill * k + (d > 55 ? (d - 55) * 0.05 : 0);
     pos.push(x, y, z);
-    // moss meadows on the patches, rose rock in the hollows and on the hill tops, a little jitter everywhere
-    const mossK = clamp((v - 0.25) / 0.5, 0, 1) * 0.8, roseK = y < -1.05 ? 0.28 : (y > 0.7 ? 0.3 : 0), j2 = (rnd() - 0.5) * 0.05;
+    // moss meadows (a finer noise so patches also reach the flat basin round the course), rose rock in the hollows and on the hill tops
+    const v2 = Math.sin(x * 0.43 + z * 0.21 + 0.8) * Math.cos(z * 0.37 - x * 0.12) + v * 0.6;
+    const mossK = THREE.MathUtils.smoothstep(v2, 0.05, 0.6) * 0.85, roseK = y < -1.05 && mossK < 0.2 ? 0.25 : (y > 0.7 ? 0.3 : 0), j2 = (rnd() - 0.5) * 0.05;
     tmp.copy(tuff).lerp(moss, mossK).lerp(rose, roseK);
     col.push(tmp.r + j2, tmp.g + j2, tmp.b + j2);
   }
@@ -1654,7 +1656,7 @@ function updateClouds(dt) {
 }
 const MOTE_N = 90, motePos = new Float32Array(MOTE_N * 3), moteCol = new Float32Array(MOTE_N * 3), moteState = [];
 const moteGeo = new THREE.BufferGeometry(); moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3)); moteGeo.setAttribute('color', new THREE.BufferAttribute(moteCol, 3));
-const motes = new THREE.Points(moteGeo, new THREE.PointsMaterial({ size: 0.12, map: spriteTex, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false, alphaTest: 0.02 }));
+const motes = new THREE.Points(moteGeo, new THREE.PointsMaterial({ size: 0.15, map: spriteTex, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false, alphaTest: 0.02 }));
 motes.frustumCulled = false; scene.add(motes);
 function setMotes(course) { // fairy lights drift over the hole; half of them on Low
   const bb = course.bbox, r = mulberry(300 + course.index);
