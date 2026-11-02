@@ -18,7 +18,7 @@
 :root{
   --wood:#A9703F; --wood2:#6B4428; --wood3:#C98F5E; --board:#FFF4E3; --board2:#F4E3C9; --ink:#4A2E1E; --ink2:#7A5A44;
   --accent:#D32F2F; --accentH:#E53935; --accentD:#8E1C1C; --moss:#7FA36B; --mossD:#4F7F45; --sky:#9AD1F5; --skyD:#6FB4E6;
-  --mint:#BFE8C8; --blush:#F6C3C3; --lemon:#FFE7A3; --lilac:#C9B8E8; --gold:#FFD166; --focus:#1E6FB8; --bg:#9AD1F5;
+  --mint:#BFE8C8; --blush:#F6C3C3; --lemon:#FFE7A3; --lilac:#C9B8E8; --gold:#FFD166; --focus:#C85A32; --bg:#9AD1F5;
   --line:rgba(107,68,40,.22);
   --sa-t:env(safe-area-inset-top,0px); --sa-b:env(safe-area-inset-bottom,0px);
 }
@@ -53,7 +53,7 @@ svg{display:block}
 .topbar .acts{display:flex;gap:5px}
 .ibtn{width:44px;height:44px;border-radius:14px;border:2px solid transparent;background:var(--board2);display:inline-flex;align-items:center;
   justify-content:center;color:var(--ink);font-weight:700;font-size:14px;transition:background .18s,border-color .18s,transform .12s}
-.ibtn:hover{background:var(--sky);border-color:var(--wood2)}
+.ibtn:hover{background:var(--lemon);border-color:var(--wood2)}
 .ibtn:active{transform:translateY(1px)}
 .ibtn.on{background:var(--lemon);border-color:var(--wood2)}
 .ibtn svg{width:24px;height:24px}
@@ -88,6 +88,27 @@ svg{display:block}
 .intro p{margin:4px 0 0;color:var(--ink2);font-size:15px}
 .intro small{display:block;margin-top:6px;color:var(--ink2);font-size:13px}
 @media (max-width:700px){.intro{top:calc(126px + var(--sa-t))}}
+/* phone landscape: compact single-row HUD so it never overlaps the play area or touch controls */
+@media (max-height:500px){
+  .topbar{top:calc(4px + var(--sa-t));left:6px;right:6px;min-height:36px;flex-wrap:nowrap;padding:2px 6px;gap:6px;border-width:3px;border-radius:12px;
+    box-shadow:0 3px 0 var(--wood2),0 6px 12px rgba(60,30,10,.18)}
+  .topbar .brand span{display:none}
+  .topbar .brand svg{width:22px;height:22px}
+  .topbar .stats{order:0;flex-basis:auto;gap:10px;font-size:13px;padding:0;justify-content:center}
+  .topbar .stats b{font-size:14px}
+  .topbar .acts{margin-left:0;gap:3px}
+  .ibtn{width:30px;height:30px;border-radius:8px;font-size:12px}
+  .ibtn svg{width:17px;height:17px}
+  .toasts{top:calc(46px + var(--sa-t))}
+  .toast{padding:4px 10px;font-size:13px;border-radius:10px}
+  .power{left:8px;bottom:calc(8px + var(--sa-b));width:16px;height:96px;border-width:2px;pointer-events:none}
+  .hint{bottom:calc(6px + var(--sa-b));padding:3px 10px;font-size:12px;border-width:3px;border-radius:10px;box-shadow:0 2px 0 var(--wood2)}
+  .intro{top:calc(46px + var(--sa-t));padding:6px 14px;border-width:4px;border-radius:14px;min-width:180px;pointer-events:none}
+  .intro::after{display:none}
+  .intro h2{font-size:18px}
+  .intro p{font-size:12px;margin-top:2px}
+  .intro small{font-size:11px;margin-top:2px}
+}
 
 /* overlays + panels */
 .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(154,209,245,.42);
@@ -104,7 +125,8 @@ svg{display:block}
 .btn.primary{background:var(--accent);border-color:var(--accentD);color:#fff;box-shadow:0 4px 0 var(--accentD)}
 .btn.primary:hover{background:var(--accentH)}
 .btn.primary:active{box-shadow:0 1px 0 var(--accentD)}
-.btn.sky{background:var(--sky)} .btn.sky:hover{background:#b4ddf8}
+/* warm Cappadocia tuff/lemon buttons instead of generic blue */
+.btn.sky{background:#F3D5A5} .btn.sky:hover{background:var(--lemon)}
 .btn.lemon{background:var(--lemon)} .btn.lemon:hover{background:#ffefc0}
 .btn.blush{background:var(--blush)} .btn.blush:hover{background:#f9d4d4}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
@@ -115,7 +137,7 @@ label.sl span{width:92px}
 input[type=range]{flex:1;accent-color:var(--mossD);height:44px;margin:0}
 .seg{display:inline-flex;border:2px solid var(--wood2);border-radius:14px;overflow:hidden;background:var(--board2);box-shadow:0 3px 0 var(--wood2)}
 .seg button{min-height:42px;min-width:64px;padding:0 14px;border:0;background:transparent;font-weight:600;color:var(--ink2);transition:background .18s}
-.seg button.on{background:var(--sky);color:var(--ink)}
+.seg button.on{background:var(--lemon);color:var(--ink)}
 .footer{margin-top:14px;font-size:13px;color:var(--ink2);text-align:center}
 .footer a{color:var(--accent);text-decoration:none;font-weight:600}
 
@@ -127,9 +149,9 @@ input[type=range]{flex:1;accent-color:var(--mossD);height:44px;margin:0}
 .title .how{font-size:14px;color:var(--ink2);margin:0 0 14px;line-height:1.45}
 .title .best{font-size:15px;margin:10px 0 4px;color:var(--ink)}
 .holes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 4px}
-.holes button{min-height:46px;border-radius:12px;border:2px solid var(--wood2);background:var(--sky);font-weight:700;font-size:15px;color:var(--ink);
+.holes button{min-height:46px;border-radius:12px;border:2px solid var(--wood2);background:var(--lemon);font-weight:700;font-size:15px;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;box-shadow:0 3px 0 var(--wood2);transition:transform .12s,box-shadow .12s}
-.holes button:hover{background:#b4ddf8}
+.holes button:hover{background:#ffefc0}
 .holes button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--wood2)}
 .holes button .stars svg{width:10px;height:10px}
 .holes button.locked{opacity:.45;background:var(--board2);box-shadow:none;cursor:default}
