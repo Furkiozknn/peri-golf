@@ -98,16 +98,18 @@ The live state is on `window.periGolf`.
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/assets-after-title.png" alt="Title screen"><br><sub>Title screen</sub></td>
-    <td width="33%"><img src="docs/assets-after-hole4-wheel.png" alt="Hole 4, the pottery wheel and a hidden grape"><br><sub>Hole 4: Pottery Workshop</sub></td>
-    <td width="33%"><img src="docs/assets-after-hole8-donkey.png" alt="Hole 8 with the donkey crossing"><br><sub>Hole 8: the donkey crossing</sub></td>
+    <td width="33%"><img src="docs/01-title.png" alt="Title screen on a wooden signpost board"><br><sub>Title screen</sub></td>
+    <td width="33%"><img src="docs/02-pottery-wheel.png" alt="Hole 4, the pottery wheel and a hidden grape"><br><sub>Hole 4: Pottery Workshop</sub></td>
+    <td width="33%"><img src="docs/04-flyover-bridge.png" alt="The intro flyover of hole 9 with its tiny bridge"><br><sub>Hole 9: Stone Bridge, intro flyover</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/assets-after-hole2.png" alt="Hole 2, Chimney Bend"><br><sub>Hole 2: Chimney Bend</sub></td>
-    <td><img src="docs/assets-after-hole12-ridge.png" alt="Hole 12, Sunrise Ridge with lanterns"><br><sub>Hole 12: Sunrise Ridge</sub></td>
-    <td><img src="docs/05-hole-result.png" alt="Hole result with three stars"><br><sub>Birdie and three stars (Turkish UI)</sub></td>
+    <td><img src="docs/03-sunrise-ridge.png" alt="Hole 12, Sunrise Ridge with lanterns and arches"><br><sub>Hole 12: Sunrise Ridge</sub></td>
+    <td><img src="docs/05-hole-result.png" alt="Hole result with two stars"><br><sub>Birdie (Turkish UI)</sub></td>
+    <td><img src="docs/06-settings.png" alt="Settings panel"><br><sub>Settings</sub></td>
   </tr>
 </table>
+
+<p align="center"><img src="docs/redesign-before-after.png" alt="Hole 4 before and after the 2026-11 redesign"><br><sub>Hole 4: v1 (2026-10) and the redesign (2026-11)</sub></p>
 
 <details>
 <summary><b>Phone layout and the asset pass, before and after</b></summary>
@@ -126,6 +128,35 @@ The live state is on `window.periGolf`.
 <p align="center"><img src="docs/assets-after-phone.png" width="300" alt="Peri Golf on a phone"><br><sub>On a phone (Low tier)</sub></p>
 
 </details>
+
+## Redesign (2026-11)
+
+Art direction: a fantasy miniature diorama. Pastel tuff `#E8C9A0`, rose rock `#C98B7A`, moss `#7FA36B`, sky
+`#9AD1F5` and flag red `#E53935`, lit like a toy under a soft morning sun with tilt-shift depth fog.
+
+What changed (the physics, controls, scoring, 12 holes, bot, saves and both languages are untouched):
+
+- **Palette and lighting:** pastel vertex colours, warm sun plus a sky-tinted hemisphere, nearer fog so the far chimneys fade
+  like a model landscape, a lighter procedural sky with clouds.
+- **Environment:** mossier terrain with meadows in the basin, rounded rock arches with mossy crowns over the tunnels and cave
+  houses, tiny wooden bridges with railings over the water, drifting fairy-light motes.
+- **Objects:** toy-like props (round bushes with blossoms, toadstools, flower patches, a signpost beside every tee),
+  pop-in animation when a hole loads, a sparkle trail behind the ball and pastel splash and cup FX.
+- **UI skin:** wooden signpost boards with a cream face for every panel (title, hole card, pause, settings, hole result,
+  scorecard, course complete), pastel toy buttons with a 3D edge, Fredoka as the self-hosted UI face
+  (`assets/fonts/`), 44 px touch targets, visible focus rings, phone portrait and landscape layouts.
+
+Measured on the Intel UHD 620 (headless Chrome, 1280x720, High tier, with assets), v1 -> redesign:
+
+| | v1 (2026-10) | Redesign (2026-11) |
+|---|---|---|
+| title fps / draw calls | 60 / 16 | 60 / 18 |
+| hole 4 fps / draw calls | 56 / 19 | 60 / 21 |
+| hole 12 fps / draw calls | 60 / 20 | 60 / 22 |
+| hole 7 and hole 9 | - | 60 / 22 and 60 / 20 |
+| phone 500x900 (Low tier) | - | 60 / 21 |
+| `?low` on desktop, `?noassets` | - | 60 / 20, 60 / 16 |
+| `?auto` bot, 12 holes | 18 strokes, 0 errors | 18 strokes, 23 stars, 0 errors (with assets and `?noassets`) |
 
 ## Balance
 
