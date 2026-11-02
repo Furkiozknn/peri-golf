@@ -16,7 +16,7 @@
     "Web Audio API",
     "Blender"
   ],
-  "version": null,
+  "version": "2.0.0",
   "license": "MIT",
   "topics": [
     "browser-game",
@@ -26,25 +26,25 @@
     "claude-code",
     "claude-game-arena"
   ],
-  "summary": "3D physics mini-golf among the fairy chimneys of Cappadocia, built by Claude Fable 5.1 · Kapadokya peribacaları arasında gerçek fizikli 3D mini golf, Claude Fable 5.1 yaptı",
+  "summary": "3D physics mini-golf among the fairy chimneys of Cappadocia, redesigned as a fantasy miniature diorama with a wooden signpost UI, built by Claude Fable 5.1 · Kapadokya peribacaları arasında 3D fizikli mini golf, fantastik minyatür diorama ve ahşap tabela arayüzüyle yeniden tasarlandı, Claude Fable 5.1 yaptı",
   "key_features": [
-    "12 hand-designed holes, course par 40, from Pigeon Terrace to Sunrise Ridge",
-    "Real rolling physics: slopes, ramps, jumps, wall bounces and grass, sand and stone friction",
-    "Moving obstacles: a turning pottery wheel, a rolling stone door, swinging lanterns and a donkey",
-    "Three stars per hole (under par, a hidden grape, a trick shot); the ?auto bot finishes the course in 18 strokes",
-    "60 fps on Intel UHD 620 at 1280x720 with 16-22 draw calls; one index.html, optional CC0 asset pass"
+    "Twelve hand-designed holes, par 40: cave houses, a pottery wheel, a donkey crossing, a stone bridge and a sunrise ridge with balloons",
+    "Redesign: a moss and pebble diorama base around every hole, strata slabs, hero fairy chimneys, a warm peach haze and a numbered signpost at each tee",
+    "Redesign: wooden signpost boards with a cream face for every panel and the Fredoka font",
+    "Real rolling physics: slopes, ramps, wall bounces and moving obstacles; three challenge stars per hole and a ghost line of your best shot",
+    "Measured after the redesign: the bot finishes in 18 strokes with 23 stars and 0 JS errors, 60 fps and 25-27 draw calls"
   ],
   "media": {
-    "hero": "docs/assets-after-hole4-wheel.png",
+    "hero": "docs/02-pottery-wheel.png",
     "screenshots": [
       "docs/card.jpg",
-      "docs/assets-after-hole4-wheel.png",
-      "docs/assets-after-title.png",
-      "docs/assets-after-hole2.png",
-      "docs/assets-after-hole8-donkey.png",
-      "docs/assets-after-hole12-ridge.png",
+      "docs/02-pottery-wheel.png",
+      "docs/redesign-before-after.png",
+      "docs/01-title.png",
+      "docs/03-sunrise-ridge.png",
+      "docs/04-flyover-bridge.png",
       "docs/05-hole-result.png",
-      "docs/assets-after-phone.png"
+      "docs/07-phone.png"
     ],
     "gifs": [
       "docs/gameplay.gif"
@@ -78,8 +78,9 @@
     "primary_link": "https://furkiozknn.github.io/peri-golf/"
   },
   "provenance": {
-    "generated_at": "2026-10-27",
+    "generated_at": "2026-10-28",
     "generator": "hand-written",
-    "rule": "mechanical fields read from the repository; editorial fields hand-written from the README, index.html, docs/assets.md and the video-studio analiz.md; no field is generated from a guess"
+    "rule": "mechanical fields read from the repository; editorial fields hand-written from the README, index.html, docs/assets.md and the video-studio analiz.md; no field is generated from a guess",
+    "note": "visual redesign 2026-11-02"
   }
 }

@@ -13,7 +13,7 @@
 <p align="center"><b>A 3D physics mini-golf game set among the fairy chimneys of Cappadocia: 12 hand-designed holes past cave houses, a pottery wheel, a donkey crossing and a sunrise rim with hot-air balloons overhead.</b></p>
 
 <p align="center">
-  <img src="docs/gameplay.gif" width="640" alt="Peri Golf gameplay: putting past the pottery wheel in Cappadocia">
+  <img src="docs/gameplay.gif" width="640" alt="Peri Golf gameplay after the redesign: the ball rolls across a mossy diorama hole between pastel fairy chimneys toward the cup">
   <br>
   <sub>Watch the promo: <a href="https://github.com/Furkiozknn/social-videos/releases/download/promo-2026-10/2026-10-27-peri-golf-en.mp4">EN</a> · <a href="https://github.com/Furkiozknn/social-videos/releases/download/promo-2026-10/2026-10-27-peri-golf-tr.mp4">TR</a></sub>
 </p>
