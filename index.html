@@ -16,9 +16,9 @@
 <style>
 /* Redesign 2026-11: toy diorama UI, wooden signposts with cream boards and pastel buttons */
 :root{
-  --wood:#A9703F; --wood2:#6B4428; --wood3:#C98F5E; --board:#FFF4E3; --board2:#F4E3C9; --ink:#4A2E1E; --ink2:#7A5A44;
+  --wood:#A9703F; --wood2:#6B4428; --wood3:#C98F5E; --board:#FFF4E3; --board2:#F4E3C9; --ink:#4A2E1E; --ink2:#5A3E2B;
   --accent:#D32F2F; --accentH:#E53935; --accentD:#8E1C1C; --moss:#7FA36B; --mossD:#4F7F45; --sky:#9AD1F5; --skyD:#6FB4E6;
-  --mint:#BFE8C8; --blush:#F6C3C3; --lemon:#FFE7A3; --lilac:#C9B8E8; --gold:#FFD166; --focus:#C85A32; --bg:#9AD1F5;
+  --mint:#BFE8C8; --blush:#F6C3C3; --lemon:#FFE7A3; --lilac:#C9B8E8; --gold:#FFD166; --focus:#8B3213; --bg:#9AD1F5;
   --line:rgba(107,68,40,.22);
   --sa-t:env(safe-area-inset-top,0px); --sa-b:env(safe-area-inset-bottom,0px);
 }
@@ -193,6 +193,12 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
   padding:6px 8px;white-space:pre;pointer-events:none;z-index:60;border-radius:6px;max-width:92vw;overflow:hidden}
 #dbg .err{color:#f66}
 #loadmsg{color:var(--ink2);font-size:14px;margin:6px 0}
+@media (prefers-reduced-motion: reduce){
+  .toast{animation:none}
+  .toast.out{transition:none;opacity:0}
+  .bigstars svg.on{animation:none}
+  .intro{animation:none}
+}
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
@@ -297,9 +303,9 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
   <div class="overlay" id="ov-settings" hidden>
     <div class="panel glass col">
       <h2 data-t="settings"></h2>
-      <label class="sl"><span data-t="master"></span><input type="range" id="r-master" min="0" max="1" step="0.01"></label>
-      <label class="sl"><span data-t="music"></span><input type="range" id="r-music" min="0" max="1" step="0.01"></label>
-      <label class="sl"><span data-t="effects"></span><input type="range" id="r-sfx" min="0" max="1" step="0.01"></label>
+      <label class="sl"><span data-t="master"></span><input type="range" id="r-master" min="0" max="1" step="0.01" data-t-aria="master"></label>
+      <label class="sl"><span data-t="music"></span><input type="range" id="r-music" min="0" max="1" step="0.01" data-t-aria="music"></label>
+      <label class="sl"><span data-t="effects"></span><input type="range" id="r-sfx" min="0" max="1" step="0.01" data-t-aria="effects"></label>
       <div class="row"><span style="width:92px;font-size:14px;color:var(--ink2)" data-t="language"></span><div class="seg" id="seg-lang2"><button data-l="tr">TR</button><button data-l="en">EN</button></div></div>
       <div class="row"><span style="width:92px;font-size:14px;color:var(--ink2)" data-t="quality"></span><div class="seg" id="seg-q"><button data-q="low" data-t="low"></button><button data-q="high" data-t="high"></button></div></div>
       <button class="btn w sky" id="b-full"><svg><use href="#i-full"/></svg><span data-t="fullscreen"></span></button>
@@ -2125,6 +2131,7 @@ const ui = {
     document.documentElement.lang = LANG;
     document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
     document.querySelectorAll('[data-tt]').forEach(el => { el.title = t(el.dataset.tt); el.setAttribute('aria-label', t(el.dataset.tt)); });
+    document.querySelectorAll('[data-t-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
     $('b-lang').textContent = LANG.toUpperCase();
     document.querySelectorAll('#seg-lang button, #seg-lang2 button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
     document.querySelectorAll('#seg-q button').forEach(b => b.classList.toggle('on', b.dataset.q === settings.quality));
