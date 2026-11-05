@@ -758,13 +758,14 @@ function merged(list) {
   return g;
 }
 // per-triangle box projection: UVs from the two axes orthogonal to the face normal (detail textures tile every `tile` m)
+// scratch vectors allocated once to avoid GC in geometry generation
+const _ax = new THREE.Vector3(), _bx = new THREE.Vector3(), _cx = new THREE.Vector3(), _nr = new THREE.Vector3(), _sub = new THREE.Vector3();
 function boxUV(geo, tile) {
   const p = geo.attributes.position, n = p.count, uv = new Float32Array(n * 2), k = 1 / tile;
-  const ax = new THREE.Vector3(), bx = new THREE.Vector3(), cx = new THREE.Vector3(), nr = new THREE.Vector3();
   for (let i = 0; i < n; i += 3) {
-    ax.fromBufferAttribute(p, i); bx.fromBufferAttribute(p, i + 1); cx.fromBufferAttribute(p, i + 2);
-    nr.subVectors(bx, ax).cross(cx.clone().sub(ax));
-    const X = Math.abs(nr.x), Y = Math.abs(nr.y), Z = Math.abs(nr.z);
+    _ax.fromBufferAttribute(p, i); _bx.fromBufferAttribute(p, i + 1); _cx.fromBufferAttribute(p, i + 2);
+    _nr.subVectors(_bx, _ax).cross(_sub.subVectors(_cx, _ax));
+    const X = Math.abs(_nr.x), Y = Math.abs(_nr.y), Z = Math.abs(_nr.z);
     for (let j = 0; j < 3; j++) {
       const x = p.getX(i + j), y = p.getY(i + j), z = p.getZ(i + j);
       if (Y >= X && Y >= Z) { uv[(i + j) * 2] = x * k; uv[(i + j) * 2 + 1] = z * k; }
@@ -1383,19 +1384,20 @@ function shootBall(b, course, angle, power) {
   b.rest = false; b.restTimer = 0; b.bounces = 0; b.hitObs = false; b.wheelTouched = false; b.maxAir = 0; b.airTime = 0; b.penalty = null; b.dist = 0; b.lipped = false;
 }
 // simulate a shot without rendering; moving obstacles advance from t0
+const _simEv = []; // reused scratch array to prevent per-frame allocations during aim preview and bot simulation
 function simulateShot(course, ball, angle, power, t0, wind, maxT, trace) {
   const b = cloneBall(ball); shootBall(b, course, angle, power);
-  const ev = []; let tt = t0, steps = 0, firstHit = -1;
+  _simEv.length = 0; let tt = t0, steps = 0, firstHit = -1;
   const maxSteps = Math.round(maxT / DT);
   while (steps < maxSteps && !b.rest && !b.sunk && !b.penalty) {
-    course.updateObstacles(tt); stepBall(b, course, DT, wind, ev);
+    course.updateObstacles(tt); stepBall(b, course, DT, wind, _simEv);
     tt += DT; steps++;
     if (trace && steps % 3 === 0) trace.push(b.x, b.y, b.z);
-    if (firstHit < 0 && ev.length) { const e = ev[ev.length - 1]; if (e.type === 'bounce' || e.type === 'obstacle') firstHit = steps; if (trace && firstHit > 0) break; }
+    if (firstHit < 0 && _simEv.length) { const e = _simEv[_simEv.length - 1]; if (e.type === 'bounce' || e.type === 'obstacle') firstHit = steps; if (trace && firstHit > 0) break; }
   }
   if (trace) trace.push(b.x, b.y, b.z);
   course.updateObstacles(t0);
-  return { b, steps, time: steps * DT, firstHit, ev };
+  return { b, steps, time: steps * DT, firstHit, ev: _simEv };
 }
 
 // ---------------------------------------------------------------------------
@@ -1509,7 +1511,7 @@ function trickDone(def, st) {
     case 'noSand': return !game.sandTouched;
     case 'clean': return game.penalties === 0;
     case 'air': return game.maxAir >= tr.t;
-    case 'tunnel': return st.startZ > (def.tunnels[0].z1 + 0.2);
+    case 'tunnel': return def.tunnels && def.tunnels[0] ? st.startZ > (def.tunnels[0].z1 + 0.2) : false;
   }
   return false;
 }
@@ -1571,6 +1573,7 @@ function trackBall(ev) {
   }
 }
 let acc = 0, pathTimer = 0;
+const _frameEv = []; // reused scratch array to eliminate per-frame event allocations
 function update(dt) {
   if (game.paused || game.hidden) return;
   game.time += dt;
@@ -1584,9 +1587,9 @@ function update(dt) {
     game.holeTime += dt; const b = game.ball, course = game.course;
     course.updateObstacles(game.holeTime);
     if (!b.rest) {
-      acc += dt; const ev = [];
-      while (acc >= DT) { stepBall(b, course, DT, game.wind, ev); acc -= DT; if (b.rest || b.sunk || b.penalty) { acc = 0; break; } }
-      trackBall(ev);
+      acc += dt; _frameEv.length = 0;
+      while (acc >= DT) { stepBall(b, course, DT, game.wind, _frameEv); acc -= DT; if (b.rest || b.sunk || b.penalty) { acc = 0; break; } }
+      trackBall(_frameEv);
       pathTimer += dt; if (pathTimer > 0.08) { pathTimer = 0; game.pathPts.push([b.x, b.y, b.z]); }
       if (b.penalty) { const k = b.penalty; b.rest = true; game.penaltyT = 0.9; game.penaltyKind = k; }
       if (b.sunk) { holeSunk(); return; }
@@ -1594,8 +1597,8 @@ function update(dt) {
       game.penaltyT -= dt; if (game.penaltyT <= 0) { applyPenalty(game.penaltyKind); game.penaltyT = 0; }
     } else {
       // moving obstacles can still push a resting ball
-      const ev = []; collideObstacles(b, course, ev);
-      if (ev.length) { b.rest = false; b.restTimer = 0; trackBall(ev); }
+      _frameEv.length = 0; collideObstacles(b, course, _frameEv);
+      if (_frameEv.length) { b.rest = false; b.restTimer = 0; trackBall(_frameEv); }
       // keyboard power charge
       if (game.aim.charging) { game.aim.power += game.aim.dir * dt / 1.1; if (game.aim.power >= 1) { game.aim.power = 1; game.aim.dir = -1; } if (game.aim.power <= 0) { game.aim.power = 0; game.aim.dir = 1; } }
       if (FLAG.auto) {
@@ -1702,14 +1705,14 @@ const balloonState = [];
   }
   balloons.instanceColor.needsUpdate = true;
 }
-const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3();
+const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3(), _e = new THREE.Euler();
 function updateBalloons(dt) {
   for (let i = 0; i < BALLOON_N; i++) {
     const b = balloonState[i];
     b.y += b.rise * dt; b.x += (0.35 + game.wind[0] * 0.3) * dt; b.z += (game.wind[1] * 0.3 + 0.1) * dt;
     if (b.y > 26 || Math.hypot(b.x, b.z) > 60) { const a = Math.random() * Math.PI * 2, d = 10 + Math.random() * 24; b.x = Math.cos(a) * d; b.z = Math.sin(a) * d; b.y = 2.5; }
     const sway = Math.sin(game.time * 0.5 + b.ph) * 0.05;
-    _q.setFromEuler(new THREE.Euler(sway, 0, Math.cos(game.time * 0.4 + b.ph) * 0.05)); _s.setScalar(b.s); _p.set(b.x, b.y, b.z);
+    _q.setFromEuler(_e.set(sway, 0, Math.cos(game.time * 0.4 + b.ph) * 0.05)); _s.setScalar(b.s); _p.set(b.x, b.y, b.z);
     balloons.setMatrixAt(i, _m.compose(_p, _q, _s));
     if (!balloonModel) _p.y -= 3.1 * b.s; _s.setScalar(b.s); baskets.setMatrixAt(i, _m.compose(_p, _q, _s));
   }
@@ -1736,7 +1739,6 @@ function setPigeons(course) {
   }
   pigBody.count = pigL.count = pigR.count = PIG_N;
 }
-const _e = new THREE.Euler();
 function updatePigeons(dt) {
   if (!pig.roost) return;
   const b = game.ball;
