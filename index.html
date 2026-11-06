@@ -13,191 +13,1102 @@
 <meta property="og:image:width" content="960">
 <meta property="og:image:height" content="540">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Redesign 2026-11: toy diorama UI, wooden signposts with cream boards and pastel buttons */
-:root{
-  --wood:#A9703F; --wood2:#6B4428; --wood3:#C98F5E; --board:#FFF4E3; --board2:#F4E3C9; --ink:#4A2E1E; --ink2:#5A3E2B;
-  --accent:#D32F2F; --accentH:#E53935; --accentD:#8E1C1C; --moss:#7FA36B; --mossD:#4F7F45; --sky:#9AD1F5; --skyD:#6FB4E6;
-  --mint:#BFE8C8; --blush:#F6C3C3; --lemon:#FFE7A3; --lilac:#C9B8E8; --gold:#FFD166; --focus:#8B3213; --bg:#9AD1F5;
-  --line:rgba(107,68,40,.22);
-  --sa-t:env(safe-area-inset-top,0px); --sa-b:env(safe-area-inset-bottom,0px);
-}
-@font-face{font-family:'Fredoka';font-style:normal;font-weight:400 700;font-display:swap;src:url(assets/fonts/fredoka-latin-ext.woff2) format('woff2');
-  unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:'Fredoka';font-style:normal;font-weight:400 700;font-display:swap;src:url(assets/fonts/fredoka-latin.woff2) format('woff2');
-  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);
-  font-family:'Fredoka',"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent;
-  touch-action:none;user-select:none;-webkit-user-select:none}
-#c{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}
-[hidden]{display:none!important}
-button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
-/* wooden sign: a wood frame (border-box layer with grain) around a cream board (padding-box layer) */
-.glass{border:8px solid transparent;border-radius:24px;
-  background:linear-gradient(var(--board),var(--board)) padding-box,
-    repeating-linear-gradient(90deg,rgba(60,30,10,.09) 0 2px,transparent 2px 9px) border-box,
-    linear-gradient(180deg,var(--wood3),var(--wood)) border-box;
-  box-shadow:0 7px 0 var(--wood2),0 16px 28px rgba(60,30,10,.22),inset 0 0 0 2px rgba(107,68,40,.25)}
-.serif{font-family:inherit}
-svg{display:block}
+/* ==========================================================================
+   PERİ GOLF UI REBORN: KAPADOKYA MİNYATÜR DİORAMA VE TAŞ-TOPRAK ZANAATI
+   ========================================================================== */
+:root {
+  /* Volcanic Tuff & Cappadocia Stone */
+  --tuff-light: #F7EBDC;
+  --tuff-1: #EBD4B8;
+  --tuff-2: #D1B08C;
+  --tuff-mid: #B88B5D;
+  --tuff-dark: #7A502D;
+  --tuff-deep: #4A2B14;
+  
+  /* Terracotta Pottery (Avanos Clay) */
+  --terra: #C2562C;
+  --terra-bright: #DE6B3D;
+  --terra-dark: #8C3314;
+  --terra-glow: rgba(194, 86, 44, 0.28);
 
-/* top bar: a hanging plank */
-.topbar{position:fixed;top:calc(8px + var(--sa-t));left:8px;right:8px;min-height:60px;display:flex;align-items:center;gap:8px;
-  padding:3px 8px;z-index:20;border-width:6px;border-radius:18px;box-shadow:0 5px 0 var(--wood2),0 12px 22px rgba(60,30,10,.22),inset 0 0 0 2px rgba(107,68,40,.22)}
-.topbar .brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.02em;color:var(--accent);white-space:nowrap}
-.topbar .brand span{font-size:19px}
-.topbar .stats{flex:1;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:15px;color:var(--ink2);min-width:0}
-.topbar .stats b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;font-size:16px}
-.topbar .acts{display:flex;gap:5px}
-.ibtn{width:44px;height:44px;border-radius:14px;border:2px solid transparent;background:var(--board2);display:inline-flex;align-items:center;
-  justify-content:center;color:var(--ink);font-weight:700;font-size:14px;transition:background .18s,border-color .18s,transform .12s}
-.ibtn:hover{background:var(--lemon);border-color:var(--wood2)}
-.ibtn:active{transform:translateY(1px)}
-.ibtn.on{background:var(--lemon);border-color:var(--wood2)}
-.ibtn svg{width:24px;height:24px}
-@media (max-width:700px){
-  .topbar{flex-wrap:wrap;padding:3px 6px;min-height:0}
-  .topbar .brand span{display:none}
-  .topbar .stats{gap:10px;font-size:14px;order:3;flex-basis:100%;justify-content:space-around;padding:2px 0 4px}
-  .topbar .acts{margin-left:auto}
-}
+  /* Regional Accents: Turquoise Glaze & Pigeon Valley Sage */
+  --turq: #247B93;
+  --turq-bright: #3FA6C3;
+  --turq-bg: #E8F6F9;
+  --sage: #4E7C45;
+  --sage-bright: #6EA362;
+  --sage-bg: #EEF7EC;
+  
+  /* Dawn Saffron Gold */
+  --gold: #E5A328;
+  --gold-bright: #FFCA48;
+  --gold-bg: #FFF8E5;
+  
+  /* Hazards & Accents */
+  --hazard: #C73838;
+  --hazard-bg: #FDF0F0;
+  
+  /* Surfaces & Ink */
+  --parchment: #FFFDF9;
+  --parchment-2: #F9F2E6;
+  --parchment-3: #F0E3CE;
+  --ink: #211612;
+  --ink-mid: #523B2F;
+  --ink-muted: #795F51;
+  --ink-faint: rgba(33, 22, 18, 0.45);
+  
+  --line: rgba(122, 80, 45, 0.22);
+  --focus: #DE6B3D;
+  --bg: #9AD1F5;
 
-/* toasts: little wooden tags */
-.toasts{position:fixed;top:calc(84px + var(--sa-t));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;
-  align-items:center;z-index:25;pointer-events:none;width:max-content;max-width:92vw}
-@media (max-width:700px){.toasts{top:calc(118px + var(--sa-t))}}
-.toast{padding:7px 16px;border-radius:14px;font-weight:600;font-size:15px;animation:tin .25s ease-out;color:var(--ink);background:var(--lemon);
-  border:2px solid var(--wood2);box-shadow:0 3px 0 var(--wood2)}
-.toast.good{background:var(--mint)} .toast.bad{background:var(--blush)}
-.toast.out{opacity:0;transform:translateY(-6px);transition:all .3s}
-@keyframes tin{from{opacity:0;transform:translateY(-8px) scale(.96)}to{opacity:1;transform:none}}
+  /* Tactile Depth System */
+  --shadow-sm: 0 2px 6px rgba(45, 26, 15, 0.12), 0 2px 0 var(--tuff-deep);
+  --shadow-md: 0 6px 16px rgba(45, 26, 15, 0.16), 0 3px 0 var(--tuff-deep);
+  --shadow-lg: 0 16px 36px rgba(45, 26, 15, 0.24), 0 4px 0 var(--tuff-deep);
+  --shadow-relief: inset 0 1px 1px rgba(255, 255, 255, 0.75), inset 0 -2px 0 rgba(74, 43, 20, 0.18);
 
-/* power meter (a wooden ruler) + hint */
-.power{position:fixed;left:14px;bottom:calc(18px + var(--sa-b));width:22px;height:170px;border-radius:10px;overflow:hidden;z-index:15;
-  background:var(--board);border:3px solid var(--wood2);box-shadow:0 3px 0 var(--wood2)}
-.power i{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(to top,var(--moss),var(--lemon),var(--accentH))}
-.power b{position:absolute;left:0;right:0;top:0;bottom:0;background:repeating-linear-gradient(to top,transparent 0 24%,rgba(107,68,40,.35) 24% 25%)}
-.hint{position:fixed;bottom:calc(20px + var(--sa-b));left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:14px;font-size:15px;
-  color:var(--ink);background:var(--board);border:2px solid var(--wood2);box-shadow:0 3px 0 var(--wood2);z-index:15;pointer-events:none;text-align:center;max-width:90vw}
-.intro{position:fixed;top:calc(92px + var(--sa-t));left:50%;transform:translateX(-50%);padding:14px 26px 12px;text-align:center;z-index:22;min-width:260px;animation:tin .3s ease-out}
-.intro::after{content:'';position:absolute;left:50%;top:100%;width:16px;height:40px;margin-left:-8px;margin-top:7px;
-  background:linear-gradient(90deg,var(--wood2),var(--wood) 40%,var(--wood2));border-radius:0 0 6px 6px}
-.intro h2{margin:0;font-size:28px;color:var(--accent);font-weight:700}
-.intro p{margin:4px 0 0;color:var(--ink2);font-size:15px}
-.intro small{display:block;margin-top:6px;color:var(--ink2);font-size:13px}
-@media (max-width:700px){.intro{top:calc(126px + var(--sa-t))}}
-/* phone landscape: compact single-row HUD so it never overlaps the play area or touch controls */
-@media (max-height:500px){
-  .topbar{top:calc(4px + var(--sa-t));left:6px;right:6px;min-height:36px;flex-wrap:nowrap;padding:2px 6px;gap:6px;border-width:3px;border-radius:12px;
-    box-shadow:0 3px 0 var(--wood2),0 6px 12px rgba(60,30,10,.18)}
-  .topbar .brand span{display:none}
-  .topbar .brand svg{width:22px;height:22px}
-  .topbar .stats{order:0;flex-basis:auto;gap:10px;font-size:13px;padding:0;justify-content:center}
-  .topbar .stats b{font-size:14px}
-  .topbar .acts{margin-left:0;gap:3px}
-  .ibtn{width:30px;height:30px;border-radius:8px;font-size:12px}
-  .ibtn svg{width:17px;height:17px}
-  .toasts{top:calc(46px + var(--sa-t))}
-  .toast{padding:4px 10px;font-size:13px;border-radius:10px}
-  .power{left:8px;bottom:calc(8px + var(--sa-b));width:16px;height:96px;border-width:2px;pointer-events:none}
-  .hint{bottom:calc(6px + var(--sa-b));padding:3px 10px;font-size:12px;border-width:3px;border-radius:10px;box-shadow:0 2px 0 var(--wood2)}
-  .intro{top:calc(46px + var(--sa-t));padding:6px 14px;border-width:4px;border-radius:14px;min-width:180px;pointer-events:none}
-  .intro::after{display:none}
-  .intro h2{font-size:18px}
-  .intro p{font-size:12px;margin-top:2px}
-  .intro small{font-size:11px;margin-top:2px}
+  /* Safe Area insets */
+  --sa-t: env(safe-area-inset-top, 0px);
+  --sa-b: env(safe-area-inset-bottom, 0px);
+  --sa-l: env(safe-area-inset-left, 0px);
+  --sa-r: env(safe-area-inset-right, 0px);
 }
 
-/* overlays + panels */
-.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(154,209,245,.42);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:30;padding:12px;overflow:auto}
-.panel{padding:20px 22px;width:min(94vw,460px);max-height:calc(100vh - 24px);overflow:auto}
-.panel h2{margin:0 0 12px;font-size:26px;color:var(--accent);font-weight:700}
-.col{display:flex;flex-direction:column;gap:10px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn{min-height:46px;padding:0 20px;border-radius:16px;border:2px solid var(--wood2);background:var(--mint);color:var(--ink);
-  font-weight:600;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 0 var(--wood2);
-  transition:transform .14s,box-shadow .14s,background .18s}
-.btn:hover{background:#d2f0d9}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--wood2)}
-.btn.primary{background:var(--accent);border-color:var(--accentD);color:#fff;box-shadow:0 4px 0 var(--accentD)}
-.btn.primary:hover{background:var(--accentH)}
-.btn.primary:active{box-shadow:0 1px 0 var(--accentD)}
-/* warm Cappadocia tuff/lemon buttons instead of generic blue */
-.btn.sky{background:#F3D5A5} .btn.sky:hover{background:var(--lemon)}
-.btn.lemon{background:var(--lemon)} .btn.lemon:hover{background:#ffefc0}
-.btn.blush{background:var(--blush)} .btn.blush:hover{background:#f9d4d4}
-.btn:disabled{opacity:.5;cursor:default;transform:none}
-.btn.w{width:100%}
-.btn svg{width:20px;height:20px}
-label.sl{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ink2)}
-label.sl span{width:92px}
-input[type=range]{flex:1;accent-color:var(--mossD);height:44px;margin:0}
-.seg{display:inline-flex;border:2px solid var(--wood2);border-radius:14px;overflow:hidden;background:var(--board2);box-shadow:0 3px 0 var(--wood2)}
-.seg button{min-height:42px;min-width:64px;padding:0 14px;border:0;background:transparent;font-weight:600;color:var(--ink2);transition:background .18s}
-.seg button.on{background:var(--lemon);color:var(--ink)}
-.footer{margin-top:14px;font-size:13px;color:var(--ink2);text-align:center}
-.footer a{color:var(--accent);text-decoration:none;font-weight:600}
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(assets/fonts/fredoka-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(assets/fonts/fredoka-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
 
-/* title */
-.title{text-align:center;width:min(94vw,520px)}
-.title .logo{width:104px;height:104px;margin:0 auto 4px;filter:drop-shadow(0 4px 0 rgba(107,68,40,.35))}
-.title h1{margin:0;font-size:48px;color:var(--accent);letter-spacing:.02em;line-height:1.05;font-weight:700;text-shadow:0 3px 0 var(--lemon)}
-.title .sub{margin:6px 0 10px;color:var(--ink2);font-size:16px}
-.title .how{font-size:14px;color:var(--ink2);margin:0 0 14px;line-height:1.45}
-.title .best{font-size:15px;margin:10px 0 4px;color:var(--ink)}
-.holes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 4px}
-.holes button{min-height:46px;border-radius:12px;border:2px solid var(--wood2);background:var(--lemon);font-weight:700;font-size:15px;color:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;box-shadow:0 3px 0 var(--wood2);transition:transform .12s,box-shadow .12s}
-.holes button:hover{background:#ffefc0}
-.holes button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--wood2)}
-.holes button .stars svg{width:10px;height:10px}
-.holes button.locked{opacity:.45;background:var(--board2);box-shadow:none;cursor:default}
-.holes button.done{background:var(--mint)}
-.lbl{font-size:13px;color:var(--ink2);text-align:left;margin-top:6px}
-@media (max-height:600px){.title .logo{width:64px;height:64px}.title h1{font-size:36px}.title .how{display:none}}
+*, *::before, *::after { box-sizing: border-box; }
+::selection { background: var(--terra); color: #FFFDF9; }
 
-/* scorecard */
-table.card{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
-table.card th,table.card td{padding:3px 4px;text-align:center;border-bottom:1px solid var(--line)}
-table.card th{color:var(--ink2);font-weight:600;font-size:12px}
-table.card td.n{color:var(--accent);font-weight:700}
-table.card td.r{font-size:12px}
-table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:var(--accent)} table.card .ace{color:#a66a00;font-weight:700}
-.stars{display:inline-flex;gap:2px}
-.stars svg{width:16px;height:16px}
-.stars svg,.bigstars svg,.starlist svg{fill:transparent;stroke:rgba(107,68,40,.45);stroke-width:1.5}
-.stars svg.on,.bigstars svg.on,.starlist li.on svg{fill:var(--gold);stroke:var(--wood2)}
-.bigstars{display:flex;justify-content:center;gap:8px;margin:8px 0}
-.bigstars svg{width:44px;height:44px}
-.bigstars svg.on{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
-.bigstars svg.on:nth-child(2){animation-delay:.12s} .bigstars svg.on:nth-child(3){animation-delay:.24s}
-@keyframes pop{from{transform:scale(.2) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
-.kv div{padding:10px;border-radius:14px;background:var(--sky);border:2px solid var(--wood2);text-align:center}
-.kv div:nth-child(2n){background:var(--mint)}
-.kv b{display:block;font-size:26px;color:var(--ink);font-weight:700}
-.kv span{font-size:13px;color:var(--ink2)}
-/* short desktop viewports: the course-complete board must fit without clipping its buttons */
-@media (max-height:760px){.kv{grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}.kv div{padding:6px 4px}.kv b{font-size:20px}
-  #ov-end .panel{padding:14px 18px}#ov-end table.card th,#ov-end table.card td{padding:1px 4px;font-size:13px}}
-.rec{color:var(--mossD);font-weight:700;text-align:center;margin:4px 0;font-size:17px}
-.starlist{list-style:none;margin:8px 0 0;padding:0;font-size:15px;color:var(--ink2);text-align:left}
-.starlist li{display:flex;align-items:center;gap:8px;padding:3px 0}
-.starlist svg{width:18px;height:18px}
-.starlist li.on{color:var(--ink);font-weight:600}
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Fredoka', 'Plus Jakarta Sans', "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  text-rendering: optimizeLegibility;
+}
 
-#dbg{position:fixed;left:8px;bottom:calc(8px + var(--sa-b));font:12px/1.4 ui-monospace,Consolas,monospace;color:#9f9;background:rgba(0,0,0,.6);
-  padding:6px 8px;white-space:pre;pointer-events:none;z-index:60;border-radius:6px;max-width:92vw;overflow:hidden}
-#dbg .err{color:#f66}
-#loadmsg{color:var(--ink2);font-size:14px;margin:6px 0}
-@media (prefers-reduced-motion: reduce){
-  .toast{animation:none}
-  .toast.out{transition:none;opacity:0}
-  .bigstars svg.on{animation:none}
-  .intro{animation:none}
+#c {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+}
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; padding: 0; background: none; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+svg { display: block; }
+
+/* Custom themed scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--parchment-3); border-radius: 6px; }
+::-webkit-scrollbar-thumb { background: var(--tuff-mid); border-radius: 6px; border: 2px solid var(--parchment-3); }
+::-webkit-scrollbar-thumb:hover { background: var(--tuff-dark); }
+
+/* ==========================================================================
+   SURFACE CONTAINERS & CRAFTED STONE FRAMES
+   ========================================================================== */
+.glass, .glass-stone {
+  background: linear-gradient(175deg, var(--parchment) 0%, var(--parchment-2) 100%);
+  border: 3px solid var(--tuff-dark);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md), var(--shadow-relief);
+}
+
+/* ==========================================================================
+   REBORN HUD: DUAL FLOATING ANCHORS + UNOBSTRUCTED CENTER SKY
+   ========================================================================== */
+.topbar {
+  position: fixed;
+  top: calc(10px + var(--sa-t));
+  left: calc(10px + var(--sa-l));
+  right: calc(10px + var(--sa-r));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Left telemetry capsule */
+.hud-telemetry {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 8px;
+  background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
+  border: 2.5px solid var(--tuff-dark);
+  border-radius: 18px;
+  box-shadow: var(--shadow-md), var(--shadow-relief);
+  animation: hudSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.topbar .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--terra-dark);
+  white-space: nowrap;
+  padding-right: 6px;
+  border-right: 2px solid var(--line);
+}
+.topbar .brand svg { width: 32px; height: 32px; filter: drop-shadow(0 2px 2px rgba(45,26,15,0.18)); }
+.topbar .brand span { font-size: 18px; font-weight: 700; color: var(--terra); text-shadow: 0 1px 0 rgba(255,255,255,0.7); }
+
+.topbar .stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ink-mid);
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: var(--parchment-3);
+  border: 1.5px solid rgba(122, 80, 45, 0.25);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.stat-pill.highlight {
+  background: var(--terra-soft);
+  border-color: var(--terra);
+  color: var(--terra-dark);
+}
+.stat-pill b {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-pill.highlight b {
+  color: var(--terra);
+  font-size: 17px;
+}
+.stat-slash {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* Micro progress pips under HUD */
+.hud-pips {
+  display: flex;
+  gap: 3px;
+  padding: 0 2px;
+}
+.p-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tuff-2);
+  transition: all 0.2s;
+}
+.p-dot.cur {
+  background: var(--terra);
+  transform: scale(1.4);
+  box-shadow: 0 0 6px var(--terra);
+}
+.p-dot.done {
+  background: var(--sage);
+}
+
+/* Right control deck */
+.topbar .acts {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
+  border: 2.5px solid var(--tuff-dark);
+  border-radius: 18px;
+  box-shadow: var(--shadow-md), var(--shadow-relief);
+  animation: hudSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ibtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 2px solid var(--tuff-mid);
+  background: var(--parchment-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-mid);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 3px 0 var(--tuff-dark), 0 2px 4px rgba(45, 26, 15, 0.1);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s, color 0.15s;
+}
+.ibtn:hover {
+  background: var(--gold-bg);
+  border-color: var(--tuff-dark);
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 var(--tuff-dark), 0 4px 8px rgba(45, 26, 15, 0.15);
+}
+.ibtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--tuff-dark);
+}
+.ibtn.on {
+  background: var(--turq-bg);
+  border-color: var(--turq);
+  color: var(--turq);
+  box-shadow: 0 3px 0 var(--turq), inset 0 1px 2px rgba(36, 123, 147, 0.2);
+}
+.ibtn svg { width: 22px; height: 22px; }
+
+/* ==========================================================================
+   TOASTS & NOTIFICATIONS
+   ========================================================================== */
+.toasts {
+  position: fixed;
+  top: calc(76px + var(--sa-t));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  z-index: 25;
+  pointer-events: none;
+  width: max-content;
+  max-width: 92vw;
+}
+.toast {
+  padding: 8px 18px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  animation: toastIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--ink);
+  background: var(--gold-bg);
+  border: 2.5px solid var(--tuff-dark);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.good {
+  background: var(--sage-bg);
+  border-color: var(--sage);
+  color: var(--sage);
+}
+.toast.bad {
+  background: var(--hazard-bg);
+  border-color: var(--hazard);
+  color: var(--hazard);
+}
+.toast.out {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-12px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   TACTILE POWER METER & HINT
+   ========================================================================== */
+.power {
+  position: fixed;
+  left: calc(14px + var(--sa-l));
+  bottom: calc(18px + var(--sa-b));
+  width: 26px;
+  height: 164px;
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 15;
+  background: var(--parchment-2);
+  border: 3px solid var(--tuff-dark);
+  box-shadow: var(--shadow-md), var(--shadow-relief);
+}
+.power i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  background: linear-gradient(to top, var(--sage-bright), var(--gold-bright) 55%, var(--terra-bright));
+  transition: height 0.04s ease-out;
+}
+.power b {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(to top, transparent 0 24%, rgba(74, 43, 20, 0.35) 24% 25%);
+  pointer-events: none;
+}
+.power::after {
+  content: 'GÜÇ';
+  position: absolute;
+  top: 4px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+.hint {
+  position: fixed;
+  bottom: calc(20px + var(--sa-b));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 9px 20px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
+  border: 2.5px solid var(--tuff-dark);
+  box-shadow: var(--shadow-md), var(--shadow-relief);
+  z-index: 15;
+  pointer-events: none;
+  text-align: center;
+  max-width: 90vw;
+  letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   HOLE INTRO BANNER: ELEGANT, NON-INTRUSIVE & CRYSTAL CLEAR
+   ========================================================================== */
+.intro {
+  position: fixed;
+  top: calc(74px + var(--sa-t));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 22px 10px;
+  text-align: center;
+  z-index: 22;
+  min-width: 280px;
+  max-width: min(92vw, 420px);
+  background: linear-gradient(180deg, var(--parchment) 0%, var(--parchment-2) 100%);
+  border: 3px solid var(--tuff-dark);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg), var(--shadow-relief);
+  animation: introDrop 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+  pointer-events: none;
+}
+.intro-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--terra-dark);
+  background: var(--terra-soft);
+  padding: 2px 10px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+.intro h2 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--terra);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.intro p {
+  margin: 6px 0 0;
+  color: var(--ink-mid);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.intro small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 3px 12px;
+  border-radius: 10px;
+  background: var(--parchment-3);
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px dashed rgba(122, 80, 45, 0.35);
+}
+@keyframes introDrop {
+  from { opacity: 0; transform: translate(-50%, -14px) scale(0.94); }
+  to { opacity: 1; transform: translateX(-50%); }
+}
+
+/* ==========================================================================
+   OVERLAYS, PANELS & CRAFTED BUTTONS
+   ========================================================================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(33, 22, 18, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 30;
+  padding: 16px;
+  overflow: auto;
+}
+.panel {
+  padding: 24px 26px;
+  width: min(94vw, 480px);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  position: relative;
+}
+.panel h2 {
+  margin: 0 0 16px;
+  font-size: 28px;
+  color: var(--terra);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.col { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* Tactile 3D Buttons */
+.btn {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 16px;
+  border: 2px solid var(--tuff-deep);
+  background: var(--parchment-2);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 0 var(--tuff-deep), 0 6px 14px rgba(45, 26, 15, 0.16);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+}
+.btn:hover {
+  background: var(--parchment);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 var(--tuff-deep), 0 8px 18px rgba(45, 26, 15, 0.2);
+}
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--tuff-deep);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 2px 0 var(--tuff-deep) !important;
+}
+.btn.w { width: 100%; }
+.btn svg { width: 22px; height: 22px; }
+
+/* Button Color Variants */
+.btn.primary {
+  background: linear-gradient(180deg, var(--terra-bright) 0%, var(--terra) 100%);
+  border-color: var(--terra-dark);
+  color: #FFFDF9;
+  box-shadow: 0 4px 0 var(--terra-dark), 0 6px 16px var(--terra-glow);
+}
+.btn.primary:hover {
+  background: linear-gradient(180deg, #E67A4E 0%, var(--terra-bright) 100%);
+  box-shadow: 0 6px 0 var(--terra-dark), 0 10px 20px var(--terra-glow);
+}
+.btn.primary:active {
+  box-shadow: 0 1px 0 var(--terra-dark);
+}
+
+.btn.lemon {
+  background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 100%);
+  border-color: var(--tuff-dark);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--tuff-dark), 0 6px 14px rgba(229, 163, 40, 0.25);
+}
+.btn.lemon:hover {
+  background: linear-gradient(180deg, #FFD56B 0%, var(--gold-bright) 100%);
+}
+
+.btn.sky {
+  background: linear-gradient(180deg, var(--turq-bright) 0%, var(--turq) 100%);
+  border-color: #175769;
+  color: #FFFDF9;
+  box-shadow: 0 4px 0 #175769, 0 6px 14px rgba(36, 123, 147, 0.25);
+}
+.btn.sky:hover {
+  background: linear-gradient(180deg, #51B8D5 0%, var(--turq-bright) 100%);
+}
+
+.btn.blush {
+  background: linear-gradient(180deg, #E87A7A 0%, var(--hazard) 100%);
+  border-color: #8A1F1F;
+  color: #FFFDF9;
+  box-shadow: 0 4px 0 #8A1F1F, 0 6px 14px rgba(199, 56, 56, 0.25);
+}
+.btn.blush:hover {
+  background: linear-gradient(180deg, #ED8C8C 0%, #E87A7A 100%);
+}
+
+/* Sliders & Segmented Controls */
+label.sl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  padding: 4px 0;
+}
+label.sl span { width: 110px; font-weight: 700; color: var(--ink); }
+input[type=range] {
+  flex: 1;
+  accent-color: var(--terra);
+  height: 44px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.seg {
+  display: inline-flex;
+  border: 2px solid var(--tuff-dark);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--parchment-3);
+  box-shadow: 0 3px 0 var(--tuff-deep);
+}
+.seg button {
+  min-height: 44px;
+  min-width: 68px;
+  padding: 0 16px;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink-muted);
+  transition: background 0.16s, color 0.16s;
+}
+.seg button.on {
+  background: var(--gold-bg);
+  color: var(--ink);
+  box-shadow: inset 0 2px 0 rgba(74, 43, 20, 0.1);
+}
+.seg button:hover:not(.on) {
+  background: rgba(255,255,255,0.4);
+}
+
+.footer {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+.footer a {
+  color: var(--terra);
+  text-decoration: none;
+  font-weight: 700;
+}
+.footer a:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   TITLE SCREEN & EXPEDITION COURSE GRID
+   ========================================================================= */
+.title {
+  text-align: center;
+  width: min(94vw, 560px);
+}
+.title .logo {
+  width: 108px;
+  height: 108px;
+  margin: 0 auto 8px;
+  filter: drop-shadow(0 6px 12px rgba(45, 26, 15, 0.28));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.title .logo:hover {
+  transform: scale(1.05) rotate(2deg);
+}
+
+.title h1 {
+  margin: 0;
+  font-size: 50px;
+  color: var(--terra);
+  letter-spacing: 0.02em;
+  line-height: 1.05;
+  font-weight: 700;
+  text-shadow: 0 2px 0 var(--tuff-light), 0 4px 0 var(--tuff-dark);
+}
+.title .sub {
+  margin: 8px 0 12px;
+  color: var(--ink-mid);
+  font-size: 16px;
+  font-weight: 600;
+}
+.title .how {
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  margin: 0 0 16px;
+  line-height: 1.5;
+  padding: 8px 14px;
+  background: var(--parchment-3);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+.title .best {
+  font-size: 14.5px;
+  font-weight: 700;
+  margin: 12px 0 8px;
+  color: var(--ink);
+  padding: 8px 16px;
+  background: var(--gold-bg);
+  border: 2px solid var(--tuff-dark);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.lbl {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: left;
+  margin: 14px 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 12-Hole Course Grid */
+.holes {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin: 8px 0 6px;
+}
+.holes button {
+  min-height: 58px;
+  border-radius: 14px;
+  border: 2px solid var(--tuff-dark);
+  background: var(--parchment-2);
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 3px;
+  box-shadow: 0 3px 0 var(--tuff-deep), 0 2px 6px rgba(45, 26, 15, 0.12);
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+}
+.holes button:hover:not(:disabled) {
+  background: var(--gold-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--tuff-deep), 0 4px 10px rgba(45, 26, 15, 0.18);
+}
+.holes button:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--tuff-deep);
+}
+.holes button .hole-idx {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+.holes button .hole-par {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.holes button .stars svg {
+  width: 11px;
+  height: 11px;
+}
+.holes button.done {
+  background: var(--sage-bg);
+  border-color: var(--sage);
+}
+.holes button.done .hole-idx {
+  color: var(--sage);
+}
+.holes button.locked {
+  opacity: 0.55;
+  background: var(--parchment-3);
+  box-shadow: none;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+.holes button.locked .hole-idx {
+  color: var(--ink-muted);
+}
+
+/* ==========================================================================
+   SCORECARD & TABLE PRESENTATION
+   ========================================================================== */
+table.card {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  margin: 6px 0;
+  background: var(--parchment);
+  border: 2px solid var(--tuff-dark);
+  border-radius: 14px;
+  overflow: hidden;
+}
+table.card th, table.card td {
+  padding: 6px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+table.card th {
+  background: var(--parchment-3);
+  color: var(--ink-mid);
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+table.card td.n {
+  color: var(--terra);
+  font-weight: 700;
+}
+table.card td.r {
+  font-size: 13px;
+  font-weight: 700;
+}
+table.card tr:nth-child(even) td {
+  background: rgba(247, 235, 220, 0.35);
+}
+table.card tr.cur-row td {
+  background: var(--terra-soft);
+  font-weight: 700;
+}
+table.card tr.sum-row td {
+  background: var(--parchment-3);
+  border-top: 2px solid var(--tuff-dark);
+  font-weight: 800;
+  font-size: 14.5px;
+}
+
+table.card .birdie { color: var(--sage); font-weight: 700; }
+table.card .bogey { color: var(--terra); font-weight: 700; }
+table.card .ace { color: var(--gold); font-weight: 800; }
+
+.score-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.score-chip.birdie { background: var(--sage-bg); color: var(--sage); }
+.score-chip.bogey { background: var(--hazard-bg); color: var(--hazard); }
+.score-chip.ace { background: var(--gold-bg); color: #8A5B00; }
+
+.stars { display: inline-flex; gap: 2px; align-items: center; justify-content: center; }
+.stars svg { width: 16px; height: 16px; }
+.stars svg, .bigstars svg, .starlist svg {
+  fill: transparent;
+  stroke: var(--tuff-mid);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+.stars svg.on, .bigstars svg.on, .starlist li.on svg {
+  fill: var(--gold-bright);
+  stroke: var(--tuff-dark);
+}
+
+.bigstars {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 14px 0;
+}
+.bigstars svg {
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 3px 6px rgba(45, 26, 15, 0.2));
+}
+.bigstars svg.on {
+  animation: starPop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.bigstars svg.on:nth-child(2) { animation-delay: 0.14s; }
+.bigstars svg.on:nth-child(3) { animation-delay: 0.28s; }
+@keyframes starPop {
+  from { transform: scale(0.2) rotate(-25deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* ==========================================================================
+   HOLE RESULT MODAL & END OF COURSE SCREEN
+   ========================================================================== */
+#ov-hole .panel h2 {
+  font-size: 34px;
+  margin-bottom: 4px;
+}
+#ov-hole .panel h2.birdie { color: var(--sage); }
+#ov-hole .panel h2.bogey { color: var(--terra); }
+#ov-hole .panel h2.ace { color: var(--gold); }
+
+.starlist {
+  list-style: none;
+  margin: 12px 0 16px;
+  padding: 0;
+  font-size: 15px;
+  color: var(--ink-muted);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.starlist li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--parchment-3);
+  border: 1.5px solid var(--line);
+  font-weight: 600;
+}
+.starlist li.on {
+  color: var(--ink);
+  font-weight: 700;
+  background: var(--gold-bg);
+  border-color: var(--tuff-mid);
+}
+.starlist svg { width: 22px; height: 22px; flex-shrink: 0; margin-right: 8px; }
+.star-name { flex: 1; }
+.star-badge {
+  font-size: 13px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.06);
+}
+.starlist li.on .star-badge {
+  background: var(--gold);
+  color: #fff;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+.kv div {
+  padding: 12px 8px;
+  border-radius: 16px;
+  background: var(--turq-bg);
+  border: 2px solid var(--turq);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.kv div:nth-child(2n) {
+  background: var(--sage-bg);
+  border-color: var(--sage);
+}
+.kv div:nth-child(3n) {
+  background: var(--gold-bg);
+  border-color: var(--gold);
+}
+.kv b {
+  display: block;
+  font-size: 30px;
+  color: var(--ink);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.kv span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rec {
+  color: var(--sage);
+  font-weight: 800;
+  text-align: center;
+  margin: 6px 0;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  animation: pulseRec 1.2s infinite alternate;
+}
+@keyframes pulseRec {
+  from { transform: scale(1); }
+  to { transform: scale(1.04); }
+}
+
+#dbg {
+  position: fixed;
+  left: 8px;
+  bottom: calc(8px + var(--sa-b));
+  font: 12px/1.4 ui-monospace, Consolas, monospace;
+  color: #9f9;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 6px 10px;
+  white-space: pre;
+  pointer-events: none;
+  z-index: 60;
+  border-radius: 8px;
+  max-width: 92vw;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+#dbg .err { color: #ff6b6b; font-weight: 700; }
+#loadmsg { color: var(--ink-mid); font-size: 14px; font-weight: 600; margin: 8px 0; }
+
+/* ==========================================================================
+   RESPONSIVE ADAPTATIONS & MOBILE POLISH
+   ========================================================================== */
+@media (max-width: 768px) {
+  .topbar {
+    top: calc(6px + var(--sa-t));
+    left: calc(6px + var(--sa-l));
+    right: calc(6px + var(--sa-r));
+    gap: 6px;
+  }
+  .hud-telemetry {
+    padding: 4px 10px 4px 6px;
+    gap: 6px;
+  }
+  .topbar .brand span { display: none; }
+  .topbar .brand { padding-right: 4px; }
+  .topbar .brand svg { width: 28px; height: 28px; }
+  .topbar .stats { gap: 4px; }
+  .stat-pill { padding: 3px 7px; font-size: 12px; }
+  .stat-pill b { font-size: 14px; }
+  .stat-pill.highlight b { font-size: 15px; }
+  .topbar .acts { gap: 4px; padding: 3px 4px; }
+  .ibtn { width: 44px; height: 44px; }
+  .holes { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .intro { top: calc(68px + var(--sa-t)); min-width: 250px; }
+  .intro h2 { font-size: 20px; }
+}
+
+@media (max-width: 500px) {
+  .topbar { flex-wrap: wrap; }
+  .hud-telemetry { order: 1; }
+  .topbar .acts { order: 2; margin-left: auto; }
+  .holes { grid-template-columns: repeat(3, 1fr); }
+  .panel { padding: 18px 16px; }
+  .title h1 { font-size: 38px; }
+}
+
+@media (max-height: 600px) {
+  .title .logo { width: 68px; height: 68px; }
+  .title h1 { font-size: 34px; }
+  .title .how { display: none; }
+  .panel { padding: 14px 18px; }
+  .kv { grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 6px 0; }
+  .kv div { padding: 6px 4px; }
+  .kv b { font-size: 20px; }
+}
+
+@media (max-height: 500px) {
+  .topbar {
+    top: calc(4px + var(--sa-t));
+    left: 6px;
+    right: 6px;
+    gap: 4px;
+  }
+  .hud-telemetry { padding: 2px 8px; border-width: 2px; }
+  .topbar .brand svg { width: 22px; height: 22px; }
+  .stat-pill { padding: 2px 6px; font-size: 11px; }
+  .stat-pill b { font-size: 13px; }
+  .topbar .acts { padding: 2px 3px; border-width: 2px; }
+  .ibtn { width: 36px; height: 36px; border-radius: 10px; }
+  .ibtn svg { width: 18px; height: 18px; }
+  .intro {
+    top: calc(46px + var(--sa-t));
+    padding: 6px 14px;
+    border-width: 2.5px;
+    border-radius: 14px;
+    min-width: 200px;
+  }
+  .intro h2 { font-size: 17px; }
+  .intro p { font-size: 12px; margin-top: 2px; }
+  .intro small { font-size: 11px; margin-top: 4px; }
+  .power {
+    left: 6px;
+    bottom: calc(6px + var(--sa-b));
+    width: 18px;
+    height: 100px;
+    border-width: 2px;
+  }
+  .hint {
+    bottom: calc(6px + var(--sa-b));
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; }
+  .toast.out { transition: none; opacity: 0; }
+  .bigstars svg.on { animation: none; }
+  .intro { animation: none; }
+  .hud-telemetry, .topbar .acts { animation: none; }
+  .rec { animation: none; }
 }
 </style>
 <script type="importmap">
@@ -210,62 +1121,112 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
+    <!-- Master Cappadocia Emblem Logo -->
     <symbol id="i-logo" viewBox="0 0 64 64">
-      <circle cx="32" cy="32" r="30" fill="#9AD1F5"/>
-      <circle cx="47" cy="15" r="6" fill="#FFE7A3"/>
-      <path d="M10 18c0-5.5 3.6-8.5 7.5-8.5S25 12.5 25 18c0 4.6-3.6 6.6-5.6 11h-3.8C13.6 24.6 10 22.6 10 18z" fill="#F6C3C3"/>
-      <rect x="15.6" y="30" width="3.8" height="3" rx="1" fill="#8B5A3C"/>
-      <ellipse cx="32" cy="50" rx="28" ry="9" fill="#7FA36B"/>
-      <path d="M26 51 L29.5 22 H36.5 L40 51 Z" fill="#E8C9A0"/>
-      <path d="M26 51 L27.6 38 H38.4 L40 51 Z" fill="#C98B7A"/>
-      <path d="M28 23 L33 13 L38 23 Z" fill="#A86E60"/>
-      <path d="M43 51 L45 34 H50 L52 51 Z" fill="#E8C9A0"/>
-      <path d="M44 35 L47.5 28 L51 35 Z" fill="#A86E60"/>
-      <rect x="12" y="35" width="2" height="15" rx="1" fill="#FFF4E3"/>
-      <path d="M14 35 L22 38 L14 41 Z" fill="#E53935"/>
-      <circle cx="19" cy="49" r="2.6" fill="#fff"/>
-      <circle cx="32" cy="32" r="30" fill="none" stroke="#6B4428" stroke-width="2.5"/>
+      <circle cx="32" cy="32" r="30" fill="#E8C9A0" stroke="#7A502D" stroke-width="2.5"/>
+      <circle cx="32" cy="32" r="27.5" fill="#9AD1F5"/>
+      <!-- Dawn sun & rays -->
+      <circle cx="48" cy="16" r="8" fill="#FFCA48" opacity="0.95"/>
+      <path d="M48 4v4 M48 24v4 M36 16h4 M56 16h4" stroke="#FFCA48" stroke-width="1.8" stroke-linecap="round"/>
+      <!-- Distant hot air balloon -->
+      <path d="M12 18c0-5 3.2-8 7-8s7 3 7 8c0 4.2-3.2 6.2-5 9.8h-4c-1.8-3.6-5-5.6-5-9.8z" fill="#C2562C"/>
+      <path d="M15.5 10c-1.5 2-2.5 5-2.5 8 0 3 1.2 5 2.5 8h1c-1.3-3-2-5-2-8 0-3 .7-6 2-8z" fill="#FFCA48"/>
+      <path d="M22.5 10c1.5 2 2.5 5 2.5 8 0 3-1.2 5-2.5 8h-1c1.3-3 2-5 2-8 0-3-.7-6-2-8z" fill="#FFCA48"/>
+      <rect x="17.2" y="29" width="3.6" height="2.5" rx="0.8" fill="#543318"/>
+      <!-- Soft volcanic terrain & putting green -->
+      <ellipse cx="32" cy="51" rx="27.5" ry="9" fill="#4E7C45"/>
+      <path d="M4.5 50 Q 32 44 59.5 50 L 59.5 59.5 Q 32 60 4.5 59.5 Z" fill="#7A502D" opacity="0.6"/>
+      <!-- Fairy Chimneys with Basalt Caps -->
+      <path d="M25 52 L28.5 24 H35.5 L39 52 Z" fill="#D1B08C"/>
+      <path d="M25 52 L27 38 H37 L39 52 Z" fill="#B88B5D"/>
+      <path d="M26.5 25 L32 14 L37.5 25 Z" fill="#543318"/>
+      <!-- Secondary smaller chimney -->
+      <path d="M42 52 L44.5 35 H49.5 L52 52 Z" fill="#D1B08C"/>
+      <path d="M43 36 L47 28 L51 36 Z" fill="#543318"/>
+      <!-- Golf Pin & Flag -->
+      <rect x="12" y="34" width="2" height="17" rx="1" fill="#FFFDF9"/>
+      <path d="M14 34 L23 38 L14 42 Z" fill="#C2562C"/>
+      <!-- Golf Ball on Green -->
+      <circle cx="19" cy="50" r="2.8" fill="#FFFFFF"/>
+      <circle cx="19.8" cy="49.5" r="0.8" fill="#EBD4B8"/>
+      <!-- Outer decorative rim -->
+      <circle cx="32" cy="32" r="30" fill="none" stroke="#4A2B14" stroke-width="2.5"/>
     </symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l12-7z" fill="currentColor"/></symbol>
-    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
-    <symbol id="i-eye" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M3 10h18M3 14h18" stroke="currentColor" stroke-width="1.2" opacity=".6"/></symbol>
-    <symbol id="i-card" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
-    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
-    <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.8 6.3.8-4.6 4.4 1.2 6.3L12 17.3 6.4 20.3l1.2-6.3L3 9.6l6.3-.8z" stroke-linejoin="round"/></symbol>
-    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-5h-6v5H4z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></symbol>
-    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M4 4v5h5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-back" viewBox="0 0 24 24"><path d="M14 6l-6 6 6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></symbol>
+    
+    <!-- Action and telemetry icons -->
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5.5v13a1 1 0 001.55.83l10.5-6.5a1 1 0 000-1.66L8.55 4.67A1 1 0 007 5.5z" fill="currentColor"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8a5 5 0 010 8M19 5.5a8.5 8.5 0 010 13" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/><path d="M3 10h18M3 14h18" stroke="currentColor" stroke-width="1.2" opacity=".5"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="2.2" fill="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-linejoin="round"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-5h-6v5H4z" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M4 4v5h5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 10V6a4 4 0 018 0v4" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="15.5" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 4h12v4a6 6 0 01-12 0V4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 6H3a2 2 0 00-2 2v1a4 4 0 004 4h1M18 6h3a2 2 0 012 2v1a4 4 0 01-4 4h-1M12 14v4M8 21h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   </defs>
 </svg>
 
 <div id="ui">
-  <!-- HUD -->
-  <div class="topbar glass" id="hud" hidden>
-    <div class="brand"><svg width="30" height="30"><use href="#i-logo"/></svg><span>Peri Golf</span></div>
-    <div class="stats">
-      <div><span data-t="hole">Delik</span> <b id="s-hole">1</b>/12</div>
-      <div><span data-t="par">Par</span> <b id="s-par">3</b></div>
-      <div><span data-t="strokes">Vuruş</span> <b id="s-str">0</b></div>
-      <div><span data-t="total">Toplam</span> <b id="s-tot">0</b></div>
+  <!-- HUD: Dual floating anchor docks + clear center -->
+  <header class="topbar" id="hud" hidden>
+    <!-- Left Pod: Course Telemetry -->
+    <div class="hud-telemetry">
+      <div class="brand">
+        <svg><use href="#i-logo"/></svg>
+        <span>Peri Golf</span>
+      </div>
+      <div class="stats">
+        <div class="stat-pill">
+          <span data-t="hole">Delik</span>
+          <b id="s-hole">1</b><span class="stat-slash">/12</span>
+        </div>
+        <div class="stat-pill">
+          <span data-t="par">Par</span>
+          <b id="s-par">3</b>
+        </div>
+        <div class="stat-pill highlight">
+          <span data-t="strokes">Vuruş</span>
+          <b id="s-str">0</b>
+        </div>
+        <div class="stat-pill">
+          <span data-t="total">Toplam</span>
+          <b id="s-tot">0</b>
+        </div>
+      </div>
+      <div class="hud-pips" id="hud-progress-dots" aria-hidden="true"></div>
     </div>
+
+    <!-- Right Pod: Command Deck -->
     <div class="acts">
       <button class="ibtn" id="b-view" data-tt="overview" aria-label="Overview"><svg><use href="#i-eye"/></svg></button>
       <button class="ibtn" id="b-card" data-tt="scorecard" aria-label="Scorecard"><svg><use href="#i-card"/></svg></button>
-      <button class="ibtn" id="b-pause" data-tt="pause" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
       <button class="ibtn" id="b-sound" data-tt="sound" aria-label="Sound"><svg><use href="#i-sound"/></svg></button>
       <button class="ibtn" id="b-lang" data-tt="language" aria-label="Language">EN</button>
+      <button class="ibtn" id="b-pause" data-tt="pause" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
     </div>
-  </div>
+  </header>
+
   <div class="toasts" id="toasts"></div>
-  <div class="power glass" id="power" hidden><i id="powerfill"></i><b></b></div>
-  <div class="hint glass" id="hint" hidden></div>
-  <div class="intro glass" id="intro" hidden><h2 id="intro-name"></h2><p id="intro-par"></p><small id="intro-skip"></small></div>
+  <div class="power" id="power" hidden><i id="powerfill"></i><b></b></div>
+  <div class="hint" id="hint" hidden></div>
+  
+  <!-- Hole Intro Banner: Unobtrusive, elegant, and unambiguous -->
+  <div class="intro" id="intro" hidden>
+    <span class="intro-badge">Kapadokya Parkuru</span>
+    <h2 id="intro-name"></h2>
+    <p id="intro-par"></p>
+    <small id="intro-skip"></small>
+  </div>
+  
   <div id="dbg" hidden></div>
 
-  <!-- Title -->
+  <!-- Title Screen -->
   <div class="overlay" id="ov-title">
     <div class="panel glass title">
       <svg class="logo"><use href="#i-logo"/></svg>
@@ -275,20 +1236,20 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
       <div id="loadmsg"></div>
       <div class="col">
         <button class="btn primary w" id="b-play" disabled><svg><use href="#i-play"/></svg><span data-t="play"></span></button>
-        <button class="btn w lemon" id="b-continue" hidden><span data-t="continue"></span> <span id="cont-info"></span></button>
+        <button class="btn w lemon" id="b-continue" hidden><svg><use href="#i-restart"/></svg><span data-t="continue"></span> <span id="cont-info"></span></button>
         <div class="row" style="justify-content:center">
           <button class="btn sky" id="b-settings"><svg><use href="#i-gear"/></svg><span data-t="settings"></span></button>
           <div class="seg" id="seg-lang"><button data-l="tr">TR</button><button data-l="en">EN</button></div>
         </div>
       </div>
       <div class="best" id="best-line"></div>
-      <div class="lbl" data-t="pickHole"></div>
+      <div class="lbl"><svg width="18" height="18"><use href="#i-target"/></svg><span data-t="pickHole"></span></div>
       <div class="holes" id="holes"></div>
       <div class="footer"><a href="https://furkiozknn.github.io/" target="_blank" rel="noopener">Claude Game Arena</a> · built by Claude Fable 5.1</div>
     </div>
   </div>
 
-  <!-- Pause -->
+  <!-- Pause Menu -->
   <div class="overlay" id="ov-pause" hidden>
     <div class="panel glass col">
       <h2 data-t="paused"></h2>
@@ -299,21 +1260,21 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
     </div>
   </div>
 
-  <!-- Settings -->
+  <!-- Settings Menu -->
   <div class="overlay" id="ov-settings" hidden>
     <div class="panel glass col">
       <h2 data-t="settings"></h2>
       <label class="sl"><span data-t="master"></span><input type="range" id="r-master" min="0" max="1" step="0.01" data-t-aria="master"></label>
       <label class="sl"><span data-t="music"></span><input type="range" id="r-music" min="0" max="1" step="0.01" data-t-aria="music"></label>
       <label class="sl"><span data-t="effects"></span><input type="range" id="r-sfx" min="0" max="1" step="0.01" data-t-aria="effects"></label>
-      <div class="row"><span style="width:92px;font-size:14px;color:var(--ink2)" data-t="language"></span><div class="seg" id="seg-lang2"><button data-l="tr">TR</button><button data-l="en">EN</button></div></div>
-      <div class="row"><span style="width:92px;font-size:14px;color:var(--ink2)" data-t="quality"></span><div class="seg" id="seg-q"><button data-q="low" data-t="low"></button><button data-q="high" data-t="high"></button></div></div>
+      <div class="row"><span style="width:110px;font-size:14px;font-weight:700;color:var(--ink)" data-t="language"></span><div class="seg" id="seg-lang2"><button data-l="tr">TR</button><button data-l="en">EN</button></div></div>
+      <div class="row"><span style="width:110px;font-size:14px;font-weight:700;color:var(--ink)" data-t="quality"></span><div class="seg" id="seg-q"><button data-q="low" data-t="low"></button><button data-q="high" data-t="high"></button></div></div>
       <button class="btn w sky" id="b-full"><svg><use href="#i-full"/></svg><span data-t="fullscreen"></span></button>
       <button class="btn primary w" id="b-sclose"><svg><use href="#i-back"/></svg><span data-t="back"></span></button>
     </div>
   </div>
 
-  <!-- Scorecard -->
+  <!-- Scorecard Overlay -->
   <div class="overlay" id="ov-card" hidden>
     <div class="panel glass col">
       <h2 data-t="scorecard"></h2>
@@ -322,11 +1283,11 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
     </div>
   </div>
 
-  <!-- Hole result -->
+  <!-- Hole Result Celebration -->
   <div class="overlay" id="ov-hole" hidden>
     <div class="panel glass col" style="text-align:center">
       <h2 id="hr-title"></h2>
-      <div id="hr-sub" style="color:var(--ink2)"></div>
+      <div id="hr-sub" style="color:var(--ink-mid);font-weight:700"></div>
       <div class="bigstars" id="hr-stars"></div>
       <ul class="starlist" id="hr-list"></ul>
       <button class="btn primary w" id="b-next"><svg><use href="#i-play"/></svg><span id="b-next-t"></span></button>
@@ -334,9 +1295,10 @@ table.card .birdie{color:var(--mossD);font-weight:600} table.card .bogey{color:v
     </div>
   </div>
 
-  <!-- End of course -->
+  <!-- Course Complete / End of Course -->
   <div class="overlay" id="ov-end" hidden>
     <div class="panel glass col" style="text-align:center">
+      <div style="display:flex;justify-content:center;margin-bottom:4px"><svg width="52" height="52" style="color:var(--gold)"><use href="#i-trophy"/></svg></div>
       <h2 data-t="endTitle"></h2>
       <div class="rec" id="end-rec" hidden></div>
       <div class="kv">
@@ -384,44 +1346,44 @@ window.periGolfAssets = ASSETS;
 // ---------------------------------------------------------------------------
 const I18N = {
   tr: {
-    subtitle: 'Kapadokya peribacaları arasında 3B fizikli mini golf',
-    howto: 'Topa basıp geriye sürükle, bırakınca vur. Boş alana sürükleyince kamera döner. Klavye: ok tuşları nişan, Boşluk basılı tutunca güç.',
+    subtitle: 'Kapadokya peribacaları arasında minyatür diorama golfü',
+    howto: 'Topa basıp geriye sürükle, bırakınca vur. Boş alana sürükleyince kamera döner · [V] Kuş bakışı · [C] Skor kartı',
     play: 'Oyna', continue: 'Devam Et', settings: 'Ayarlar', hole: 'Delik', par: 'Par', strokes: 'Vuruş', total: 'Toplam',
-    paused: 'Duraklatıldı', resume: 'Devam', restartHole: 'Deliği Yeniden Başlat', mainMenu: 'Ana Menü',
-    master: 'Ana ses', music: 'Müzik', effects: 'Efektler', language: 'Dil', quality: 'Kalite', low: 'Düşük', high: 'Yüksek',
-    fullscreen: 'Tam ekran', back: 'Geri', scorecard: 'Skor Kartı', endTitle: 'Tur Tamamlandı', vsPar: "Par'a göre", starsLbl: 'Yıldız', // fix: golf "Par'a göre" instead of "Para göre"
-    bestLbl: 'En iyi', playAgain: 'Tekrar Oyna', pickHole: 'Delik seç (açılanlar oynanabilir):', bestNone: 'Henüz tamamlanmış tur yok',
-    bestCard: 'En iyi kart: {t} vuruş ({r}), {s}/36 yıldız', contFrom: '(delik {n})', overview: 'Kuş bakışı', pause: 'Duraklat', sound: 'Ses',
-    hintAim: 'Topa basıp geriye sürükle, bırakınca vur', hintCam: 'Boş alana sürükleyerek kamerayı döndür · V kuş bakışı',
-    skip: 'Geçmek için dokun', nextHole: 'Sonraki Delik', finish: 'Sonucu Gör', water: 'Suya düştü: +1 vuruş', oob: 'Saha dışı: +1 vuruş',
+    paused: 'Duraklatıldı', resume: 'Devam Et', restartHole: 'Deliği Yeniden Başlat', mainMenu: 'Ana Menü',
+    master: 'Ana Ses', music: 'Müzik', effects: 'Efektler', language: 'Dil', quality: 'Kalite', low: 'Düşük', high: 'Yüksek',
+    fullscreen: 'Tam Ekran', back: 'Geri', scorecard: 'Skor Kartı', endTitle: 'Parkur Tamamlandı', vsPar: "Par'a Göre", starsLbl: 'Yıldız',
+    bestLbl: 'En İyi', playAgain: 'Tekrar Oyna', pickHole: 'Parkur Delikleri (Açılanlar Oynanabilir):', bestNone: 'Henüz tamamlanmış tur yok',
+    bestCard: 'En iyi tur: {t} vuruş ({r}) · {s}/36 yıldız', contFrom: '(delik {n})', overview: 'Kuş Bakışı', pause: 'Duraklat', sound: 'Ses',
+    hintAim: 'Topa basıp geriye çek, bırakınca vur', hintCam: 'Boş alana sürükleyerek kamerayı döndür · V kuş bakışı',
+    skip: 'Kamera tanıtımını geçmek için dokun', nextHole: 'Sonraki Delik', finish: 'Sonuçları Gör', water: 'Suya düştü: +1 vuruş', oob: 'Saha dışı: +1 vuruş',
     grape: 'Gizli üzüm bulundu!', locked: 'Kilitli', loading: 'Yükleniyor…', loadFail: 'Three.js yüklenemedi; internet bağlantısını kontrol et.',
-    ace: 'Tek Vuruş!', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Çift Bogey', over: '+{n}',
-    star_under: 'Par altı', star_grape: 'Gizli üzüm', newRecord: 'Yeni rekor!', musicOn: 'Müzik açık', musicOff: 'Müzik kapalı',
-    sfxOn: 'Efektler açık', sfxOff: 'Efektler kapalı', strokesOf: '{s} vuruş · par {p}', cardSaved: 'Kart kaydedildi', holeBest: 'Delik rekoru!',
-    cupName: 'Delik', result: 'Sonuç', trickLbl: 'Numara', ghostLbl: 'Hayalet çizgi: en iyi vuruşun',
-    trick: { ace: 'Tek vuruşta delik', banks: 'Duvardan sekerek delik', banks2: 'İki duvardan sekerek delik', long: '{d} m uzaktan delik',
-      ride: 'Çömlek çarkına binip delik', noSand: 'Kuma hiç girmeden bitir', clean: 'Hiç ceza almadan bitir', air: 'Havada {t} sn uç', tunnel: 'Tünelden geçerek delik' },
+    ace: 'Hole-in-One! (Tek Vuruş)', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Çift Bogey', over: '+{n}',
+    star_under: 'Par Altı Başarı', star_grape: 'Gizli Kapadokya Üzümü', newRecord: '★ Yeni Parkur Rekoru! ★', musicOn: 'Müzik açık', musicOff: 'Müzik kapalı',
+    sfxOn: 'Efektler açık', sfxOff: 'Efektler kapalı', strokesOf: '{s} vuruş · Par {p}', cardSaved: 'Kart kaydedildi', holeBest: 'Delik rekoru!',
+    cupName: 'Delik', result: 'Sonuç', trickLbl: 'Özel Görev', ghostLbl: 'Hayalet çizgi: en iyi vuruşun',
+    trick: { ace: 'Tek vuruşta deliğe gir', banks: 'Duvardan sekerek deliğe gir', banks2: 'İki duvardan sekerek deliğe gir', long: '{d} m uzaktan deliğe gir',
+      ride: 'Çömlek çarkına binip deliğe gir', noSand: 'Kuma hiç basmadan bitir', clean: 'Hiç ceza almadan bitir', air: 'Havada {t} sn uç', tunnel: 'Tünelden geçerek deliğe gir' },
     holes: ['Güvercinlik Terası', 'Peribacası Dönemeci', 'Kaya Ev', 'Çömlek Atölyesi', 'Kum Vadisi', 'Yeraltı Şehri', 'Fener Geçidi',
       'Bağ Yolu', 'Taş Köprü', 'Sıçrama', 'Güvercin Vadisi', 'Gün Doğumu Sırtı'],
   },
   en: {
     subtitle: '3D physics mini golf among the fairy chimneys of Cappadocia',
-    howto: 'Press on the ball and drag back, release to shoot. Drag on empty ground to orbit the camera. Keyboard: arrows aim, hold Space for power.',
+    howto: 'Press on ball and drag back to aim, release to shoot. Drag empty ground to orbit camera · [V] Overview · [C] Scorecard',
     play: 'Play', continue: 'Continue', settings: 'Settings', hole: 'Hole', par: 'Par', strokes: 'Strokes', total: 'Total',
     paused: 'Paused', resume: 'Resume', restartHole: 'Restart Hole', mainMenu: 'Main Menu',
-    master: 'Master', music: 'Music', effects: 'Effects', language: 'Language', quality: 'Quality', low: 'Low', high: 'High',
-    fullscreen: 'Fullscreen', back: 'Back', scorecard: 'Scorecard', endTitle: 'Course Complete', vsPar: 'vs par', starsLbl: 'Stars',
-    bestLbl: 'Best', playAgain: 'Play Again', pickHole: 'Pick a hole (unlocked ones are playable):', bestNone: 'No completed round yet',
-    bestCard: 'Best card: {t} strokes ({r}), {s}/36 stars', contFrom: '(hole {n})', overview: 'Overview', pause: 'Pause', sound: 'Sound',
-    hintAim: 'Press on the ball and drag back, release to shoot', hintCam: 'Drag on empty ground to orbit · V for overview',
-    skip: 'Tap to skip', nextHole: 'Next Hole', finish: 'See Results', water: 'Water: +1 stroke', oob: 'Out of bounds: +1 stroke',
+    master: 'Master Volume', music: 'Music', effects: 'Effects', language: 'Language', quality: 'Quality', low: 'Low', high: 'High',
+    fullscreen: 'Fullscreen', back: 'Back', scorecard: 'Scorecard', endTitle: 'Course Complete', vsPar: 'vs Par', starsLbl: 'Stars',
+    bestLbl: 'Best Score', playAgain: 'Play Again', pickHole: 'Course Holes (Unlocked are playable):', bestNone: 'No completed round yet',
+    bestCard: 'Best card: {t} strokes ({r}) · {s}/36 stars', contFrom: '(hole {n})', overview: 'Overview', pause: 'Pause', sound: 'Sound',
+    hintAim: 'Press on ball and drag back, release to shoot', hintCam: 'Drag on empty ground to orbit · V for overview',
+    skip: 'Tap anywhere to skip flyover', nextHole: 'Next Hole', finish: 'See Results', water: 'Water: +1 stroke', oob: 'Out of bounds: +1 stroke',
     grape: 'Hidden grape found!', locked: 'Locked', loading: 'Loading…', loadFail: 'Three.js could not load; check your connection.',
     ace: 'Hole in One!', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Double Bogey', over: '+{n}',
-    star_under: 'Under par', star_grape: 'Hidden grape', newRecord: 'New record!', musicOn: 'Music on', musicOff: 'Music off',
-    sfxOn: 'Effects on', sfxOff: 'Effects off', strokesOf: '{s} strokes · par {p}', cardSaved: 'Card saved', holeBest: 'Hole record!',
-    cupName: 'Hole', result: 'Result', trickLbl: 'Trick', ghostLbl: 'Ghost line: your best shot',
-    trick: { ace: 'Hole in one', banks: 'Bank it off a wall', banks2: 'Bank it off two walls', long: 'Sink it from {d} m',
-      ride: 'Ride the pottery wheel, then sink', noSand: 'Finish without touching sand', clean: 'Finish with no penalty', air: 'Fly {t} s in the air', tunnel: 'Sink it through the tunnel' },
+    star_under: 'Under Par Finish', star_grape: 'Hidden Cappadocia Grape', newRecord: '★ New Course Record! ★', musicOn: 'Music on', musicOff: 'Music off',
+    sfxOn: 'Effects on', sfxOff: 'Effects off', strokesOf: '{s} strokes · Par {p}', cardSaved: 'Card saved', holeBest: 'Hole record!',
+    cupName: 'Hole', result: 'Result', trickLbl: 'Special Trick', ghostLbl: 'Ghost line: your best shot',
+    trick: { ace: 'Hole in one', banks: 'Bank off a wall into hole', banks2: 'Bank off two walls into hole', long: 'Sink from {d} m',
+      ride: 'Ride pottery wheel, then sink', noSand: 'Finish without touching sand', clean: 'Finish with no penalty', air: 'Fly {t} s in air', tunnel: 'Sink through tunnel' },
     holes: ['Pigeon Terrace', 'Chimney Bend', 'Cave House', 'Pottery Workshop', 'Sand Valley', 'Underground City', 'Lantern Passage',
       'Vineyard Road', 'Stone Bridge', 'The Leap', 'Pigeon Valley', 'Sunrise Ridge'],
   },
@@ -1775,14 +2737,15 @@ const partState = []; for (let i = 0; i < 260; i++) { partState.push({ life: 0, 
 let partCursor = 0;
 function fx(kind, x, y, z, n) {
   const cols = { dust: [0xe6d2b4], sand: [0xebd6a6], splash: [0x9fdcf4, 0xffffff], confetti: [COL.lemon, COL.accent, COL.mint, COL.blush, 0xffffff], grape: [0xb07ad0, COL.lemon], burn: [0xffa040, 0xffe080], spark: [COL.lemon, 0xffffff, COL.blush, 0xa8dcf8] }[kind];
-  const sp = { dust: 1.2, sand: 1.0, splash: 2.4, confetti: 3.2, grape: 1.6, burn: 0.8, spark: 0.35 }[kind], life = kind === 'confetti' ? 1.4 : kind === 'spark' ? 0.5 : 0.7;
+  const sp = { dust: 1.2, sand: 1.0, splash: 2.4, confetti: 2.6, grape: 1.6, burn: 0.8, spark: 0.35 }[kind], life = kind === 'confetti' ? 1.4 : kind === 'spark' ? 0.5 : 0.7;
   if (settings.quality !== 'high') n = Math.ceil(n / 2);
   for (let k = 0; k < n; k++) {
     const i = partCursor; partCursor = (partCursor + 1) % PMAX; const ps = partState[i];
     ps.life = life * (0.6 + Math.random() * 0.4); ps.max = ps.life; ps.g = kind === 'burn' ? -2 : kind === 'spark' ? -1.2 : 6;
     const a = Math.random() * Math.PI * 2, r = Math.random();
-    ps.vx = Math.cos(a) * r * sp; ps.vz = Math.sin(a) * r * sp; ps.vy = sp * (kind === 'spark' ? 0.3 + Math.random() * 0.5 : 0.6 + Math.random() * 1.2);
-    partPos[i * 3] = x; partPos[i * 3 + 1] = y; partPos[i * 3 + 2] = z;
+    const rad = kind === 'confetti' ? 0.25 + Math.random() * 0.35 : 0;
+    ps.vx = Math.cos(a) * (rad ? 0.65 : r) * sp; ps.vz = Math.sin(a) * (rad ? 0.65 : r) * sp; ps.vy = sp * (kind === 'spark' ? 0.3 + Math.random() * 0.5 : 0.7 + Math.random() * 1.0);
+    partPos[i * 3] = x + Math.cos(a) * rad; partPos[i * 3 + 1] = y; partPos[i * 3 + 2] = z + Math.sin(a) * rad;
     _c.set(cols[k % cols.length]); partCol[i * 3] = _c.r; partCol[i * 3 + 1] = _c.g; partCol[i * 3 + 2] = _c.b;
   }
   partGeo.attributes.color.needsUpdate = true;
@@ -2018,7 +2981,7 @@ async function loadAssets() {
   } catch (e) { done('sfx', 'fail'); } })();
 }
 view.onShot = (power) => { audio.putt(power); };
-view.onSink = () => { const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.3, c[1], 40); };
+view.onSink = () => { const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.55, c[1], 36); };
 view.onGrape = () => { if (grapeMesh) { fx('grape', grapeMesh.position.x, grapeMesh.position.y + 0.2, grapeMesh.position.z, 14); grapeMesh.visible = false; } };
 view.onPenalty = () => { };
 view.onEnd = () => { };
@@ -2148,9 +3111,18 @@ const ui = {
   hud() {
     const i = game.holeIndex; $('s-hole').textContent = i + 1; $('s-par').textContent = HOLES[i].par; $('s-str').textContent = game.strokes;
     const tot = totalStrokes() + (game.card[i] === null ? game.strokes : 0); $('s-tot').textContent = tot;
+    const dots = $('hud-progress-dots');
+    if (dots) {
+      if (!dots.children.length) {
+        dots.innerHTML = Array.from({length: 12}, (_, k) => `<span class="p-dot" data-h="${k}"></span>`).join('');
+      }
+      Array.from(dots.children).forEach((d, k) => {
+        d.className = 'p-dot' + (k === i ? ' cur' : (game.card[k] !== null && game.card[k] !== undefined ? ' done' : ''));
+      });
+    }
   },
   toast(msg, cls) {
-    const el = document.createElement('div'); el.className = 'toast glass ' + (cls || 'info'); el.textContent = msg; $('toasts').appendChild(el);
+    const el = document.createElement('div'); el.className = 'toast ' + (cls || 'info'); el.textContent = msg; $('toasts').appendChild(el);
     setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2200);
   },
   hint(msg) { const h = $('hint'); if (!msg) { h.hidden = true; return; } h.textContent = msg; h.hidden = false; },
@@ -2171,7 +3143,7 @@ const ui = {
       const b = document.createElement('button'); const unlocked = i < best.unlocked || FLAG.debug;
       b.className = unlocked ? (best.holeBest[i] !== undefined ? 'done' : '') : 'locked'; b.disabled = !unlocked;
       const hs = (best.holeStars && best.holeStars[i]) || [false, false, false];
-      b.innerHTML = `<span>${i + 1}</span><span class="stars">${hs.map(starSvg).join('')}</span>`;
+      b.innerHTML = `<span class="hole-idx">${i + 1}</span><span class="hole-par">Par ${HOLES[i].par}</span><span class="stars">${hs.map(starSvg).join('')}</span>`;
       b.title = unlocked ? t('holes')[i] + ' · ' + t('par') + ' ' + HOLES[i].par : t('locked'); b.setAttribute('aria-label', b.title);
       b.addEventListener('click', () => { audio.init(); audio.ui(); startRun(i); });
       grid.appendChild(b);
@@ -2198,14 +3170,17 @@ const ui = {
   toggleTop() { game.top = !game.top; this.topBtn(); },
   topBtn() { $('b-view').classList.toggle('on', game.top); },
   cardTable(card, stars) {
-    let h = `<table class="card"><tr><th>${t('cupName')}</th><th>${t('par')}</th><th>${t('strokes')}</th><th>${t('result')}</th><th>${t('starsLbl')}</th></tr>`;
+    let h = `<table class="card"><thead><tr><th>${t('cupName')}</th><th>${t('par')}</th><th>${t('strokes')}</th><th>${t('result')}</th><th>${t('starsLbl')}</th></tr></thead><tbody>`;
     let tp = 0, ts = 0;
     for (let i = 0; i < 12; i++) {
       const s = card[i], st = stars[i] || [false, false, false]; let r = '';
-      if (s !== null && s !== undefined) { tp += HOLES[i].par; ts += s; const rr = resultText(s, HOLES[i].par); r = `<span class="${rr.cls}">${t(rr.k, { n: rr.n })}</span>`; }
-      h += `<tr><td class="n">${i + 1}</td><td>${HOLES[i].par}</td><td>${s ?? '–'}</td><td class="r">${r}</td><td><span class="stars">${st.map(starSvg).join('')}</span></td></tr>`;
+      if (s !== null && s !== undefined) { tp += HOLES[i].par; ts += s; const rr = resultText(s, HOLES[i].par); r = `<span class="score-chip ${rr.cls}">${t(rr.k, { n: rr.n })}</span>`; }
+      const isCur = (game.phase === 'play' || game.phase === 'intro') && i === game.holeIndex;
+      h += `<tr class="${isCur ? 'cur-row' : ''}"><td class="n">${i + 1}</td><td>${HOLES[i].par}</td><td><b>${s ?? '–'}</b></td><td class="r">${r || '–'}</td><td><span class="stars">${st.map(starSvg).join('')}</span></td></tr>`;
     }
-    h += `<tr><td class="n">Σ</td><td>${tp}</td><td><b>${ts}</b></td><td class="r">${ts ? relStr(ts - tp) : ''}</td><td></td></tr></table>`;
+    const rel = ts ? relStr(ts - tp) : 'E';
+    const relCls = ts ? (ts - tp < 0 ? 'birdie' : (ts - tp > 0 ? 'bogey' : '')) : '';
+    h += `</tbody><tfoot><tr class="sum-row"><td class="n">Σ</td><td>${tp}</td><td><b>${ts}</b></td><td class="r"><span class="score-chip ${relCls}">${rel}</span></td><td></td></tr></tfoot></table>`;
     return h;
   },
   showCard(show) {
@@ -2214,10 +3189,12 @@ const ui = {
   },
   showHoleResult() {
     const i = game.holeIndex, def = HOLES[i], s = game.strokes, rr = resultText(s, def.par), st = game.stars[i];
-    $('hr-title').textContent = t(rr.k, { n: rr.n }); $('hr-sub').textContent = t('strokesOf', { s, p: def.par }) + (game.holeBestNew ? ' · ' + t('holeBest') : '');
+    $('hr-title').textContent = t(rr.k, { n: rr.n });
+    $('hr-title').className = rr.cls;
+    $('hr-sub').textContent = t('strokesOf', { s, p: def.par }) + (game.holeBestNew ? ' · ' + t('holeBest') : '');
     $('hr-stars').innerHTML = st.map(starSvg).join('');
     const names = [t('star_under'), t('star_grape'), trickText(def)];
-    $('hr-list').innerHTML = names.map((n, k) => `<li class="${st[k] ? 'on' : ''}">${starSvg(st[k])}<span>${n}</span></li>`).join('');
+    $('hr-list').innerHTML = names.map((n, k) => `<li class="${st[k] ? 'on' : ''}">${starSvg(st[k])}<span class="star-name">${n}</span><span class="star-badge">${st[k] ? '✓' : '–'}</span></li>`).join('');
     $('b-next-t').textContent = i >= 11 ? t('finish') : t('nextHole');
     $('ov-hole').hidden = false; $('b-next').focus({ preventScroll: true });
     if (st.filter(Boolean).length) audio.star();
