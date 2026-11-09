@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="arena-game" content="peri-golf">
 <title>Peri Golf</title>
 <meta name="description" content="Physics mini-golf among the fairy chimneys of Cappadocia, redesigned as a fantasy miniature diorama with a wooden signpost UI: 12 hand-designed holes. Plays in the browser.">
 <meta property="og:type" content="website">
@@ -1607,6 +1608,7 @@ table.card .ace { color: var(--gold); font-weight: 800; }
       <div class="col">
         <button class="btn primary w" id="b-play" disabled><svg><use href="#i-play"/></svg><span data-t="play"></span></button>
         <button class="btn w lemon" id="b-continue" hidden><svg><use href="#i-restart"/></svg><span data-t="continue"></span> <span id="cont-info"></span></button>
+        <button class="btn w sky" id="b-daily" disabled><svg><use href="#i-target"/></svg><span data-t="daily"></span> <span id="daily-info" style="font-weight:600;opacity:.8"></span></button>
         <div class="row" style="justify-content:center">
           <button class="btn sky" id="b-settings"><svg><use href="#i-gear"/></svg><span data-t="settings"></span></button>
           <div class="seg" id="seg-lang"><button data-l="tr">TR</button><button data-l="en">EN</button></div>
@@ -1662,8 +1664,10 @@ table.card .ace { color: var(--gold); font-weight: 800; }
       <div id="hr-sub" style="color:var(--ink-mid);font-weight:700"></div>
       <div class="bigstars" id="hr-stars"></div>
       <ul class="starlist" id="hr-list"></ul>
+      <div id="hr-daily" style="font-weight:700;color:var(--ink-mid)" hidden></div>
       <button class="btn primary w" id="b-next"><svg><use href="#i-play"/></svg><span id="b-next-t"></span></button>
       <button class="btn w sky" id="b-hcard"><svg><use href="#i-card"/></svg><span data-t="scorecard"></span></button>
+      <button class="btn w lemon" id="b-hshare"><span data-t="share"></span></button>
     </div>
   </div>
 
@@ -1684,6 +1688,8 @@ table.card .ace { color: var(--gold); font-weight: 800; }
       <div id="end-card"></div>
       <button class="btn primary w" id="b-again"><svg><use href="#i-restart"/></svg><span data-t="playAgain"></span></button>
       <button class="btn w blush" id="b-emenu"><svg><use href="#i-home"/></svg><span data-t="mainMenu"></span></button>
+      <button class="btn w lemon" id="b-eshare"><span data-t="share"></span></button>
+      <a class="btn w sky" id="e-another" href="https://furkiozknn.github.io/" target="_blank" rel="noopener" style="text-decoration:none"><span data-t="another"></span></a>
     </div>
   </div>
 </div>
@@ -1740,6 +1746,10 @@ const I18N = {
     aceGallery: 'Tek vuruş galerisi', aceNone: 'Henüz tek vuruş yok', aceItem: '{h}. delik · {d} · {s} vuruş', aceNew: 'Galeriye eklendi!',
     trick: { ace: 'Tek vuruşta deliğe gir', banks: 'Duvardan sekerek deliğe gir', banks2: 'İki duvardan sekerek deliğe gir', long: '{d} m uzaktan deliğe gir',
       ride: 'Çömlek çarkına binip deliğe gir', noSand: 'Kuma hiç basmadan bitir', clean: 'Hiç ceza almadan bitir', air: 'Havada {t} sn uç', tunnel: 'Tünelden geçerek deliğe gir' },
+    daily: 'Günün Meydan Okuması', dailyInfo: '(seri {s} · en iyi {b})', dailyDone: '(bugün tamam · seri {s})',
+    dailyRes: 'Günün Meydan Okuması {d}: seri {s} gün · en iyi {b}', share: 'Paylaş', another: 'Başka oyun',
+    shareHole: '{n}. delik · {name}: {s} vuruş (Par {p}) {st}', shareDaily: 'Günün Meydan Okuması {d} · seri {k}',
+    shareEnd: '{h} delik: {t} vuruş ({r}) · {s} yıldız', awAce: 'Tek vuruş', awCourse: '12 delik tamam', awUnder: 'Par altı tur',
     holes: ['Güvercinlik Terası', 'Peribacası Dönemeci', 'Kaya Ev', 'Çömlek Atölyesi', 'Kum Vadisi', 'Yeraltı Şehri', 'Fener Geçidi',
       'Bağ Yolu', 'Taş Köprü', 'Sıçrama', 'Güvercin Vadisi', 'Gün Doğumu Sırtı'],
   },
@@ -1764,6 +1774,10 @@ const I18N = {
     aceGallery: 'Hole-in-one gallery', aceNone: 'No hole-in-one yet', aceItem: 'Hole {h} · {d} · {s} stroke', aceNew: 'Added to the gallery!',
     trick: { ace: 'Hole in one', banks: 'Bank off a wall into hole', banks2: 'Bank off two walls into hole', long: 'Sink from {d} m',
       ride: 'Ride pottery wheel, then sink', noSand: 'Finish without touching sand', clean: 'Finish with no penalty', air: 'Fly {t} s in air', tunnel: 'Sink through tunnel' },
+    daily: 'Daily challenge', dailyInfo: '(streak {s} · best {b})', dailyDone: '(done today · streak {s})',
+    dailyRes: 'Daily challenge {d}: streak {s} days · best {b}', share: 'Share', another: 'Another game',
+    shareHole: 'Hole {n} · {name}: {s} strokes (par {p}) {st}', shareDaily: 'Daily challenge {d} · streak {k}',
+    shareEnd: '{h} holes: {t} strokes ({r}) · {s} stars', awAce: 'Hole in one', awCourse: 'All 12 holes', awUnder: 'Round under par',
     holes: ['Pigeon Terrace', 'Chimney Bend', 'Cave House', 'Pottery Workshop', 'Sand Valley', 'Underground City', 'Lantern Passage',
       'Vineyard Road', 'Stone Bridge', 'The Leap', 'Pigeon Valley', 'Sunrise Ridge'],
   },
@@ -2855,7 +2869,7 @@ function loadHole(i, keepCard) {
   game.pathPts = []; game.strokeStart = [def.tee[0], def.tee[1]]; game.lastSinkStats = null; game.holeBestNew = false; game.scUsed = false; game.aceNew = false;
   game.aim.active = false; game.aim.kb = false; game.aim.power = 0; game.aim.charging = false;
   game.aim.angle = Math.atan2(def.cup[0] - def.tee[0], -(def.cup[1] - def.tee[1]));
-  const r = mulberry(77 + i); game.wind = [(r() - 0.5) * 2.4, (r() - 0.5) * 2.4];
+  const r = mulberry(77 + i); game.wind = game.daily && game.daily.hole === i ? game.daily.wind.slice() : [(r() - 0.5) * 2.4, (r() - 0.5) * 2.4];
   game.course.updateObstacles(0);
   if (!keepCard) { /* card entries stay as they are: practice start keeps blanks */ }
   game.phase = 'intro'; game.introT = 0; game.introDur = FLAG.auto ? 0.6 : 3.2;
@@ -2863,11 +2877,13 @@ function loadHole(i, keepCard) {
   ui.hud();
 }
 function startRun(fromHole) {
+  game.daily = null;
   game.card = new Array(12).fill(null); game.stars = new Array(12).fill(null); game.startHole = fromHole; game.done = false;
   loadHole(fromHole);
   ui.showTitle(false);
 }
 function continueRun(save) {
+  game.daily = null;
   game.card = save.card; game.stars = save.stars; game.startHole = save.startHole || 0; game.done = false;
   loadHole(save.hole); ui.showTitle(false);
 }
@@ -2920,6 +2936,12 @@ function holeSunk() {
   const stars = [game.strokes < def.par, game.grapeTaken, trickDone(def, st)];
   game.stars[i] = stars;
   game.pathPts.push([b.x, b.y, b.z]);
+  if (game.strokes === 1) arenaAward('ace', 'awAce');
+  if (game.daily) { // the daily hole keeps the campaign untouched (records, ghost line, unlocks, run save)
+    game.dailyRes = FLAG.auto || FLAG.nosave ? null : game.daily.complete(stars.filter(Boolean).length);
+    if (game.strokes === 1) { const a = aces[i]; game.aceNew = !a; aces[i] = a ? Object.assign(a, { count: (a.count || 1) + 1 }) : { date: today(), strokes: 1, count: 1 }; store.set(PG.aces, aces); }
+    game.phase = 'sunk'; game.sunkT = 0; view.onSink && view.onSink(); ui.hud(); return;
+  }
   // records
   const prev = best.holeBest[i];
   if (prev === undefined || game.strokes < prev) { best.holeBest[i] = game.strokes; best.ghost[i] = game.pathPts.map(p => p.map(v => Math.round(v * 100) / 100)); game.holeBestNew = prev !== undefined; }
@@ -2949,6 +2971,7 @@ function finishCourse() {
   if (full && (best.total === null || total < best.total)) { best.total = total; best.card = game.card.slice(); best.stars = game.stars.map(s => s && s.slice()); best.starsN = starsN; record = true; saveBest(); }
   store.del(KEY.save);
   game.autoResult = { total, par: playedPar(), stars: starsN, record };
+  if (full) { arenaAward('course', 'awCourse'); if (total < TOTAL_PAR) arenaAward('under', 'awUnder'); }
   ui.showEnd(total, starsN, record);
   view.onEnd && view.onEnd();
 }
@@ -3039,6 +3062,37 @@ function simulate(seconds) {
 window.periGolfSim = simulate;
 
 // ---------------------------------------------------------------------------
+// arena-kit: daily challenge, share, badges
+// The day's rng (Arena.daily().rng) picks one of the 12 holes (locks do not apply) and its wind; the hole is
+// played like any other, but nothing is written to the run save or the best card. Score = stars (0-3).
+// ---------------------------------------------------------------------------
+const ARENA_URL = 'https://furkiozknn.github.io/peri-golf/';
+const dayText = d => String(d).replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+function dailyInfo() {
+  if (!window.Arena) return null;
+  const d = Arena.daily(); d.hole = Math.floor(d.rng() * 12); d.wind = [(d.rng() - 0.5) * 2.4, (d.rng() - 0.5) * 2.4];
+  return d;
+}
+function startDaily() {
+  const d = dailyInfo(); if (!d) return;
+  game.card = new Array(12).fill(null); game.stars = new Array(12).fill(null); game.startHole = d.hole; game.done = false;
+  game.daily = d; game.dailyRes = null;
+  loadHole(d.hole); ui.showTitle(false);
+}
+function shareResult(end) {
+  if (!window.Arena) return;
+  let lines;
+  if (end) { const r = game.autoResult || { total: totalStrokes(), par: playedPar(), stars: 0 }; lines = [t('shareEnd', { h: game.card.filter(c => c !== null).length, t: r.total, r: relStr(r.total - r.par), s: r.stars })]; }
+  else {
+    const i = game.holeIndex, st = (game.stars[i] || []).filter(Boolean).length;
+    lines = [t('shareHole', { n: i + 1, name: t('holes')[i], s: game.card[i] ?? game.strokes, p: HOLES[i].par, st: '★'.repeat(st) + '☆'.repeat(3 - st) })];
+    if (game.daily) lines.unshift(t('shareDaily', { d: dayText(game.daily.day), k: game.dailyRes ? game.dailyRes.streak : game.daily.streak }));
+  }
+  Arena.share({ title: 'Peri Golf', lines, url: ARENA_URL });
+}
+function arenaAward(id, key) { if (window.Arena && !FLAG.auto && !FLAG.nosave) Arena.award('peri-golf:' + id, 'Peri Golf · ' + t(key)); }
+
+// ---------------------------------------------------------------------------
 // Renderer, scene, lights, static world
 // ---------------------------------------------------------------------------
 const canvas = document.getElementById('c');
@@ -3058,10 +3112,12 @@ const farMesh = mesh(far.geo, 'rock'); scene.add(farMesh);
 scene.fog = new THREE.Fog(0xf3e2d2, 13, 56); // tilt-shift depth fog: the course and hero chimneys stay crisp, the far field melts into the warm haze
 const envOn = () => settings.quality === 'high' && !!ASSETS.env;
 
-let PMAX = 260;
+let PMAX = 260, perfHandle = null;
 function applyQuality() {
   const hi = settings.quality === 'high';
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, hi ? 1.5 : 1));
+  // arena-kit: dynamic pixel ratio for weak GPUs, never above this quality's cap
+  if (window.Arena) { if (perfHandle) perfHandle.stop(); perfHandle = Arena.perf.attach(renderer, { max: Math.min(window.devicePixelRatio || 1, hi ? 1.5 : 1) }); }
   renderer.shadowMap.enabled = hi; sun.castShadow = hi;
   setMaterialSet(hi);
   scene.environment = envOn() ? ASSETS.env : null; // HDRI lighting only on High
@@ -3567,10 +3623,11 @@ window.addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeig
 // ---------------------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
 const starSvg = (on) => `<svg class="${on ? 'on' : ''}" viewBox="0 0 24 24"><use href="#i-star"/></svg>`;
+const INTRO_BADGE = $('intro').querySelector('.intro-badge').textContent;
 const ui = {
   prevOverlay: null,
   applyLang() {
-    document.documentElement.lang = LANG;
+    document.documentElement.lang = LANG; if (window.Arena) Arena.lang(LANG);
     document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
     document.querySelectorAll('[data-tt]').forEach(el => { el.title = t(el.dataset.tt); el.setAttribute('aria-label', t(el.dataset.tt)); });
     document.querySelectorAll('[data-t-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
@@ -3605,15 +3662,18 @@ const ui = {
   hint(msg) { const h = $('hint'); if (!msg) { h.hidden = true; return; } h.textContent = msg; h.hidden = false; },
   introCard(show) {
     const el = $('intro'); if (!show) { el.hidden = true; return; }
+    $('intro').querySelector('.intro-badge').textContent = game.daily ? t('daily') : INTRO_BADGE;
     const i = game.holeIndex; $('intro-name').textContent = (i + 1) + '. ' + t('holes')[i]; $('intro-par').textContent = t('par') + ' ' + HOLES[i].par + ' · ' + t('trickLbl') + ': ' + trickText(HOLES[i]); el.hidden = false;
   },
   power(p, show) { $('power').hidden = !show; $('powerfill').style.height = Math.round(p * 100) + '%'; },
   showTitle(show) {
-    $('ov-title').hidden = !show; $('hud').hidden = show; if (show) { game.phase = 'title'; this.title(); this.hint(''); this.introCard(false); $('b-play').focus({ preventScroll: true }); }
+    $('ov-title').hidden = !show; $('hud').hidden = show; if (show) { game.daily = null; game.phase = 'title'; this.title(); this.hint(''); this.introCard(false); $('b-play').focus({ preventScroll: true }); }
   },
   title() {
     const save = store.get(KEY.save);
     $('b-continue').hidden = !(save && save.card); if (save) $('cont-info').textContent = t('contFrom', { n: save.hole + 1 });
+    const d = dailyInfo(); $('b-daily').hidden = !d;
+    if (d) $('daily-info').textContent = t(d.done ? 'dailyDone' : 'dailyInfo', { s: d.streak, b: d.best });
     $('best-line').textContent = best.total === null ? t('bestNone') : t('bestCard', { t: best.total, r: relStr(best.total - TOTAL_PAR), s: best.starsN || 0 });
     const grid = $('holes'); grid.innerHTML = '';
     for (let i = 0; i < 12; i++) {
@@ -3679,7 +3739,10 @@ const ui = {
     $('hr-stars').innerHTML = st.map(starSvg).join('');
     const names = [t('star_under'), t('star_grape'), trickText(def)];
     $('hr-list').innerHTML = names.map((n, k) => `<li class="${st[k] ? 'on' : ''}">${starSvg(st[k])}<span class="star-name">${n}</span><span class="star-badge">${st[k] ? '✓' : '–'}</span></li>`).join('');
-    $('b-next-t').textContent = i >= 11 ? t('finish') : t('nextHole');
+    $('b-next-t').textContent = game.daily ? t('mainMenu') : i >= 11 ? t('finish') : t('nextHole');
+    $('hr-daily').hidden = !game.daily;
+    if (game.daily) $('hr-daily').textContent = game.dailyRes ? t('dailyRes', { d: dayText(game.daily.day), s: game.dailyRes.streak, b: game.dailyRes.best }) : t('daily') + ' ' + dayText(game.daily.day);
+    $('b-hshare').hidden = !window.Arena;
     $('ov-hole').hidden = false; $('b-next').focus({ preventScroll: true });
     if (st.filter(Boolean).length) audio.star();
   },
@@ -3688,6 +3751,8 @@ const ui = {
     const par = playedPar(); $('e-total').textContent = total; $('e-rel').textContent = relStr(total - par); $('e-stars').textContent = stars + '/' + (game.card.filter(c => c !== null).length * 3);
     $('e-best').textContent = best.total === null ? '–' : best.total; $('end-rec').hidden = !record; $('end-rec').textContent = t('newRecord');
     $('end-card').innerHTML = this.cardTable(game.card, game.stars); this.extras('end-sc', 'end-gallery');
+    if (window.Arena) { const others = Arena.games.filter(g => g !== 'peri-golf'); $('e-another').href = 'https://furkiozknn.github.io/' + others[Math.floor(Math.random() * others.length)] + '/'; }
+    $('b-eshare').hidden = !window.Arena;
     $('hud').hidden = true; $('ov-end').hidden = false; $('b-again').focus({ preventScroll: true }); this.hint('');
   },
 };
@@ -3700,10 +3765,13 @@ $('b-sclose').addEventListener('click', () => { audio.ui(true); ui.showSettings(
 $('b-pause').addEventListener('click', () => { audio.init(); ui.setPaused(true); });
 $('b-resume').addEventListener('click', () => { audio.ui(); ui.setPaused(false); });
 $('b-restart').addEventListener('click', () => { ui.setPaused(false); restartHole(); });
-$('b-menu').addEventListener('click', () => { ui.setPaused(false); saveRun(game.holeIndex); game.card[game.holeIndex] = null; ui.showTitle(true); });
+$('b-menu').addEventListener('click', () => { ui.setPaused(false); if (!game.daily) saveRun(game.holeIndex); game.card[game.holeIndex] = null; ui.showTitle(true); });
 $('b-emenu').addEventListener('click', () => { $('ov-end').hidden = true; ui.showTitle(true); });
 $('b-again').addEventListener('click', () => { $('ov-end').hidden = true; startRun(0); });
-$('b-next').addEventListener('click', () => { audio.ui(); nextHole(); });
+$('b-next').addEventListener('click', () => { audio.ui(); if (game.daily) { ui.hideHoleResult(); ui.showTitle(true); } else nextHole(); });
+$('b-daily').addEventListener('click', () => { audio.init(); audio.ui(); startDaily(); });
+$('b-hshare').addEventListener('click', () => shareResult(false));
+$('b-eshare').addEventListener('click', () => shareResult(true));
 $('b-hcard').addEventListener('click', () => { ui.showCard(true); });
 $('b-cclose').addEventListener('click', () => { audio.ui(true); ui.showCard(false); });
 $('b-card').addEventListener('click', () => { audio.init(); ui.showCard(true); });
@@ -3799,7 +3867,8 @@ camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
   camera.position.set(6, 3, 12); camera.lookAt(-4, 1, -6);
 }
 ui.applyLang(); ui.soundBtn();
-$('loadmsg').textContent = ''; $('b-play').disabled = false;
+$('loadmsg').textContent = ''; $('b-play').disabled = false; $('b-daily').disabled = false;
+if (window.Arena) Arena.mountSettingsButton(); // bottom-right is free here: the power bar is bottom-left, hints bottom-centre
 if (FLAG.auto) startRun(FLAG.hole ? clamp(FLAG.hole - 1, 0, 11) : 0);
 else if (FLAG.hole) startRun(clamp(FLAG.hole - 1, 0, 11));
 if (FLAG.sim > 0) simulate(FLAG.sim);
