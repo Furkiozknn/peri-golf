@@ -14,6 +14,7 @@
 <meta property="og:image:width" content="960">
 <meta property="og:image:height" content="540">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Peri Golf","short_name":"PeriGolf","start_url":"./","display":"standalone","background_color":"#9AD1F5","theme_color":"#C2562C"}'>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -3902,6 +3903,23 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 window.__loaded = true;
+if ('serviceWorker' in navigator) {
+  const sw = `
+    self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+          return caches.open('perigolf-v1').then(cache => {
+            if (e.request.url.startsWith('http')) cache.put(e.request, res.clone());
+            return res;
+          });
+        }).catch(() => cached))
+      );
+    });
+  `;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], {type: 'text/javascript'}))).catch(()=>{});
+}
 </script>
 </body>
 </html>
