@@ -796,6 +796,22 @@ input[type=range] {
 .holes button.locked .hole-idx {
   color: var(--ink-muted);
 }
+.holes button { position: relative; }
+.holes button .sc-mark {
+  position: absolute; top: 3px; right: 5px;
+  font-size: 11px; line-height: 1; color: var(--gold);
+}
+.sc-line {
+  margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--ink-mid); text-align: center;
+}
+.gallery {
+  margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  font-size: 12px; font-weight: 600; color: var(--ink-muted);
+}
+.gallery b { width: 100%; text-align: center; color: var(--ink); font-size: 13px; }
+.gallery .ace-chip {
+  padding: 3px 9px; border-radius: 10px; background: var(--gold-bg); border: 1.5px solid var(--tuff-dark); color: var(--ink);
+}
 
 /* ==========================================================================
    SCORECARD & TABLE PRESENTATION
@@ -1245,6 +1261,8 @@ table.card .ace { color: var(--gold); font-weight: 800; }
       <div class="best" id="best-line"></div>
       <div class="lbl"><svg width="18" height="18"><use href="#i-target"/></svg><span data-t="pickHole"></span></div>
       <div class="holes" id="holes"></div>
+      <div class="sc-line" id="sc-line"></div>
+      <div class="gallery" id="ace-gallery"></div>
       <div class="footer"><a href="https://github.com/Furkiozknn" target="_blank" rel="noopener">Claude Game Arena</a> · built by Claude Fable 5.1</div>
     </div>
   </div>
@@ -1307,6 +1325,8 @@ table.card .ace { color: var(--gold); font-weight: 800; }
         <div><b id="e-stars">0/36</b><span data-t="starsLbl"></span></div>
         <div><b id="e-best">-</b><span data-t="bestLbl"></span></div>
       </div>
+      <div class="sc-line" id="end-sc"></div>
+      <div class="gallery" id="end-gallery"></div>
       <div id="end-card"></div>
       <button class="btn primary w" id="b-again"><svg><use href="#i-restart"/></svg><span data-t="playAgain"></span></button>
       <button class="btn w blush" id="b-emenu"><svg><use href="#i-home"/></svg><span data-t="mainMenu"></span></button>
@@ -1361,6 +1381,9 @@ const I18N = {
     star_under: 'Par Altı Başarı', star_grape: 'Gizli Kapadokya Üzümü', newRecord: '★ Yeni Parkur Rekoru! ★', musicOn: 'Müzik açık', musicOff: 'Müzik kapalı',
     sfxOn: 'Efektler açık', sfxOff: 'Efektler kapalı', strokesOf: '{s} vuruş · Par {p}', cardSaved: 'Kart kaydedildi', holeBest: 'Delik rekoru!',
     cupName: 'Delik', result: 'Sonuç', trickLbl: 'Özel Görev', ghostLbl: 'Hayalet çizgi: en iyi vuruşun',
+    scFound: 'Gizli kestirme bulundu: {k}!', scUsed: 'Kestirme: {k}', scCount: 'Gizli kestirmeler: {n}/{m}', scTaken: 'kestirme',
+    scKind: { ring: 'Peri Halkası', tunnel: 'Gizli Tünel', portal: 'Peri Kapısı' },
+    aceGallery: 'Tek vuruş galerisi', aceNone: 'Henüz tek vuruş yok', aceItem: '{h}. delik · {d} · {s} vuruş', aceNew: 'Galeriye eklendi!',
     trick: { ace: 'Tek vuruşta deliğe gir', banks: 'Duvardan sekerek deliğe gir', banks2: 'İki duvardan sekerek deliğe gir', long: '{d} m uzaktan deliğe gir',
       ride: 'Çömlek çarkına binip deliğe gir', noSand: 'Kuma hiç basmadan bitir', clean: 'Hiç ceza almadan bitir', air: 'Havada {t} sn uç', tunnel: 'Tünelden geçerek deliğe gir' },
     holes: ['Güvercinlik Terası', 'Peribacası Dönemeci', 'Kaya Ev', 'Çömlek Atölyesi', 'Kum Vadisi', 'Yeraltı Şehri', 'Fener Geçidi',
@@ -1382,6 +1405,9 @@ const I18N = {
     star_under: 'Under Par Finish', star_grape: 'Hidden Cappadocia Grape', newRecord: '★ New Course Record! ★', musicOn: 'Music on', musicOff: 'Music off',
     sfxOn: 'Effects on', sfxOff: 'Effects off', strokesOf: '{s} strokes · Par {p}', cardSaved: 'Card saved', holeBest: 'Hole record!',
     cupName: 'Hole', result: 'Result', trickLbl: 'Special Trick', ghostLbl: 'Ghost line: your best shot',
+    scFound: 'Hidden shortcut found: {k}!', scUsed: 'Shortcut: {k}', scCount: 'Shortcuts found: {n}/{m}', scTaken: 'shortcut',
+    scKind: { ring: 'Fairy Ring', tunnel: 'Hidden Tunnel', portal: 'Fairy Portal' },
+    aceGallery: 'Hole-in-one gallery', aceNone: 'No hole-in-one yet', aceItem: 'Hole {h} · {d} · {s} stroke', aceNew: 'Added to the gallery!',
     trick: { ace: 'Hole in one', banks: 'Bank off a wall into hole', banks2: 'Bank off two walls into hole', long: 'Sink from {d} m',
       ride: 'Ride pottery wheel, then sink', noSand: 'Finish without touching sand', clean: 'Finish with no penalty', air: 'Fly {t} s in air', tunnel: 'Sink through tunnel' },
     holes: ['Pigeon Terrace', 'Chimney Bend', 'Cave House', 'Pottery Workshop', 'Sand Valley', 'Underground City', 'Lantern Passage',
@@ -1418,6 +1444,10 @@ const saveSettings = () => store.set(KEY.settings, settings);
 let best = store.get(KEY.best) || { total: null, card: null, stars: null, unlocked: 1, ghost: {}, holeBest: {} };
 if (!best.ghost) best.ghost = {}; if (!best.holeBest) best.holeBest = {}; if (!best.unlocked) best.unlocked = 1;
 const saveBest = () => store.set(KEY.best, best);
+// Hidden shortcuts found ({hole index: date}) and the hole-in-one gallery ({hole index: {date, strokes, count}})
+const PG = { shortcuts: 'perigolf.shortcuts', aces: 'perigolf.aces' };
+const found = store.get(PG.shortcuts) || {}, aces = store.get(PG.aces) || {};
+const today = () => new Date().toISOString().slice(0, 10);
 
 // ---------------------------------------------------------------------------
 // Audio: everything synthesised with Web Audio
@@ -1602,6 +1632,23 @@ const HOLES = [
     path: [[-1.6, 0.3], [-1.6, -5.2]], deco: { chimneys: 18, houses: 3, vines: true } },
 ];
 const TOTAL_PAR = HOLES.reduce((a, h) => a + h.par, 0);
+// Hidden shortcuts ("Gizli Kestirme"): one per hole. A ball that rolls into the ring at `at` is carried to `out`
+// and leaves rolling towards the cup. Rings sit off the main line; they sparkle once the ball comes near.
+const SC_R = 0.3, SC_NEAR = 1.8;
+const SHORTCUTS = [
+  { kind: 'ring', at: [-0.95, 0.9], out: [0, -2.4] },
+  { kind: 'tunnel', at: [0.95, 1.4], out: [4.0, -1.5] },
+  { kind: 'portal', at: [-0.95, 3.0], out: [0.4, -3.4] },
+  { kind: 'ring', at: [-1.2, -0.5], out: [1.9, -2.2] },
+  { kind: 'ring', at: [1.6, 2.4], out: [-0.7, -3.3] },
+  { kind: 'tunnel', at: [-0.7, 2.0], out: [3.6, -5.1] },
+  { kind: 'ring', at: [-1.0, 2.6], out: [0, -3.95] },
+  { kind: 'portal', at: [0.9, 1.3], out: [0.2, -4.0] },
+  { kind: 'ring', at: [-1.25, 3.4], out: [0.9, -3.4] },
+  { kind: 'portal', at: [-1.0, 2.6], out: [0.7, -3.2] },
+  { kind: 'tunnel', at: [-0.9, 3.6], out: [4.5, -3.9] },
+  { kind: 'ring', at: [2.6, 0.2], out: [1.2, -6.4] },
+];
 
 // ---------------------------------------------------------------------------
 // Course model: height field, walls, obstacles
@@ -1620,6 +1667,21 @@ class Course {
     this.bbox = { x0, x1, z0, z1, ymin, ymax, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2 };
     this.base = ymin - 1.3;
     this.walls = this.buildWalls();
+    const sc = SHORTCUTS[index];
+    if (sc) { this.sc = Object.assign({ v: 0 }, sc); this.sc.v = this.scSpeed(); }
+  }
+  // smallest exit speed that still drops the ball from the shortcut exit (found by simulation, obstacles at rest pose)
+  scSpeed() {
+    const sc = this.sc, cup = this.def.cup, a = Math.atan2(cup[0] - sc.out[0], cup[1] - sc.out[1]);
+    this.updateObstacles(0);
+    const sinks = (v) => {
+      const b = makeBall(sc.out[0], (this.height(sc.out[0], sc.out[1]) ?? 0) + BALL_R, sc.out[1]);
+      b.rest = false; b.warped = true; b.vx = Math.sin(a) * v; b.vz = Math.cos(a) * v; const ev = [];
+      for (let n = 0; n < 1200 && !b.rest && !b.sunk && !b.penalty; n++) stepBall(b, this, DT, [0, 0], ev);
+      return b.sunk;
+    };
+    for (let v = 0.6; v <= 2.7; v += 0.05) if (sinks(v)) return v + 0.04;
+    return 1.8;
   }
   bumpH(x, z) {
     let h = 0;
@@ -2224,7 +2286,7 @@ const _n = new THREE.Vector3();
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 function makeBall(x, y, z) {
   return { x, y, z, vx: 0, vy: 0, vz: 0, grounded: true, surface: 'grass', airTime: 0, maxAir: 0, bounces: 0, hitObs: false, onWheel: false,
-    wheelTouched: false, sandTouched: false, rest: true, restTimer: 0, sunk: false, penalty: null, lipped: false, dist: 0 };
+    wheelTouched: false, sandTouched: false, rest: true, restTimer: 0, sunk: false, penalty: null, lipped: false, dist: 0, warped: false };
 }
 function cloneBall(b) { return Object.assign({}, b); }
 function ballSpeed(b) { return Math.hypot(b.vx, b.vy, b.vz); }
@@ -2325,6 +2387,20 @@ function stepBall(b, course, dt, wind, ev) {
     }
     if (b.y < course.base - 1.5 && !b.penalty) { b.penalty = 'oob'; ev.push({ type: 'oob' }); }
   }
+  const sc = course.sc;
+  if (sc && !b.warped && b.grounded && !b.penalty) {
+    const sx = b.x - sc.at[0], sz = b.z - sc.at[1];
+    if (sx * sx + sz * sz < SC_R * SC_R) {
+      // carried to the exit, at most once per stroke. Speed and line follow the entry: a firm roll through the
+      // middle heads for the cup, a soft one stops short, an off-centre one leaves at an angle (a putt is left)
+      const sp = Math.hypot(b.vx, b.vz), cup = course.def.cup, off = sp > 1e-6 ? (b.vx * sz - b.vz * sx) / sp / SC_R : 0;
+      const a = Math.atan2(cup[0] - sc.out[0], cup[1] - sc.out[1]) + off * 0.45;
+      const v = sc.v * (0.7 + 0.32 * clamp((sp - 1) / 3, 0, 1));
+      ev.push({ type: 'warp', x: sc.at[0], z: sc.at[1] });
+      b.warped = true; b.x = sc.out[0]; b.z = sc.out[1]; b.y = (course.height(b.x, b.z) ?? b.y) + BALL_R;
+      b.vx = Math.sin(a) * v; b.vz = Math.cos(a) * v; b.vy = 0; b.grounded = true; b.airTime = 0;
+    }
+  }
   for (const w of course.walls) collideWall(b, w, course, ev);
   collideObstacles(b, course, ev);
   const cup = course.def.cup, dx = b.x - cup[0], dz = b.z - cup[1], d = Math.hypot(dx, dz);
@@ -2343,7 +2419,7 @@ function shootBall(b, course, angle, power) {
   const dn = dx * _n.x + dz * _n.z; let vx = dx - dn * _n.x, vy = -dn * _n.y, vz = dz - dn * _n.z;
   const l = Math.hypot(vx, vy, vz) || 1; vx /= l; vy /= l; vz /= l;
   b.vx = vx * speed; b.vy = vy * speed; b.vz = vz * speed;
-  b.rest = false; b.restTimer = 0; b.bounces = 0; b.hitObs = false; b.wheelTouched = false; b.maxAir = 0; b.airTime = 0; b.penalty = null; b.dist = 0; b.lipped = false;
+  b.rest = false; b.restTimer = 0; b.bounces = 0; b.hitObs = false; b.wheelTouched = false; b.maxAir = 0; b.airTime = 0; b.penalty = null; b.dist = 0; b.lipped = false; b.warped = false;
 }
 // simulate a shot without rendering; moving obstacles advance from t0
 const _simEv = []; // reused scratch array to prevent per-frame allocations during aim preview and bot simulation
@@ -2354,10 +2430,11 @@ function simulateShot(course, ball, angle, power, t0, wind, maxT, trace) {
   while (steps < maxSteps && !b.rest && !b.sunk && !b.penalty) {
     course.updateObstacles(tt); stepBall(b, course, DT, wind, _simEv);
     tt += DT; steps++;
+    if (trace && b.warped) break; // the aim preview does not give the shortcut away
     if (trace && steps % 3 === 0) trace.push(b.x, b.y, b.z);
     if (firstHit < 0 && _simEv.length) { const e = _simEv[_simEv.length - 1]; if (e.type === 'bounce' || e.type === 'obstacle') firstHit = steps; if (trace && firstHit > 0) break; }
   }
-  if (trace) trace.push(b.x, b.y, b.z);
+  if (trace && !b.warped) trace.push(b.x, b.y, b.z);
   course.updateObstacles(t0);
   return { b, steps, time: steps * DT, firstHit, ev: _simEv };
 }
@@ -2408,7 +2485,7 @@ const game = {
   startHole: 0, holeTime: 0, paused: false, hidden: false, aim: { active: false, kb: false, angle: 0, power: 0, charging: false, dir: 1 },
   top: false, introT: 0, introDur: 3.2, sunkT: 0, grapeTaken: false, strokeStart: null, strokeStartZ: 0, sandTouched: false, penalties: 0,
   maxAir: 0, pathPts: [], time: 0, wind: [0, 0], done: false, botWait: 0, hintShown: false, holeBestNew: false, autoResult: 0,
-  wheelTouched: false, lastSinkStats: null,
+  wheelTouched: false, lastSinkStats: null, scUsed: false, aceNew: false,
 };
 window.periGolf = game;
 const totalStrokes = () => game.card.reduce((a, s) => a + (s || 0), 0);
@@ -2421,7 +2498,7 @@ function loadHole(i, keepCard) {
   const th = game.course.height(def.tee[0], def.tee[1]) || 0;
   game.ball = makeBall(def.tee[0], th + BALL_R, def.tee[1]);
   game.strokes = 0; game.holeTime = 0; game.grapeTaken = false; game.sandTouched = false; game.penalties = 0; game.maxAir = 0; game.wheelTouched = false;
-  game.pathPts = []; game.strokeStart = [def.tee[0], def.tee[1]]; game.lastSinkStats = null; game.holeBestNew = false;
+  game.pathPts = []; game.strokeStart = [def.tee[0], def.tee[1]]; game.lastSinkStats = null; game.holeBestNew = false; game.scUsed = false; game.aceNew = false;
   game.aim.active = false; game.aim.kb = false; game.aim.power = 0; game.aim.charging = false;
   game.aim.angle = Math.atan2(def.cup[0] - def.tee[0], -(def.cup[1] - def.tee[1]));
   const r = mulberry(77 + i); game.wind = [(r() - 0.5) * 2.4, (r() - 0.5) * 2.4];
@@ -2495,6 +2572,10 @@ function holeSunk() {
   if (!best.holeStars) best.holeStars = {};
   const hs = best.holeStars[i] || [false, false, false]; best.holeStars[i] = hs.map((v, k) => v || stars[k]);
   best.unlocked = Math.max(best.unlocked, Math.min(12, i + 2));
+  if (game.strokes === 1) { // hole-in-one gallery: first date kept, repeat aces counted
+    const a = aces[i]; game.aceNew = !a;
+    aces[i] = a ? Object.assign(a, { count: (a.count || 1) + 1 }) : { date: today(), strokes: 1, count: 1 }; store.set(PG.aces, aces);
+  }
   saveBest(); saveRun(i + 1);
   game.phase = 'sunk'; game.sunkT = 0;
   view.onSink && view.onSink();
@@ -2532,7 +2613,16 @@ function trackBall(ev) {
     else if (e.type === 'oob') { audio.oob(); }
     else if (e.type === 'lip') { audio.click(); }
     else if (e.type === 'sink') { audio.cup(); }
+    else if (e.type === 'warp') onShortcut(e);
   }
+}
+function onShortcut(e) {
+  const i = game.holeIndex, sc = game.course.sc, name = t('scKind')[sc.kind];
+  game.scUsed = true; audio.grape(); audio.star();
+  if (found[i]) ui.toast(t('scUsed', { k: name }), 'good');
+  else { found[i] = today(); store.set(PG.shortcuts, found); ui.toast(t('scFound', { k: name }), 'good'); }
+  game.pathPts.push([e.x, game.ball.y, e.z], [game.ball.x, game.ball.y, game.ball.z]);
+  view.onWarp && view.onWarp(e);
 }
 let acc = 0, pathTimer = 0;
 const _frameEv = []; // reused scratch array to eliminate per-frame event allocations
@@ -2888,11 +2978,44 @@ view.onHole = function () {
     ghostLine = new THREE.Line(g, new THREE.LineDashedMaterial({ color: COL.lemon, dashSize: 0.14, gapSize: 0.1, transparent: true, opacity: 0.8 }));
     ghostLine.computeLineDistances(); holeGroup.add(ghostLine);
   }
+  buildShortcut(course);
   setPigeons(course); setMotes(course);
   applySun();
   cam.yaw = game.aim.angle; cam.cyaw = cam.yaw; cam.pitch = cam.cpitch = 0.45; cam.dist = cam.cdist = 4.8; game.top = false; ui.topBtn(); // a flatter tee camera shows the hero chimneys and the sky
   ballMesh.visible = true; ballMesh.position.set(game.ball.x, game.ball.y, game.ball.z);
 };
+
+// ---- hidden shortcut: a ring of toadstools around a glow that wakes up when the ball comes near ----
+const SC_COL = { ring: COL.lemon, tunnel: 0xF2B880, portal: COL.lilac };
+let scVis = null;
+function buildShortcut(course) {
+  if (scVis) { scVis.inRing.material.dispose(); scVis.outRing.material.dispose(); }
+  scVis = null; const sc = course.sc; if (!sc) return;
+  const gIn = course.height(sc.at[0], sc.at[1]) ?? 0, gOut = course.height(sc.out[0], sc.out[1]) ?? 0, col = SC_COL[sc.kind] || COL.lemon, rnd = mulberry(500 + course.index), list = [];
+  for (let k = 0; k < 9; k++) {
+    const a = k / 9 * Math.PI * 2 + rnd() * 0.3, r = SC_R + 0.14 + rnd() * 0.05, x = sc.at[0] + Math.cos(a) * r, z = sc.at[1] + Math.sin(a) * r, s = 0.7 + rnd() * 0.5;
+    list.push(cyl(0.012 * s, 0.016 * s, 0.07 * s, 5, x, gIn + 0.035 * s, z, 0xfff4e3), sph(0.035 * s, x, gIn + 0.075 * s, z, k % 3 ? col : COL.accent, 5));
+  }
+  const mush = mesh(merged(list), 'flat'); mush.castShadow = true;
+  const ringMat = () => new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide });
+  const inRing = new THREE.Mesh(new THREE.RingGeometry(SC_R - 0.08, SC_R + 0.02, 28), ringMat()); inRing.rotation.x = -Math.PI / 2; inRing.position.set(sc.at[0], gIn + 0.012, sc.at[1]);
+  const outRing = new THREE.Mesh(new THREE.RingGeometry(0.12, 0.18, 22), ringMat()); outRing.rotation.x = -Math.PI / 2; outRing.position.set(sc.out[0], gOut + 0.012, sc.out[1]);
+  holeGroup.add(mush, inRing, outRing);
+  scVis = { inRing, outRing, gIn, near: 0, nextSpark: 0 };
+}
+function syncShortcut(dt) {
+  const sc = game.course && game.course.sc; if (!scVis || !sc) return;
+  const b = game.ball, known = !!found[game.holeIndex], d = Math.hypot(b.x - sc.at[0], b.z - sc.at[1]);
+  const want = known || (d < SC_NEAR && game.phase === 'play') ? 1 : 0; scVis.near += (want - scVis.near) * Math.min(1, dt * 3);
+  const pulse = 0.75 + 0.25 * Math.sin(game.time * 4);
+  scVis.inRing.material.opacity = 0.1 + 0.75 * scVis.near * pulse; scVis.outRing.material.opacity = (known ? 0.6 : 0.25 * scVis.near) * pulse;
+  scVis.inRing.rotation.z = game.time * 0.6;
+  if (want && game.time > scVis.nextSpark) { // sparkles rise from the ring as a fair hint
+    scVis.nextSpark = game.time + (known ? 0.35 : 0.12); const a = Math.random() * Math.PI * 2;
+    fx('spark', sc.at[0] + Math.cos(a) * SC_R, scVis.gIn + 0.05, sc.at[1] + Math.sin(a) * SC_R, 1);
+  }
+}
+view.onWarp = (e) => { const sc = game.course.sc; fx('spark', e.x, scVis ? scVis.gIn + 0.1 : 0.1, e.z, 18); fx('grape', sc.out[0], game.ball.y, sc.out[1], 14); };
 
 // ---- instanced Blender chimneys and cave houses (near + far field), filled per hole ----
 const inst = { chim: [], house: null };
@@ -3143,11 +3266,18 @@ const ui = {
       const b = document.createElement('button'); const unlocked = i < best.unlocked || FLAG.debug;
       b.className = unlocked ? (best.holeBest[i] !== undefined ? 'done' : '') : 'locked'; b.disabled = !unlocked;
       const hs = (best.holeStars && best.holeStars[i]) || [false, false, false];
-      b.innerHTML = `<span class="hole-idx">${i + 1}</span><span class="hole-par">Par ${HOLES[i].par}</span><span class="stars">${hs.map(starSvg).join('')}</span>`;
+      b.innerHTML = `<span class="hole-idx">${i + 1}</span><span class="hole-par">Par ${HOLES[i].par}</span><span class="stars">${hs.map(starSvg).join('')}</span>` + (found[i] ? '<span class="sc-mark" aria-hidden="true">✦</span>' : '');
       b.title = unlocked ? t('holes')[i] + ' · ' + t('par') + ' ' + HOLES[i].par : t('locked'); b.setAttribute('aria-label', b.title);
       b.addEventListener('click', () => { audio.init(); audio.ui(); startRun(i); });
       grid.appendChild(b);
     }
+    this.extras('sc-line', 'ace-gallery');
+  },
+  // shortcut counter and hole-in-one gallery (title screen and course summary)
+  extras(lineId, galId) {
+    $(lineId).textContent = '✦ ' + t('scCount', { n: Object.keys(found).filter(k => SHORTCUTS[k]).length, m: SHORTCUTS.length });
+    const ks = Object.keys(aces).map(Number).filter(i => HOLES[i]).sort((a, b) => a - b);
+    $(galId).innerHTML = `<b>${t('aceGallery')}</b>` + (ks.length ? ks.map(i => `<span class="ace-chip" title="${t('holes')[i]}">${t('aceItem', { h: i + 1, d: aces[i].date, s: aces[i].strokes })}${aces[i].count > 1 ? ' ×' + aces[i].count : ''}</span>`).join('') : `<span>${t('aceNone')}</span>`);
   },
   showSettings(show) {
     if (show) { this.prevOverlay = ['ov-title', 'ov-pause'].find(id => !$(id).hidden) || null; $('ov-title').hidden = true; $('ov-pause').hidden = true;
@@ -3191,7 +3321,7 @@ const ui = {
     const i = game.holeIndex, def = HOLES[i], s = game.strokes, rr = resultText(s, def.par), st = game.stars[i];
     $('hr-title').textContent = t(rr.k, { n: rr.n });
     $('hr-title').className = rr.cls;
-    $('hr-sub').textContent = t('strokesOf', { s, p: def.par }) + (game.holeBestNew ? ' · ' + t('holeBest') : '');
+    $('hr-sub').textContent = t('strokesOf', { s, p: def.par }) + (game.holeBestNew ? ' · ' + t('holeBest') : '') + (game.scUsed ? ' · ✦ ' + t('scTaken') : '') + (game.aceNew ? ' · ' + t('aceNew') : '');
     $('hr-stars').innerHTML = st.map(starSvg).join('');
     const names = [t('star_under'), t('star_grape'), trickText(def)];
     $('hr-list').innerHTML = names.map((n, k) => `<li class="${st[k] ? 'on' : ''}">${starSvg(st[k])}<span class="star-name">${n}</span><span class="star-badge">${st[k] ? '✓' : '–'}</span></li>`).join('');
@@ -3203,7 +3333,7 @@ const ui = {
   showEnd(total, stars, record) {
     const par = playedPar(); $('e-total').textContent = total; $('e-rel').textContent = relStr(total - par); $('e-stars').textContent = stars + '/' + (game.card.filter(c => c !== null).length * 3);
     $('e-best').textContent = best.total === null ? '–' : best.total; $('end-rec').hidden = !record; $('end-rec').textContent = t('newRecord');
-    $('end-card').innerHTML = this.cardTable(game.card, game.stars);
+    $('end-card').innerHTML = this.cardTable(game.card, game.stars); this.extras('end-sc', 'end-gallery');
     $('hud').hidden = true; $('ov-end').hidden = false; $('b-again').focus({ preventScroll: true }); this.hint('');
   },
 };
@@ -3282,6 +3412,7 @@ view.sync = function (dt = 0) {
   if (flagMesh) { flagMesh.rotation.y = Math.sin(game.time * 1.7) * 0.12 + game.wind[0] * 0.2; flagMesh.rotation.z = Math.sin(game.time * 2.3) * 0.025; }
   if (grapeMesh && grapeMesh.visible) { grapeMesh.rotation.y = game.time * 1.4; grapeMesh.position.y = (course.height(grapeMesh.position.x, grapeMesh.position.z) ?? 0) + 0.08 + Math.sin(game.time * 2.5) * 0.04; }
   if (waterMesh) waterMesh.position.y = Math.sin(game.time * 1.3) * 0.012;
+  syncShortcut(dt);
   updateBalloons(dt); updatePigeons(dt); updateParticles(dt); updateClouds(dt); updateMotes();
   if (game.time - lastBurner > 6 + Math.random() * 5 && audio.ok()) { lastBurner = game.time; const k = Math.floor(Math.random() * BALLOON_N), s = balloonState[k]; audio.burner(camera.position.distanceTo(_p.set(s.x, s.y, s.z))); }
 };
@@ -3292,7 +3423,7 @@ if (FLAG.debug) {
   dbg.hidden = false;
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); gpuName = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ''; } catch (e) { gpuName = ''; }
 }
-window.periGolfDebug = { get fps() { return fps; }, get calls() { return callsNow; }, get errors() { return window.__errs; }, gpu: () => gpuName, ballScreen, mats: MATSET, scene, lights: { sun, hemi }, renderer, THREE };
+window.periGolfDebug = { shortcuts: { SHORTCUTS, found, aces, Course, HOLES, makeBall, simulateShot, botPlan, BALL_R }, get fps() { return fps; }, get calls() { return callsNow; }, get errors() { return window.__errs; }, gpu: () => gpuName, ballScreen, mats: MATSET, scene, lights: { sun, hemi }, renderer, THREE };
 function updateDebug() {
   if (!FLAG.debug) return;
   const i = renderer.info.render;
