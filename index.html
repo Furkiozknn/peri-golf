@@ -14,7 +14,6 @@
 <meta property="og:image:width" content="960">
 <meta property="og:image:height" content="540">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Peri Golf","short_name":"PeriGolf","start_url":"./","display":"standalone","background_color":"#9AD1F5","theme_color":"#C2562C"}'>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1576,7 +1575,6 @@ table.card .ace { color: var(--gold); font-weight: 800; }
 
     <!-- Right Pod: Command Deck -->
     <div class="acts">
-      <button class="ibtn" id="b-restart-hud" data-tt="restartHole" aria-label="Restart Hole"><svg><use href="#i-restart"/></svg></button>
       <button class="ibtn" id="b-view" data-tt="overview" aria-label="Overview"><svg><use href="#i-eye"/></svg></button>
       <button class="ibtn" id="b-card" data-tt="scorecard" aria-label="Scorecard"><svg><use href="#i-card"/></svg></button>
       <button class="ibtn" id="b-sound" data-tt="sound" aria-label="Sound"><svg><use href="#i-sound"/></svg></button>
@@ -1728,7 +1726,6 @@ window.periGolfAssets = ASSETS;
 // ---------------------------------------------------------------------------
 const I18N = {
   tr: {
-    restartHoleShort: 'Yeniden',
     subtitle: 'Kapadokya peribacaları arasında minyatür diorama golfü',
     howto: 'Topa basıp geriye sürükle, bırakınca vur. Boş alana sürükleyince kamera döner · [V] Kuş bakışı · [C] Skor kartı',
     play: 'Oyna', continue: 'Devam Et', settings: 'Ayarlar', hole: 'Delik', par: 'Par', strokes: 'Vuruş', total: 'Toplam',
@@ -1757,7 +1754,6 @@ const I18N = {
       'Bağ Yolu', 'Taş Köprü', 'Sıçrama', 'Güvercin Vadisi', 'Gün Doğumu Sırtı'],
   },
   en: {
-    restartHoleShort: 'Restart',
     subtitle: '3D physics mini golf among the fairy chimneys of Cappadocia',
     howto: 'Press on ball and drag back to aim, release to shoot. Drag empty ground to orbit camera · [V] Overview · [C] Scorecard',
     play: 'Play', continue: 'Continue', settings: 'Settings', hole: 'Hole', par: 'Par', strokes: 'Strokes', total: 'Total',
@@ -3595,17 +3591,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 const endPointer = (e) => {
   if (e.pointerId !== ptr.id) return;
-  if (ptr.mode === 'aim') {
-    const ddx = e.clientX - ptr.sx, ddy = e.clientY - ptr.sy, len = Math.hypot(ddx, ddy);
-    if (len < 24) {
-      game.aim.active = false;
-      game.aim.power = 0;
-    } else if (game.aim.power > 0.04) {
-      stroke(game.aim.angle, game.aim.power);
-    }
-    game.aim.active = false;
-    game.aim.power = 0;
-  }
+  if (ptr.mode === 'aim') { if (game.aim.power > 0.04) stroke(game.aim.angle, game.aim.power); game.aim.active = false; game.aim.power = 0; }
   ptr.id = null; ptr.mode = null;
 };
 canvas.addEventListener('pointerup', endPointer); canvas.addEventListener('pointercancel', endPointer);
@@ -3776,7 +3762,6 @@ $('b-continue').addEventListener('click', () => { audio.init(); audio.ui(); cons
 $('b-settings').addEventListener('click', () => { audio.init(); ui.showSettings(true); });
 $('b-psettings').addEventListener('click', () => ui.showSettings(true));
 $('b-sclose').addEventListener('click', () => { audio.ui(true); ui.showSettings(false); });
-$('b-restart-hud').addEventListener('click', () => { audio.init(); restartHole(); });
 $('b-pause').addEventListener('click', () => { audio.init(); ui.setPaused(true); });
 $('b-resume').addEventListener('click', () => { audio.ui(); ui.setPaused(false); });
 $('b-restart').addEventListener('click', () => { ui.setPaused(false); restartHole(); });
@@ -3903,23 +3888,6 @@ function frame(now) {
 }
 requestAnimationFrame(frame);
 window.__loaded = true;
-if ('serviceWorker' in navigator) {
-  const sw = `
-    self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
-    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
-          return caches.open('perigolf-v1').then(cache => {
-            if (e.request.url.startsWith('http')) cache.put(e.request, res.clone());
-            return res;
-          });
-        }).catch(() => cached))
-      );
-    });
-  `;
-  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw], {type: 'text/javascript'}))).catch(()=>{});
-}
 </script>
 </body>
 </html>
