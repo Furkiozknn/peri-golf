@@ -36,7 +36,7 @@
 - **Twelve holes, par 40:** From Pigeon Terrace to Sunrise Ridge across terraces between fairy chimneys, cave houses, an underground-city tunnel, a pottery workshop, a vineyard road, a stone bridge, and a pigeon valley.
 - **Dynamic diorama hazards:** A turning pottery wheel, a rolling stone door, swinging lanterns, and a donkey crossing the path all push the ball with real slope, bump, ramp, and wall-bounce physics across grass, sand, and stone.
 - **Three stars per hole:** Finish under par, find the hidden grape, and land the hole's trick shot (a hole-in-one, a bank off a wall, a long putt) guided by a ghost line showing your best shot.
-- **Autonomous bot verification:** The `?auto` bot uses the same physics as a player and finishes all 12 holes in 18 strokes with 23 stars and 0 errors, with or without the optional CC0 assets.
+- **Autonomous bot verification:** The `?auto` bot uses the same physics as a player and finishes all 12 holes in 14 strokes (par 40) with 20 stars and 0 errors, with or without the optional CC0 assets (measured 2026-11-09). The bot takes the hidden shortcut on 8 of the 12 holes, so its score is much lower than a typical first round.
 - **Ultra-lean web performance:** A single `index.html` running Three.js r170 delivering 60 fps at 16–22 draw calls on an Intel UHD 620 at 1280x720 on High tier (60 fps at 26 draw calls on phone Low tier).
 
 ## How to play
@@ -144,9 +144,9 @@
 | Hole 7 and hole 9 | — | 60 / 27 and 60 / 25 |
 | Phone 500x900 (Low tier) | — | 60 / 26 |
 | `?low` on desktop, `?noassets` | — | 60 / 25, 60 / 18 |
-| `?auto` bot, 12 holes | 18 strokes, 0 errors | 18 strokes, 23 stars, 0 errors (with assets and `?noassets`) |
+| `?auto` bot, 12 holes | 18 strokes, 0 errors | 14 strokes, 20 stars, 0 errors (with assets and `?noassets`; re-measured 2026-11-09, bot uses 8 hidden shortcuts) |
 
-The `?auto` bot plays all 12 holes with the same physics as a player: 18 strokes and 0 errors, identical scorecard with and without optional assets ([measurements](docs/assets.md#measurements-intel-uhd-620-headless-chrome-1280x720-high-tier)).
+The `?auto` bot plays all 12 holes with the same physics as a player: 14 strokes (card 1,1,1,1,1,1,1,1,1,1,2,2), 20 stars and 0 errors, identical scorecard with and without optional assets. It finds and takes the hidden shortcut on 8 holes, which is why it beats par 40 by so much (earlier asset-pass measurements, 18 strokes: [docs/assets.md](docs/assets.md#measurements-intel-uhd-620-headless-chrome-1280x720-high-tier)).
 
 ![Hole 4 before and after the 2026-11 redesign](docs/redesign-before-after.png)
 
