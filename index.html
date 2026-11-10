@@ -1857,6 +1857,10 @@ class AudioEngine {
     this.padF = c.createBiquadFilter(); this.padF.type = 'lowpass'; this.padF.frequency.value = 700; this.padF.Q.value = 0.7;
     this.padG = c.createGain(); this.padG.gain.value = 0; this.padF.connect(this.padG).connect(this.musicG);
     this.pad = [0, 1, 2].map(i => { const o = c.createOscillator(); o.type = i === 2 ? 'sine' : 'triangle'; const g = c.createGain(); g.gain.value = i === 2 ? 0.5 : 0.35; o.connect(g).connect(this.padF); o.start(); return o; });
+    // drag charge oscillator: rising pitch tied to power drag
+    this.chargeOsc = c.createOscillator(); this.chargeOsc.type = 'sine'; this.chargeOsc.frequency.value = 220;
+    this.chargeG = c.createGain(); this.chargeG.gain.value = 0;
+    this.chargeOsc.connect(this.chargeG).connect(this.sfxG); this.chargeOsc.start();
     this.ready = true; this.applyVolumes(); this.nextNote = c.currentTime + 0.1;
   }
   applyVolumes() {
@@ -1955,6 +1959,21 @@ class AudioEngine {
     this.rollF.frequency.setTargetAtTime(base + speed * 60, c.currentTime, 0.08);
     this.rollSrc.playbackRate.setTargetAtTime(0.6 + speed * 0.08, c.currentTime, 0.1);
   }
+  setCharge(power) {
+    if (!this.ready) { if (power > 0.01) this.init(); else return; }
+    if (!this.chargeOsc || !this.chargeG) return;
+    const c = this.ctx, f = Math.max(0, Math.min(1, power || 0));
+    if (!this.ok() || f <= 0.01) {
+      this.chargeG.gain.setTargetAtTime(0, c.currentTime, 0.04);
+      return;
+    }
+    const freq = 220 + f * 580; // rising pitch from 220 Hz to 800 Hz
+    this.chargeOsc.frequency.setTargetAtTime(freq, c.currentTime, 0.03);
+    try { this.chargeOsc.frequency.value = freq; } catch (e) {}
+    const vol = 0.05 + f * 0.12;
+    this.chargeG.gain.setTargetAtTime(vol, c.currentTime, 0.03);
+  }
+  charge(power) { this.setCharge(power); }
 }
 const audio = new AudioEngine();
 
@@ -2862,7 +2881,27 @@ const game = {
   maxAir: 0, pathPts: [], time: 0, wind: [0, 0], done: false, botWait: 0, hintShown: false, holeBestNew: false, autoResult: 0,
   wheelTouched: false, lastSinkStats: null, scUsed: false, aceNew: false,
 };
+game.audio = audio;
 window.periGolf = game;
+window.periGolfAudio = audio;
+
+// Mobile haptic feedback (15ms ball strike, 40ms cup entry)
+const vibrate = (ms) => {
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    try { navigator.vibrate(ms); } catch (e) {}
+  }
+};
+let _lastStrikeVib = 0;
+const vibrateStrike = () => {
+  const now = performance.now();
+  if (now - _lastStrikeVib > 80) { _lastStrikeVib = now; vibrate(15); }
+};
+let _lastSinkVib = 0;
+const vibrateCup = () => {
+  const now = performance.now();
+  if (now - _lastSinkVib > 250) { _lastSinkVib = now; vibrate(40); }
+};
+
 const totalStrokes = () => game.card.reduce((a, s) => a + (s || 0), 0);
 const playedPar = () => HOLES.reduce((a, h, i) => a + (game.card[i] !== null ? h.par : 0), 0);
 const relStr = (d) => d === 0 ? 'E' : (d > 0 ? '+' + d : '' + d);
@@ -2875,6 +2914,7 @@ function loadHole(i, keepCard) {
   game.strokes = 0; game.holeTime = 0; game.grapeTaken = false; game.sandTouched = false; game.penalties = 0; game.maxAir = 0; game.wheelTouched = false;
   game.pathPts = []; game.strokeStart = [def.tee[0], def.tee[1]]; game.lastSinkStats = null; game.holeBestNew = false; game.scUsed = false; game.aceNew = false;
   game.aim.active = false; game.aim.kb = false; game.aim.power = 0; game.aim.charging = false;
+  audio.setCharge(0);
   game.aim.angle = Math.atan2(def.cup[0] - def.tee[0], -(def.cup[1] - def.tee[1]));
   const r = mulberry(77 + i); game.wind = game.daily && game.daily.hole === i ? game.daily.wind.slice() : [(r() - 0.5) * 2.4, (r() - 0.5) * 2.4];
   game.course.updateObstacles(0);
@@ -2900,6 +2940,8 @@ function saveRun(nextHole) {
 }
 function stroke(angle, power) {
   const b = game.ball; if (!b.rest || b.sunk || game.phase !== 'play') return;
+  audio.setCharge(0);
+  vibrateStrike();
   game.strokes++; game.strokeStart = [b.x, b.z]; game.strokeStartZ = b.z;
   game.strokeDist = Math.hypot(b.x - game.course.def.cup[0], b.z - game.course.def.cup[1]);
   shootBall(b, game.course, angle, power);
@@ -2996,7 +3038,7 @@ function trackBall(ev) {
     else if (e.type === 'water') { audio.water(); view.fx && view.fx('splash', e.x, b.y, e.z, 30); }
     else if (e.type === 'oob') { audio.oob(); }
     else if (e.type === 'lip') { audio.click(); }
-    else if (e.type === 'sink') { audio.cup(); }
+    else if (e.type === 'sink') { audio.cup(); vibrateCup(); }
     else if (e.type === 'warp') onShortcut(e);
   }
 }
@@ -3036,7 +3078,12 @@ function update(dt) {
       _frameEv.length = 0; collideObstacles(b, course, _frameEv);
       if (_frameEv.length) { b.rest = false; b.restTimer = 0; trackBall(_frameEv); }
       // keyboard power charge
-      if (game.aim.charging) { game.aim.power += game.aim.dir * dt / 1.1; if (game.aim.power >= 1) { game.aim.power = 1; game.aim.dir = -1; } if (game.aim.power <= 0) { game.aim.power = 0; game.aim.dir = 1; } }
+      if (game.aim.charging) {
+        game.aim.power += game.aim.dir * dt / 1.1;
+        if (game.aim.power >= 1) { game.aim.power = 1; game.aim.dir = -1; }
+        if (game.aim.power <= 0) { game.aim.power = 0; game.aim.dir = 1; }
+        audio.setCharge(game.aim.power);
+      }
       if (FLAG.auto) {
         game.botWait += dt;
         if (game.botWait > 0.45) { game.botWait = 0; const plan = botPlan(course, b, game.holeTime, game.wind); stroke(plan.angle, plan.power); }
@@ -3520,8 +3567,8 @@ async function loadAssets() {
     done('sfx', 'ok');
   } catch (e) { done('sfx', 'fail'); } })();
 }
-view.onShot = (power) => { audio.putt(power); };
-view.onSink = () => { const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.55, c[1], 36); };
+view.onShot = (power) => { audio.putt(power); vibrateStrike(); };
+view.onSink = () => { vibrateCup(); const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.55, c[1], 36); };
 view.onGrape = () => { if (grapeMesh) { fx('grape', grapeMesh.position.x, grapeMesh.position.y + 0.2, grapeMesh.position.z, 14); grapeMesh.visible = false; } };
 view.onPenalty = () => { };
 view.onEnd = () => { };
@@ -3590,6 +3637,7 @@ canvas.addEventListener('pointermove', (e) => {
     const ddx = e.clientX - ptr.sx, ddy = e.clientY - ptr.sy, len = Math.hypot(ddx, ddy);
     const range = Math.max(150, Math.min(innerWidth, innerHeight) * 0.32);
     game.aim.power = clamp((len - 8) / range, 0, 1);
+    audio.setCharge(game.aim.power);
     if (len > 8) {
       const yaw = cam.cyaw; const wx = ddx * Math.cos(yaw) - ddy * Math.sin(yaw), wz = ddx * Math.sin(yaw) + ddy * Math.cos(yaw);
       game.aim.angle = Math.atan2(-wx, wz);
@@ -3598,6 +3646,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 const endPointer = (e) => {
   if (e.pointerId !== ptr.id) return;
+  audio.setCharge(0);
   if (ptr.mode === 'aim') { if (game.aim.power > 0.04) stroke(game.aim.angle, game.aim.power); game.aim.active = false; game.aim.power = 0; }
   ptr.id = null; ptr.mode = null;
 };
@@ -3619,10 +3668,10 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => {
   keys.delete(e.key);
-  if (e.key === ' ' && game.aim.charging) { game.aim.charging = false; if (game.aim.power > 0.04 && canAim()) stroke(game.aim.angle, game.aim.power); else { game.aim.power = 0; } }
+  if (e.key === ' ' && game.aim.charging) { game.aim.charging = false; audio.setCharge(0); if (game.aim.power > 0.04 && canAim()) stroke(game.aim.angle, game.aim.power); else { game.aim.power = 0; } }
 });
-window.addEventListener('blur', () => { keys.clear(); if (game.aim.charging) { game.aim.charging = false; game.aim.power = 0; } });
-document.addEventListener('visibilitychange', () => { game.hidden = document.hidden; if (document.hidden && audio.ready) audio.update(true); });
+window.addEventListener('blur', () => { keys.clear(); if (game.aim.charging) { game.aim.charging = false; game.aim.power = 0; audio.setCharge(0); } });
+document.addEventListener('visibilitychange', () => { game.hidden = document.hidden; if (document.hidden) { audio.setCharge(0); if (audio.ready) audio.update(true); } });
 window.addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
 
 // ---------------------------------------------------------------------------
@@ -3707,6 +3756,7 @@ const ui = {
   },
   setPaused(p) {
     if (game.phase === 'title' || game.phase === 'end') return;
+    if (p) audio.setCharge(0);
     game.paused = p; $('ov-pause').hidden = !p; if (p) $('b-resume').focus({ preventScroll: true }); else canvas.focus({ preventScroll: true });
   },
   escape() {
@@ -3827,7 +3877,11 @@ view.sync = function (dt = 0) {
     const pl = pullGeo.attributes.position.array; const L = 0.3 + game.aim.power * 1.4;
     pl[0] = b.x; pl[1] = b.y; pl[2] = b.z; pl[3] = b.x - Math.sin(game.aim.angle) * L; pl[4] = b.y; pl[5] = b.z + Math.cos(game.aim.angle) * L; pullGeo.attributes.position.needsUpdate = true; pullLine.visible = true;
     ui.power(game.aim.power, true);
-  } else { previewLine.visible = false; hitRing.visible = false; pullLine.visible = false; ui.power(0, game.aim.kb && canAim()); }
+    audio.setCharge(game.aim.power);
+  } else {
+    previewLine.visible = false; hitRing.visible = false; pullLine.visible = false; ui.power(0, game.aim.kb && canAim());
+    if (!aiming || game.aim.power <= 0.03) audio.setCharge(0);
+  }
   if (game.phase === 'play' && !game.hintShown && !FLAG.auto && b.rest) ui.hint(aiming ? t('hintCam') : t('hintAim'));
   // obstacles
   for (const { o, m } of obstacleMeshes) {
@@ -3852,7 +3906,7 @@ if (FLAG.debug) {
   dbg.hidden = false;
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); gpuName = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ''; } catch (e) { gpuName = ''; }
 }
-window.periGolfDebug = { shortcuts: { SHORTCUTS, found, aces, Course, HOLES, makeBall, simulateShot, botPlan, BALL_R }, get fps() { return fps; }, get calls() { return callsNow; }, get errors() { return window.__errs; }, gpu: () => gpuName, ballScreen, mats: MATSET, scene, lights: { sun, hemi }, renderer, THREE };
+window.periGolfDebug = { audio, shortcuts: { SHORTCUTS, found, aces, Course, HOLES, makeBall, simulateShot, botPlan, BALL_R }, get fps() { return fps; }, get calls() { return callsNow; }, get errors() { return window.__errs; }, gpu: () => gpuName, ballScreen, mats: MATSET, scene, lights: { sun, hemi }, renderer, THREE };
 function updateDebug() {
   if (!FLAG.debug) return;
   const i = renderer.info.render;
