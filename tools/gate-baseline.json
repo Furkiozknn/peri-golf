@@ -1,0 +1,17 @@
+{
+  "game": "peri-golf",
+  "recorded": "2026-11-10T00:17:14.433Z",
+  "commit": "272b5f6",
+  "entrySha": "b4ce4df751d1",
+  "run": "() => window.periGolfSim(900)",
+  "metrics": {
+    "holes": 12,
+    "underPar": 26,
+    "stars": 20,
+    "strokes": 14,
+    "perHole": "111111111122",
+    "penalties": 0,
+    "done": true,
+    "gameErrors": 0
+  }
+}
