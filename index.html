@@ -1063,6 +1063,9 @@ table.card .ace { color: var(--gold); font-weight: 800; }
   .topbar { flex-wrap: wrap; }
   .hud-telemetry { order: 1; }
   .topbar .acts { order: 2; margin-left: auto; }
+  /* the 12 progress pips were clipped on the right (capsule 432 px wide at 360-412): they get their own row inside the capsule */
+  .hud-telemetry { flex-wrap: wrap; max-width: 100%; row-gap: 3px; }
+  .hud-pips { flex: 1 0 100%; justify-content: center; padding: 0 2px 1px; }
   .holes { grid-template-columns: repeat(3, 1fr); }
   .panel { padding: 18px 16px; }
   .title h1 { font-size: 38px; }
@@ -1590,7 +1593,7 @@ table.card .ace { color: var(--gold); font-weight: 800; }
     </div>
   </header>
 
-  <div class="toasts" id="toasts"></div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
   <div class="power" id="power" hidden><i id="powerfill"></i><b></b></div>
   <div class="hint" id="hint" hidden></div>
   
@@ -2855,6 +2858,8 @@ function botPlan(course, ball, t0, wind) {
 // Game state
 // ---------------------------------------------------------------------------
 const view = {}; // filled by the renderer section (hooks the logic calls)
+const calm = () => !!(window.Arena && Arena.settings && Arena.settings.reducedMotion);   // kit "reduce motion": read live, visuals only (the physics never sees it)
+const INTRO_CALM = 0.6;   // reduce motion: the camera flyover is a short cut instead of 3.2 s (the bot already uses 0.6 s)
 const game = {
   phase: 'title', holeIndex: 0, course: null, ball: null, strokes: 0, card: new Array(12).fill(null), stars: new Array(12).fill(null),
   startHole: 0, holeTime: 0, paused: false, hidden: false, aim: { active: false, kb: false, angle: 0, power: 0, charging: false, dir: 1 },
@@ -2879,7 +2884,7 @@ function loadHole(i, keepCard) {
   const r = mulberry(77 + i); game.wind = game.daily && game.daily.hole === i ? game.daily.wind.slice() : [(r() - 0.5) * 2.4, (r() - 0.5) * 2.4];
   game.course.updateObstacles(0);
   if (!keepCard) { /* card entries stay as they are: practice start keeps blanks */ }
-  game.phase = 'intro'; game.introT = 0; game.introDur = FLAG.auto ? 0.6 : 3.2;
+  game.phase = 'intro'; game.introT = 0; game.introDur = FLAG.auto || calm() ? INTRO_CALM : 3.2;
   view.onHole && view.onHole();
   ui.hud();
 }
@@ -3521,7 +3526,10 @@ async function loadAssets() {
   } catch (e) { done('sfx', 'fail'); } })();
 }
 view.onShot = (power) => { audio.putt(power); };
-view.onSink = () => { const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.55, c[1], 36); };
+view.onSink = () => { const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.55, c[1], 36);
+  if (!FLAG.auto) { try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } }   // haptic: the ball drops into the cup (30 ms; the kit's vibration switch wraps navigator.vibrate)
+};
+if (window.Arena) Arena.on('settings', () => { if (calm() && game.phase === 'intro') game.introDur = Math.min(game.introDur, INTRO_CALM); });   // "reduce motion" switched on mid-flyover: cut it short now
 view.onGrape = () => { if (grapeMesh) { fx('grape', grapeMesh.position.x, grapeMesh.position.y + 0.2, grapeMesh.position.z, 14); grapeMesh.visible = false; } };
 view.onPenalty = () => { };
 view.onEnd = () => { };
