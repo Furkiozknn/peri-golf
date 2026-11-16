@@ -1712,7 +1712,7 @@ table.card .ace { color: var(--gold); font-weight: 800; }
       <div class="holes" id="holes"></div>
       <div class="sc-line" id="sc-line"></div>
       <div class="gallery" id="ace-gallery"></div>
-      <div class="footer"><a href="https://github.com/Furkiozknn" target="_blank" rel="noopener">Claude Game Arena</a> · built by Claude Fable 5.1</div>
+      <div class="footer"><a href="https://github.com/Furkiozknn" target="_blank" rel="noopener">Claude Game Arena</a> · <span data-t="builtBy">built by Claude Fable 5.1</span></div>
     </div>
   </div>
 
@@ -1827,7 +1827,8 @@ const I18N = {
     fullscreen: 'Tam Ekran', back: 'Geri', scorecard: 'Skor Kartı', endTitle: 'Parkur Tamamlandı', vsPar: "Par'a Göre", starsLbl: 'Yıldız',
     bestLbl: 'En İyi', playAgain: 'Tekrar Oyna', pickHole: 'Parkur Delikleri (Açılanlar Oynanabilir):', bestNone: 'Henüz tamamlanmış tur yok',
     bestCard: 'En iyi tur: {t} vuruş ({r}) · {s}/36 yıldız', contFrom: '(delik {n})', overview: 'Kuş Bakışı', pause: 'Duraklat', sound: 'Ses',
-    hintAim: 'Topa basıp geriye çek, bırakınca vur', hintCam: 'Boş alana sürükleyerek kamerayı döndür · V kuş bakışı',
+    hintAim: 'Topa basıp geriye çek, bırakınca vur', hintCam: 'Boş alana sürükleyerek kamerayı döndür · V kuş bakışı', hintRelease: 'Bırak ve vur',
+    howtoTouch: 'Topa basıp geriye sürükle, bırakınca vur. Boş alana sürükleyince kamera döner', badge: 'Kapadokya Parkuru', strokeOf: '{s} vuruş · Par {p}', builtBy: 'Claude Fable 5.1 ile yapıldı',
     skip: 'Kamera tanıtımını geçmek için dokun', nextHole: 'Sonraki Delik', finish: 'Sonuçları Gör', water: 'Suya düştü: +1 vuruş', oob: 'Saha dışı: +1 vuruş',
     grape: 'Gizli üzüm bulundu!', locked: 'Kilitli', loading: 'Yükleniyor…', loadFail: 'Three.js yüklenemedi; internet bağlantısını kontrol et.',
     ace: 'Hole-in-One! (Tek Vuruş)', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Çift Bogey', over: '+{n}',
@@ -1855,7 +1856,8 @@ const I18N = {
     fullscreen: 'Fullscreen', back: 'Back', scorecard: 'Scorecard', endTitle: 'Course Complete', vsPar: 'vs Par', starsLbl: 'Stars',
     bestLbl: 'Best Score', playAgain: 'Play Again', pickHole: 'Course Holes (Unlocked are playable):', bestNone: 'No completed round yet',
     bestCard: 'Best card: {t} strokes ({r}) · {s}/36 stars', contFrom: '(hole {n})', overview: 'Overview', pause: 'Pause', sound: 'Sound',
-    hintAim: 'Press on ball and drag back, release to shoot', hintCam: 'Drag on empty ground to orbit · V for overview',
+    hintAim: 'Press on ball and drag back, release to shoot', hintCam: 'Drag on empty ground to orbit · V for overview', hintRelease: 'Release to shoot',
+    howtoTouch: 'Press on the ball and drag back to aim, release to shoot. Drag empty ground to orbit the camera', badge: 'Cappadocia Course', strokeOf: '{s} stroke · Par {p}', builtBy: 'built by Claude Fable 5.1',
     skip: 'Tap anywhere to skip flyover', nextHole: 'Next Hole', finish: 'See Results', water: 'Water: +1 stroke', oob: 'Out of bounds: +1 stroke',
     grape: 'Hidden grape found!', locked: 'Locked', loading: 'Loading…', loadFail: 'Three.js could not load; check your connection.',
     ace: 'Hole in One!', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Double Bogey', over: '+{n}',
@@ -3722,12 +3724,11 @@ window.addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeig
 // ---------------------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
 const starSvg = (on) => `<svg class="${on ? 'on' : ''}" viewBox="0 0 24 24"><use href="#i-star"/></svg>`;
-const INTRO_BADGE = $('intro').querySelector('.intro-badge').textContent;
 const ui = {
   prevOverlay: null,
   applyLang() {
     document.documentElement.lang = LANG; if (window.Arena) Arena.lang(LANG);
-    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+    document.querySelectorAll('[data-t]').forEach(el => { const k = el.dataset.t; el.textContent = t(isPhone && k === 'howto' ? 'howtoTouch' : k); });
     document.querySelectorAll('[data-tt]').forEach(el => { el.title = t(el.dataset.tt); el.setAttribute('aria-label', t(el.dataset.tt)); });
     document.querySelectorAll('[data-t-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
     $('b-lang').textContent = LANG.toUpperCase();
@@ -3761,7 +3762,7 @@ const ui = {
   hint(msg) { const h = $('hint'); if (!msg) { h.hidden = true; return; } h.textContent = msg; h.hidden = false; },
   introCard(show) {
     const el = $('intro'); if (!show) { el.hidden = true; return; }
-    $('intro').querySelector('.intro-badge').textContent = game.daily ? t('daily') : INTRO_BADGE;
+    $('intro').querySelector('.intro-badge').textContent = game.daily ? t('daily') : t('badge');
     const i = game.holeIndex; $('intro-name').textContent = (i + 1) + '. ' + t('holes')[i]; $('intro-par').textContent = t('par') + ' ' + HOLES[i].par + ' · ' + t('trickLbl') + ': ' + trickText(HOLES[i]); el.hidden = false;
   },
   power(p, show) { $('power').hidden = !show; $('powerfill').style.height = Math.round(p * 100) + '%'; },
@@ -3834,7 +3835,7 @@ const ui = {
     const i = game.holeIndex, def = HOLES[i], s = game.strokes, rr = resultText(s, def.par), st = game.stars[i];
     $('hr-title').textContent = t(rr.k, { n: rr.n });
     $('hr-title').className = rr.cls;
-    $('hr-sub').textContent = t('strokesOf', { s, p: def.par }) + (game.holeBestNew ? ' · ' + t('holeBest') : '') + (game.scUsed ? ' · ✦ ' + t('scTaken') : '') + (game.aceNew ? ' · ' + t('aceNew') : '');
+    $('hr-sub').textContent = t(s === 1 ? 'strokeOf' : 'strokesOf', { s, p: def.par }) + (game.holeBestNew ? ' · ' + t('holeBest') : '') + (game.scUsed ? ' · ✦ ' + t('scTaken') : '') + (game.aceNew ? ' · ' + t('aceNew') : '');
     $('hr-stars').innerHTML = st.map(starSvg).join('');
     const names = [t('star_under'), t('star_grape'), trickText(def)];
     $('hr-list').innerHTML = names.map((n, k) => `<li class="${st[k] ? 'on' : ''}">${starSvg(st[k])}<span class="star-name">${n}</span><span class="star-badge">${st[k] ? '✓' : '–'}</span></li>`).join('');
@@ -3920,7 +3921,7 @@ view.sync = function (dt = 0) {
     pl[0] = b.x; pl[1] = b.y; pl[2] = b.z; pl[3] = b.x - Math.sin(game.aim.angle) * L; pl[4] = b.y; pl[5] = b.z + Math.cos(game.aim.angle) * L; pullGeo.attributes.position.needsUpdate = true; pullLine.visible = true;
     ui.power(game.aim.power, true);
   } else { previewLine.visible = false; hitRing.visible = false; pullLine.visible = false; ui.power(0, game.aim.kb && canAim()); }
-  if (game.phase === 'play' && !game.hintShown && !FLAG.auto && b.rest) ui.hint(aiming ? t('hintCam') : t('hintAim'));
+  if (game.phase === 'play' && !game.hintShown && !FLAG.auto && b.rest) ui.hint(aiming ? t('hintRelease') : t('hintAim'));
   // obstacles
   for (const { o, m } of obstacleMeshes) {
     if (o.type === 'wheel') (m.userData.spin || m).rotation.y = -o.ang;
