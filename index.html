@@ -4548,7 +4548,15 @@ $('b-restart').addEventListener('click', () => { ui.setPaused(false); restartHol
 $('b-menu').addEventListener('click', () => { ui.setPaused(false); if (!game.daily) saveRun(game.holeIndex); game.card[game.holeIndex] = null; ui.showTitle(true); });
 $('b-emenu').addEventListener('click', () => { $('ov-end').hidden = true; ui.showTitle(true); });
 $('b-again').addEventListener('click', () => { $('ov-end').hidden = true; startRun(0); });
-$('b-next').addEventListener('click', () => { audio.ui(); if (game.daily) { ui.hideHoleResult(); ui.showTitle(true); } else nextHole(); });
+// Portals (arena-kit v1.3 Arena.portal): an interstitial may play between holes, on the result screen where the game
+// already waits; on the game's own site midgame() resolves false at once and nothing changes. One tap = one advance.
+let nextBusy = false;
+$('b-next').addEventListener('click', () => {
+  audio.ui(); if (game.daily) { ui.hideHoleResult(); ui.showTitle(true); return; }
+  if (nextBusy) return; nextBusy = true;
+  const ad = window.Arena && Arena.portal ? Arena.portal.midgame() : Promise.resolve(false);
+  ad.catch(() => false).then(() => { nextBusy = false; nextHole(); });
+});
 $('b-daily').addEventListener('click', () => { audio.init(); audio.ui(); startDaily(); });
 $('b-hshare').addEventListener('click', () => shareResult(false));
 $('b-eshare').addEventListener('click', () => shareResult(true));
