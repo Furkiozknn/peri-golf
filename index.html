@@ -2577,6 +2577,7 @@ const settings = Object.assign({
   lang: (navigator.language || 'en').toLowerCase().startsWith('tr') ? 'tr' : 'en',
   quality: isPhone ? 'low' : 'high',
 }, store.get(KEY.settings) || {});
+if (settings.lang !== 'tr' && settings.lang !== 'en') settings.lang = (/^tr/i.test(navigator.language || '') ? 'tr' : 'en'); // stored unknown language -> browser's
 if (FLAG.lang === 'en' || FLAG.lang === 'tr') settings.lang = FLAG.lang;
 if (FLAG.low) settings.quality = 'low';
 LANG = settings.lang;
