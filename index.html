@@ -4580,8 +4580,9 @@ $('b-again').addEventListener('click', () => { $('ov-end').hidden = true; startR
 let nextBusy = false;
 $('b-next').addEventListener('click', () => {
   audio.ui(); if (game.daily) { ui.hideHoleResult(); ui.showTitle(true); return; }
+  if (!(window.Arena && Arena.portal && Arena.portal.name !== 'none')) { nextHole(); return; } // own site: synchronous, as before
   if (nextBusy) return; nextBusy = true;
-  const ad = window.Arena && Arena.portal ? Arena.portal.midgame() : Promise.resolve(false);
+  const ad = Arena.portal.midgame();
   ad.catch(() => false).then(() => { nextBusy = false; nextHole(); });
 });
 $('b-daily').addEventListener('click', () => { audio.init(); audio.ui(); startDaily(); });
