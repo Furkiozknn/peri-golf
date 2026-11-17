@@ -2504,7 +2504,7 @@ const I18N = {
     bestCard: 'En iyi tur: {t} vuruş ({r}) · {s}/36 yıldız', contFrom: '(delik {n})', overview: 'Kuş Bakışı', pause: 'Duraklat', sound: 'Ses',
     hintAim: 'Topa basıp geriye çek, bırakınca vur', hintCam: 'Boş alana sürükleyerek kamerayı döndür · V kuş bakışı', hintRelease: 'Bırak ve vur',
     howtoTouch: 'Topa basıp geriye sürükle, bırakınca vur. Boş alana sürükleyince kamera döner', badge: 'Kapadokya Parkuru', strokeOf: '{s} vuruş · Par {p}', builtBy: 'Claude Fable 5.1 ile yapıldı',
-    skip: 'Kamera tanıtımını geçmek için dokun', nextHole: 'Sonraki Delik', finish: 'Sonuçları Gör', water: 'Suya düştü: +1 vuruş', oob: 'Saha dışı: +1 vuruş',
+    skip: 'Kamera tanıtımını geçmek için dokun', nextHole: 'Sonraki Delik', finish: 'Sonuçları Gör', rewardUndo: 'Reklam izle, cezayı geri al', rewardDone: 'Ceza geri alındı', water: 'Suya düştü: +1 vuruş', oob: 'Saha dışı: +1 vuruş',
     grape: 'Gizli üzüm bulundu!', locked: 'Kilitli', loading: 'Yükleniyor…', loadFail: 'Three.js yüklenemedi; internet bağlantısını kontrol et.',
     ace: 'Hole-in-One! (Tek Vuruş)', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Çift Bogey', over: '+{n}',
     star_under: 'Par Altı Başarı', star_grape: 'Gizli Kapadokya Üzümü', newRecord: '★ Yeni Parkur Rekoru! ★', musicOn: 'Müzik açık', musicOff: 'Müzik kapalı',
@@ -2533,7 +2533,7 @@ const I18N = {
     bestCard: 'Best card: {t} strokes ({r}) · {s}/36 stars', contFrom: '(hole {n})', overview: 'Overview', pause: 'Pause', sound: 'Sound',
     hintAim: 'Press on ball and drag back, release to shoot', hintCam: 'Drag on empty ground to orbit · V for overview', hintRelease: 'Release to shoot',
     howtoTouch: 'Press on the ball and drag back to aim, release to shoot. Drag empty ground to orbit the camera', badge: 'Cappadocia Course', strokeOf: '{s} stroke · Par {p}', builtBy: 'built by Claude Fable 5.1',
-    skip: 'Tap anywhere to skip flyover', nextHole: 'Next Hole', finish: 'See Results', water: 'Water: +1 stroke', oob: 'Out of bounds: +1 stroke',
+    skip: 'Tap anywhere to skip flyover', nextHole: 'Next Hole', finish: 'See Results', rewardUndo: 'Watch an ad to undo the penalty', rewardDone: 'Penalty refunded', water: 'Water: +1 stroke', oob: 'Out of bounds: +1 stroke',
     grape: 'Hidden grape found!', locked: 'Locked', loading: 'Loading…', loadFail: 'Three.js could not load; check your connection.',
     ace: 'Hole in One!', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Double Bogey', over: '+{n}',
     star_under: 'Under Par Finish', star_grape: 'Hidden Cappadocia Grape', newRecord: '★ New Course Record! ★', musicOn: 'Music on', musicOff: 'Music off',
@@ -3637,7 +3637,7 @@ function loadHole(i, keepCard) {
   game.course = new Course(def, i);
   const th = game.course.height(def.tee[0], def.tee[1]) || 0;
   game.ball = makeBall(def.tee[0], th + BALL_R, def.tee[1]);
-  game.strokes = 0; game.holeTime = 0; game.grapeTaken = false; game.sandTouched = false; game.penalties = 0; game.maxAir = 0; game.wheelTouched = false;
+  game.strokes = 0; game.holeTime = 0; game.grapeTaken = false; game.sandTouched = false; game.penalties = 0; game.undoUsed = false; game.maxAir = 0; game.wheelTouched = false;
   game.pathPts = []; game.strokeStart = [def.tee[0], def.tee[1]]; game.lastSinkStats = null; game.holeBestNew = false; game.scUsed = false; game.aceNew = false;
   game.aim.active = false; game.aim.kb = false; game.aim.power = 0; game.aim.charging = false;
   game.aim.angle = Math.atan2(def.cup[0] - def.tee[0], -(def.cup[1] - def.tee[1]));
@@ -3680,7 +3680,31 @@ function applyPenalty(kind) {
   b.x = game.strokeStart[0]; b.z = game.strokeStart[1]; b.y = th + BALL_R; b.vx = b.vy = b.vz = 0; b.grounded = true; b.rest = true; b.penalty = null; b.airTime = 0;
   ui.toast(t(kind === 'water' ? 'water' : 'oob'), 'bad'); ui.hud();
   view.onPenalty && view.onPenalty(kind);
+  offerUndo();
   void def;
+}
+// Portals (arena-kit v1.3 Arena.portal): an opt-in rewarded ad undoes a water / out-of-bounds penalty. Once per hole,
+// for 5 s; never in the daily round (same course and rules for everyone) or for the bot. On the game's own site
+// Arena.portal.canReward is false, so the offer never appears.
+let undoBtn = null;
+function offerUndo() {
+  if (!(window.Arena && Arena.portal && Arena.portal.canReward) || FLAG.auto || game.daily || game.undoUsed) return;
+  if (undoBtn) undoBtn.remove();
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'btn primary'; b.id = 'b-undo';
+  b.textContent = '▶ ' + t('rewardUndo');
+  b.style.cssText = 'position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;width:auto;max-width:calc(100vw - 32px);white-space:normal';
+  let tm = 0;
+  const close = () => { clearTimeout(tm); b.remove(); if (undoBtn === b) undoBtn = null; };
+  tm = setTimeout(close, 5000);
+  b.addEventListener('click', (e) => {
+    e.stopPropagation(); close(); game.undoUsed = true;
+    const hole = game.holeIndex, was = game.paused; game.paused = true;
+    Arena.portal.rewarded().catch(() => false).then((ok) => {
+      game.paused = was;
+      if (ok && game.phase === 'play' && game.holeIndex === hole && game.penalties > 0) { game.strokes--; game.penalties--; ui.toast(t('rewardDone'), 'good'); ui.hud(); }
+    });
+  });
+  document.body.appendChild(b); undoBtn = b;
 }
 function trickDone(def, st) {
   const tr = def.trick;
