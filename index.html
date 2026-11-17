@@ -4516,8 +4516,12 @@ camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
 ui.applyLang(); ui.soundBtn();
 $('loadmsg').textContent = ''; $('b-play').disabled = false; $('b-daily').disabled = false;
 if (window.Arena) Arena.mountSettingsButton(); // bottom-right is free here: the power bar is bottom-left, hints bottom-centre
+// Instant start: a first-time player lands on hole 1 at once (the in-game hint teaches the shot); the menu is one tap
+// away in pause. Anyone with a save or a score sees the title as before; ?menu forces the title.
+const firstVisit = !store.get(KEY.save) && best.total == null && !Object.keys(best.holeBest || {}).length && !/[?&]menu(=|&|$)/.test(location.search);
 if (FLAG.auto) startRun(FLAG.hole ? clamp(FLAG.hole - 1, 0, 11) : 0);
 else if (FLAG.hole) startRun(clamp(FLAG.hole - 1, 0, 11));
+else if (firstVisit && !(FLAG.sim > 0)) startRun(0);
 if (FLAG.sim > 0) simulate(FLAG.sim);
 let last = performance.now(), assetsStarted = false;
 function frame(now) {
