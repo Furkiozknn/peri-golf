@@ -5,15 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="arena-game" content="peri-golf">
 <title>Peri Golf</title>
-<meta name="description" content="Physics mini-golf among the fairy chimneys of Cappadocia, redesigned as a fantasy miniature diorama with a wooden signpost UI: 12 hand-designed holes. Plays in the browser.">
+<meta name="description" content="Kapadokya peribacaları arasında 3D fizikli mini golf: 12 elle tasarlanmış delik, çömlek çarkı, eşek geçidi ve gün doğumu sırtı. Tarayıcıda oynanır. · Physics mini-golf among the fairy chimneys of Cappadocia: 12 hand-designed holes. Plays in the browser.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Peri Golf · Fairy Chimney Golf">
-<meta property="og:description" content="Physics mini-golf among the fairy chimneys of Cappadocia, redesigned as a fantasy miniature diorama with a wooden signpost UI: 12 hand-designed holes. Plays in the browser.">
+<meta property="og:description" content="Kapadokya peribacaları arasında 3D fizikli mini golf: 12 elle tasarlanmış delik, çömlek çarkı, eşek geçidi ve gün doğumu sırtı. Tarayıcıda oynanır. · Physics mini-golf among the fairy chimneys of Cappadocia: 12 hand-designed holes. Plays in the browser.">
 <meta property="og:url" content="https://furkiozknn.github.io/peri-golf/">
 <meta property="og:image" content="https://furkiozknn.github.io/peri-golf/docs/card.jpg">
 <meta property="og:image:width" content="960">
 <meta property="og:image:height" content="540">
+<meta property="og:image:alt" content="Peri Golf: Kapadokya peribacaları arasında minyatür diorama golfü / miniature diorama golf among the fairy chimneys">
+<meta property="og:locale" content="tr_TR">
+<meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Peri Golf · Fairy Chimney Golf">
+<meta name="twitter:description" content="Kapadokya peribacaları arasında 3D fizikli mini golf: 12 elle tasarlanmış delik, çömlek çarkı, eşek geçidi ve gün doğumu sırtı. Tarayıcıda oynanır. · Physics mini-golf among the fairy chimneys of Cappadocia: 12 hand-designed holes. Plays in the browser.">
+<meta name="twitter:image" content="https://furkiozknn.github.io/peri-golf/docs/card.jpg">
+<meta name="twitter:image:alt" content="Peri Golf: Kapadokya peribacaları arasında minyatür diorama golfü / miniature diorama golf among the fairy chimneys">
+<meta name="theme-color" content="#C2562C">
+<link rel="canonical" href="https://furkiozknn.github.io/peri-golf/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%239AD1F5'/%3E%3Ccircle cx='47' cy='15' r='7' fill='%23F7C873'/%3E%3Cpath d='M0 50q20-9 64-2v16H0z' fill='%237FA36B'/%3E%3Cpath d='M26 52l6-34 6 34z' fill='%23B88B5D'/%3E%3Cpath d='M30 24l2-10 2 10z' fill='%234A2B14'/%3E%3Ccircle cx='15' cy='47' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 /* ==========================================================================
    PERİ GOLF UI REBORN: KAPADOKYA MİNYATÜR DİORAMA VE TAŞ-TOPRAK ZANAATI
@@ -1119,6 +1129,24 @@ table.card .ace { color: var(--gold); font-weight: 800; }
   }
 }
 
+/* v2.1 (2026-11): Yenilikler, Başarımlar, sürüm etiketi */
+#b-daily { flex-wrap: wrap; justify-content: center; row-gap: 0; }
+#daily-info { white-space: nowrap; }
+.row.two { flex-wrap: nowrap; margin-top: 6px; }
+.row.two > .btn { flex: 1 1 0; min-width: 0; justify-content: center; }
+.btn .ver-dot { display: none; width: 9px; height: 9px; border-radius: 50%; background: var(--terra-bright); box-shadow: 0 0 0 2px #fff; margin-left: 6px; flex: none; }
+.btn.has-new .ver-dot { display: inline-block; }
+.footer.ver { margin-top: 6px; font-size: 12px; }
+.news-list, .ach-list { margin: 4px 0 6px; padding: 0; list-style: none; text-align: left; display: grid; gap: 8px; }
+.news-list li, .ach-list li { padding: 10px 14px; border-radius: 14px; background: var(--tuff-light); border: 1.5px solid var(--tuff-2); font-size: 14px; line-height: 1.4; color: var(--ink-mid); }
+.news-list b, .ach-list b { display: block; font-size: 15px; color: var(--ink); margin-bottom: 2px; }
+.ach-list li { display: flex; align-items: center; gap: 12px; }
+.ach-list li .ach-mark { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: #fff; border: 2px dashed var(--tuff-2); color: var(--tuff-2); }
+.ach-list li.on { border-color: var(--sage); background: #EEF6E8; }
+.ach-list li.on .ach-mark { border: 2px solid var(--sage); background: var(--sage); color: #fff; }
+.ach-list li .ach-txt { flex: 1; min-width: 0; }
+.ach-list li small { display: block; font-size: 12px; color: var(--ink-muted); font-weight: 700; margin-top: 2px; }
+.panel .sub2 { text-align: center; margin: -8px 0 6px; font-size: 13px; font-weight: 700; color: var(--ink-muted); }
 @media (prefers-reduced-motion: reduce) {
   .toast { animation: none; }
   .toast.out { transition: none; opacity: 0; }
@@ -2385,12 +2413,17 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
           <div class="seg" id="seg-lang"><button data-l="tr">TR</button><button data-l="en">EN</button></div>
         </div>
       </div>
+      <div class="row two">
+        <button class="btn" id="b-news"><span data-t="news"></span><i class="ver-dot" aria-hidden="true"></i></button>
+        <button class="btn" id="b-ach"><span data-t="ach"></span></button>
+      </div>
       <div class="best" id="best-line"></div>
       <div class="lbl"><svg width="18" height="18"><use href="#i-target"/></svg><span data-t="pickHole"></span></div>
       <div class="holes" id="holes"></div>
       <div class="sc-line" id="sc-line"></div>
       <div class="gallery" id="ace-gallery"></div>
       <div class="footer"><a href="https://github.com/Furkiozknn" target="_blank" rel="noopener">Claude Game Arena</a> · <span data-t="builtBy">built by Claude Fable 5.1</span></div>
+      <div class="footer ver"><span id="ver-line"></span> · <a href="https://furkiozknn.github.io/" target="_blank" rel="noopener" data-t="another2"></a></div>
     </div>
   </div>
 
@@ -2401,7 +2434,12 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
       <button class="btn primary w" id="b-resume"><svg><use href="#i-play"/></svg><span data-t="resume"></span></button>
       <button class="btn w lemon" id="b-restart"><svg><use href="#i-restart"/></svg><span data-t="restartHole"></span></button>
       <button class="btn w sky" id="b-psettings"><svg><use href="#i-gear"/></svg><span data-t="settings"></span></button>
+      <div class="row two">
+        <button class="btn" id="b-pnews"><span data-t="news"></span><i class="ver-dot" aria-hidden="true"></i></button>
+        <button class="btn" id="b-pach"><span data-t="ach"></span></button>
+      </div>
       <button class="btn w blush" id="b-menu"><svg><use href="#i-home"/></svg><span data-t="mainMenu"></span></button>
+      <div class="footer ver" id="p-ver"></div>
     </div>
   </div>
 
@@ -2416,6 +2454,26 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
       <div class="row"><span style="width:110px;font-size:14px;font-weight:700;color:var(--ink)" data-t="quality"></span><div class="seg" id="seg-q"><button data-q="low" data-t="low"></button><button data-q="high" data-t="high"></button></div></div>
       <button class="btn w sky" id="b-full"><svg><use href="#i-full"/></svg><span data-t="fullscreen"></span></button>
       <button class="btn primary w" id="b-sclose"><svg><use href="#i-back"/></svg><span data-t="back"></span></button>
+    </div>
+  </div>
+
+  <!-- What's new -->
+  <div class="overlay" id="ov-news" hidden role="dialog" aria-modal="true" aria-labelledby="news-h">
+    <div class="panel glass col">
+      <h2 id="news-h" data-t="news"></h2>
+      <p class="sub2" id="news-sub"></p>
+      <ul class="news-list" id="news-list"></ul>
+      <button class="btn primary w" id="b-news-back"><svg><use href="#i-back"/></svg><span data-t="back"></span></button>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="overlay" id="ov-ach" hidden role="dialog" aria-modal="true" aria-labelledby="ach-h">
+    <div class="panel glass col">
+      <h2 id="ach-h" data-t="ach"></h2>
+      <p class="sub2" id="ach-sub"></p>
+      <ul class="ach-list" id="ach-list"></ul>
+      <button class="btn primary w" id="b-ach-back"><svg><use href="#i-back"/></svg><span data-t="back"></span></button>
     </div>
   </div>
 
@@ -2522,6 +2580,18 @@ const I18N = {
     dailyRes: 'Günün Meydan Okuması {d}: seri {s} gün · en iyi {b}', share: 'Paylaş', another: 'Başka oyun',
     shareHole: '{n}. delik · {name}: {s} vuruş (Par {p}) {st}', shareDaily: 'Günün Meydan Okuması {d} · seri {k}',
     shareEnd: '{h} delik: {t} vuruş ({r}) · {s} yıldız', awAce: 'Tek vuruş', awCourse: '12 delik tamam', awUnder: 'Par altı tur',
+    news: 'Yenilikler', newsSub: 'Sürüm {v} · {d}', another2: 'Diğer oyunlar', ach: 'Başarımlar', achSub: '{n}/{m} açıldı', achNew: 'Yeni başarım: {n}',
+    newsItems: [
+      ['Başarımlar', 'Dokuz başarım: ilk delik, tam tur, par altı tur, tek vuruş, gizli kestirme, üç yıldızlı delik, yıldız avcısı ve günlük seri. Eski kaydın da sayılır; yenisi açılınca ekranda haber verilir.'],
+      ['Yenilikler penceresi ve sürüm etiketi', 'Ana menüden ve duraklatma menüsünden ulaşırsın; yeni sürümde düğmede nokta görünür. İlk açılışta doğrudan oyuna girenler de duraklatma menüsünden bulur.'],
+      ['Diğer oyunlar bağlantısı', 'Ana menünün altında furkiozknn.github.io adresindeki tüm oyunlara giden bağlantı var.'],
+      ['Sayfa ve telefon düzeltmeleri', 'Paylaşım kartı ve açıklama Türkçe/İngilizce yazıldı, simge ve tema rengi eklendi, bulunamayan adresler için 404 sayfası geldi; dar ekranda Günün Meydan Okuması düğmesi düzgün satıra sığıyor.'],
+    ],
+    achItems: {
+      first: ['İlk delik', 'Herhangi bir deliği bitir.'], course: ['Tur tamam', '12 deliği bir turda bitir.'], under: ['Par altı tur', 'Turu parın altında bitir.'],
+      ace: ['Tek vuruş', 'Bir deliği tek vuruşta bitir.'], sc1: ['Gizli yol', 'Bir gizli kestirme bul.'], scAll: ['Kestirme ustası', 'Bütün gizli kestirmeleri bul.'],
+      star3: ['Üç yıldızlı delik', 'Bir delikte üç yıldızı da topla.'], stars: ['Yıldız avcısı', '36 yıldızın yarısını topla.'], daily: ['Günlük seri', 'Günün Meydan Okuması\'nda 3 günlük seri yap.'],
+    },
     holes: ['Güvercinlik Terası', 'Peribacası Dönemeci', 'Kaya Ev', 'Çömlek Atölyesi', 'Kum Vadisi', 'Yeraltı Şehri', 'Fener Geçidi',
       'Bağ Yolu', 'Taş Köprü', 'Sıçrama', 'Güvercin Vadisi', 'Gün Doğumu Sırtı'],
   },
@@ -2551,11 +2621,24 @@ const I18N = {
     dailyRes: 'Daily challenge {d}: streak {s} · best {b}', share: 'Share', another: 'Another game',
     shareHole: 'Hole {n} · {name}: {s} strokes (par {p}) {st}', shareDaily: 'Daily challenge {d} · streak {k}',
     shareEnd: '{h} holes: {t} strokes ({r}) · {s} stars', awAce: 'Hole in one', awCourse: 'All 12 holes', awUnder: 'Round under par',
+    news: "What's new", newsSub: 'Version {v} · {d}', another2: 'More games', ach: 'Achievements', achSub: '{n}/{m} unlocked', achNew: 'New achievement: {n}',
+    newsItems: [
+      ['Achievements', 'Nine achievements: first hole, full round, round under par, hole in one, hidden shortcut, three-star hole, star hunter and daily streak. Your old save counts too; a new one pops up on screen.'],
+      ["What's new window and version tag", 'Open it from the main menu or the pause menu; a dot shows on the button for a new version. First-time players who start straight in the game find it in the pause menu.'],
+      ['More games link', 'A link under the main menu goes to every game at furkiozknn.github.io.'],
+      ['Page and phone fixes', 'Share card and description are in Turkish and English, an icon and theme colour were added, unknown addresses get a 404 page, and the Daily Challenge button now fits on narrow screens.'],
+    ],
+    achItems: {
+      first: ['First hole', 'Finish any hole.'], course: ['Full round', 'Finish all 12 holes in one round.'], under: ['Round under par', 'Finish a round under par.'],
+      ace: ['Hole in one', 'Sink a hole in a single stroke.'], sc1: ['Hidden path', 'Find a hidden shortcut.'], scAll: ['Shortcut master', 'Find every hidden shortcut.'],
+      star3: ['Three-star hole', 'Collect all three stars on one hole.'], stars: ['Star hunter', 'Collect half of the 36 stars.'], daily: ['Daily streak', 'Reach a 3-day streak in the Daily Challenge.'],
+    },
     holes: ['Pigeon Terrace', 'Chimney Bend', 'Cave House', 'Pottery Workshop', 'Sand Valley', 'Underground City', 'Lantern Passage',
       'Vineyard Road', 'Stone Bridge', 'The Leap', 'Pigeon Valley', 'Sunrise Ridge'],
   },
 };
 let LANG = 'tr';
+const VERSION = '2.1', VERSION_DATE = { tr: 'Kasım 2026', en: 'November 2026' };
 const t = (k, vars) => {
   let s = (I18N[LANG][k] ?? I18N.en[k] ?? k);
   if (vars) for (const v in vars) s = s.replace('{' + v + '}', vars[v]);
@@ -4432,6 +4515,30 @@ window.addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeig
 // ---------------------------------------------------------------------------
 const $ = (id) => document.getElementById(id);
 const starSvg = (on) => `<svg class="${on ? 'on' : ''}" viewBox="0 0 24 24"><use href="#i-star"/></svg>`;
+// v2.1: achievements are derived from data the game already saves (best, found shortcuts, aces, daily streak),
+// so a returning player sees past progress at once. Only the "already announced" list is new (arena.periGolf.ach).
+function achList() {
+  const hs = best.holeStars || {}, starsN = Object.keys(hs).reduce((a, k) => a + ((hs[k] || []).filter(Boolean).length), 0);
+  const star3 = Object.keys(hs).filter(k => (hs[k] || []).length === 3 && hs[k].every(Boolean)).length;
+  const sc = Object.keys(found).filter(k => SHORTCUTS[k]).length;
+  const d = (() => { try { return dailyInfo(); } catch (e) { return null; } })();
+  const done = Object.keys(best.holeBest || {}).length;
+  return [
+    ['first', done >= 1 ? 1 : 0, 1], ['course', best.total != null ? 1 : 0, 1], ['under', best.total != null && best.total < TOTAL_PAR ? 1 : 0, 1],
+    ['ace', Math.min(1, Object.keys(aces).filter(i => HOLES[i]).length), 1], ['sc1', Math.min(1, sc), 1], ['scAll', sc, SHORTCUTS.length],
+    ['star3', Math.min(1, star3), 1], ['stars', Math.min(starsN, 18), 18], ['daily', Math.min(3, d ? (d.best || 0) : 0), 3],
+  ];
+}
+let achSeen = null; // ids already announced (memory copy; also written to storage unless ?nosave)
+function checkAch(announce) {
+  const now = achList().filter(a => a[1] >= a[2]).map(a => a[0]);
+  if (achSeen === null) { const st = store.get('arena.periGolf.ach'); achSeen = Array.isArray(st) ? st : null; if (achSeen === null) { achSeen = now.slice(); store.set('arena.periGolf.ach', achSeen); return; } }
+  const fresh = now.filter(id => !achSeen.includes(id));
+  if (!fresh.length) return;
+  achSeen = achSeen.concat(fresh); store.set('arena.periGolf.ach', achSeen);
+  if (announce) fresh.forEach((id, i) => setTimeout(() => { ui.toast('★ ' + t('achNew', { n: t('achItems')[id][0] })); }, 900 + i * 1600));
+}
+
 const ui = {
   prevOverlay: null,
   applyLang() {
@@ -4439,7 +4546,8 @@ const ui = {
     document.querySelectorAll('[data-t]').forEach(el => { const k = el.dataset.t; el.textContent = t(isPhone && k === 'howto' ? 'howtoTouch' : k); });
     document.querySelectorAll('[data-tt]').forEach(el => { el.title = t(el.dataset.tt); el.setAttribute('aria-label', t(el.dataset.tt)); });
     document.querySelectorAll('[data-t-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
-    $('b-lang').textContent = LANG.toUpperCase();
+    $('b-lang').textContent = LANG.toUpperCase(); this.verText();
+    if (!$('ov-news').hidden) this.showPanel('ov-news', true); if (!$('ov-ach').hidden) this.showPanel('ov-ach', true);
     document.querySelectorAll('#seg-lang button, #seg-lang2 button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
     document.querySelectorAll('#seg-q button').forEach(b => b.classList.toggle('on', b.dataset.q === settings.quality));
     $('intro-skip').textContent = t('skip');
@@ -4493,7 +4601,7 @@ const ui = {
       b.addEventListener('click', () => { audio.init(); audio.ui(); startRun(i); });
       grid.appendChild(b);
     }
-    this.extras('sc-line', 'ace-gallery');
+    this.newsDot(); this.verText(); this.extras('sc-line', 'ace-gallery');
   },
   // shortcut counter and hole-in-one gallery (title screen and course summary)
   extras(lineId, galId) {
@@ -4506,11 +4614,33 @@ const ui = {
       $('r-master').value = settings.master; $('r-music').value = settings.music; $('r-sfx').value = settings.sfx; $('ov-settings').hidden = false; $('b-sclose').focus({ preventScroll: true }); }
     else { $('ov-settings').hidden = true; if (this.prevOverlay) $(this.prevOverlay).hidden = false; else if (game.phase === 'title') $('ov-title').hidden = false; }
   },
+  // v2.1: "Yenilikler" and "Başarımlar" panels, opened from the title or the pause menu, closed back to it
+  showPanel(id, show) {
+    if (show) {
+      if (!this.panelPrev) this.panelPrev = ['ov-title', 'ov-pause'].find(x => !$(x).hidden) || null;
+      $('ov-title').hidden = true; $('ov-pause').hidden = true;
+      if (id === 'ov-news') { $('news-sub').textContent = t('newsSub', { v: VERSION, d: VERSION_DATE[LANG] || VERSION_DATE.en }); $('news-list').innerHTML = t('newsItems').map(([h, p]) => `<li><b>${h}</b>${p}</li>`).join(''); store.set('arena.periGolf.seenNews', VERSION); this.newsDot(); }
+      else {
+        const L = achList(), items = t('achItems'), n = L.filter(a => a[1] >= a[2]).length;
+        $('ach-sub').textContent = t('achSub', { n, m: L.length });
+        $('ach-list').innerHTML = L.map(([k, c, m]) => `<li class="${c >= m ? 'on' : ''}"><span class="ach-mark" aria-hidden="true">${c >= m ? '✓' : ''}</span><span class="ach-txt"><b>${items[k][0]}</b>${items[k][1]}${m > 1 ? `<small>${c}/${m}</small>` : ''}</span></li>`).join('');
+      }
+      $(id).hidden = false; $(id === 'ov-news' ? 'b-news-back' : 'b-ach-back').focus({ preventScroll: true });
+    } else {
+      $('ov-news').hidden = true; $('ov-ach').hidden = true;
+      const prev = this.panelPrev || (game.phase === 'title' ? 'ov-title' : null); this.panelPrev = null;
+      if (prev) { $(prev).hidden = false; $(prev === 'ov-title' ? 'b-news' : 'b-pnews').focus({ preventScroll: true }); }
+    }
+  },
+  newsDot() { const isNew = store.get('arena.periGolf.seenNews') !== VERSION; ['b-news', 'b-pnews'].forEach(i => $(i).classList.toggle('has-new', isNew)); },
+  verText() { const v = 'v' + VERSION + ' · ' + (VERSION_DATE[LANG] || VERSION_DATE.en); $('ver-line').textContent = v; $('p-ver').textContent = v; },
   setPaused(p) {
     if (game.phase === 'title' || game.phase === 'end') return;
     game.paused = p; $('ov-pause').hidden = !p; if (p) $('b-resume').focus({ preventScroll: true }); else canvas.focus({ preventScroll: true });
   },
   escape() {
+    if (!$('ov-news').hidden) { this.showPanel('ov-news', false); return; }
+    if (!$('ov-ach').hidden) { this.showPanel('ov-ach', false); return; }
     if (!$('ov-settings').hidden) { this.showSettings(false); return; }
     if (!$('ov-card').hidden) { this.showCard(false); return; }
     if (game.phase === 'title' || game.phase === 'end' || !$('ov-hole').hidden) return;
@@ -4553,6 +4683,7 @@ const ui = {
     $('b-hshare').hidden = !window.Arena;
     $('ov-hole').hidden = false; $('b-next').focus({ preventScroll: true });
     if (st.filter(Boolean).length) audio.star();
+    checkAch(true);
   },
   hideHoleResult() { $('ov-hole').hidden = true; },
   showEnd(total, stars, record) {
@@ -4561,13 +4692,16 @@ const ui = {
     $('end-card').innerHTML = this.cardTable(game.card, game.stars); this.extras('end-sc', 'end-gallery');
     if (window.Arena) { const others = Arena.games.filter(g => g !== 'peri-golf'); $('e-another').href = 'https://furkiozknn.github.io/' + others[Math.floor(Math.random() * others.length)] + '/'; }
     $('b-eshare').hidden = !window.Arena;
-    $('hud').hidden = true; $('ov-end').hidden = false; $('b-again').focus({ preventScroll: true }); this.hint('');
+    $('hud').hidden = true; $('ov-end').hidden = false; $('b-again').focus({ preventScroll: true }); this.hint(''); checkAch(true);
   },
 };
 // buttons
 $('b-play').addEventListener('click', () => { audio.init(); audio.ui(); startRun(0); });
 $('b-continue').addEventListener('click', () => { audio.init(); audio.ui(); const s = store.get(KEY.save); if (s && s.card) continueRun(s); else startRun(0); });
 $('b-settings').addEventListener('click', () => { audio.init(); ui.showSettings(true); });
+for (const [b, id] of [['b-news', 'ov-news'], ['b-pnews', 'ov-news'], ['b-ach', 'ov-ach'], ['b-pach', 'ov-ach']]) $(b).addEventListener('click', () => { audio.init(); audio.ui(); ui.showPanel(id, true); });
+$('b-news-back').addEventListener('click', () => { audio.ui(true); ui.showPanel('ov-news', false); });
+$('b-ach-back').addEventListener('click', () => { audio.ui(true); ui.showPanel('ov-ach', false); });
 $('b-psettings').addEventListener('click', () => ui.showSettings(true));
 $('b-sclose').addEventListener('click', () => { audio.ui(true); ui.showSettings(false); });
 $('b-pause').addEventListener('click', () => { audio.init(); ui.setPaused(true); });
@@ -4683,7 +4817,7 @@ camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
   scene.environmentRotation.set(0, Math.atan2(20, 30) - Math.PI / 2, 0); scene.environmentIntensity = (FLAG.env || 0.22) * 0.75;
   camera.position.set(6, 3, 12); camera.lookAt(-4, 1, -6);
 }
-ui.applyLang(); ui.soundBtn();
+ui.applyLang(); ui.soundBtn(); ui.newsDot(); checkAch(false);
 $('loadmsg').textContent = ''; $('b-play').disabled = false; $('b-daily').disabled = false;
 if (window.Arena) Arena.mountSettingsButton(); // bottom-right is free here: the power bar is bottom-left, hints bottom-centre
 // Instant start: a first-time player lands on hole 1 at once (the in-game hint teaches the shot); the menu is one tap
