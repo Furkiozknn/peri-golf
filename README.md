@@ -37,6 +37,7 @@
 - **Dynamic diorama hazards:** A turning pottery wheel, a rolling stone door, swinging lanterns, and a donkey crossing the path all push the ball with real slope, bump, ramp, and wall-bounce physics across grass, sand, and stone.
 - **Three stars per hole:** Finish under par, find the hidden grape, and land the hole's trick shot (a hole-in-one, a bank off a wall, a long putt) guided by a ghost line showing your best shot.
 - **Autonomous bot verification:** The `?auto` bot uses the same physics as a player and finishes all 12 holes in 14 strokes (par 40) with 20 stars and 0 errors, with or without the optional CC0 assets (measured 2026-11-09). The bot takes the hidden shortcut on 8 of the 12 holes, so its score is much lower than a typical first round.
+- **Achievements and what's new (v2.1):** Nine local achievements computed from your existing save, a version tag, a "Yenilikler" (What's new) window and a link to the other games. See [CHANGELOG.md](CHANGELOG.md) (Turkish).
 - **Ultra-lean web performance:** A single `index.html` running Three.js r170 delivering 60 fps at 16–22 draw calls on an Intel UHD 620 at 1280x720 on High tier (60 fps at 26 draw calls on phone Low tier).
 
 ## How to play
@@ -104,6 +105,11 @@
     <td width="33%"><img src="docs/05-hole-result.png" alt="Hole result with two stars"><br><sub>Birdie (Turkish UI)</sub></td>
     <td width="33%"><img src="docs/06-settings.png" alt="Settings panel"><br><sub>Settings</sub></td>
   </tr>
+  <tr>
+    <td width="33%"><img src="docs/08-achievements.png" alt="Achievements window (v2.1)"><br><sub>Achievements (v2.1)</sub></td>
+    <td width="33%"><img src="docs/09-whats-new.png" alt="What's new window (v2.1)"><br><sub>Yenilikler (v2.1)</sub></td>
+    <td width="33%"></td>
+  </tr>
 </table>
 
 <details>
@@ -149,6 +155,17 @@
 The `?auto` bot plays all 12 holes with the same physics as a player: 14 strokes (card 1,1,1,1,1,1,1,1,1,1,2,2), 20 stars and 0 errors, identical scorecard with and without optional assets. It finds and takes the hidden shortcut on 8 holes, which is why it beats par 40 by so much (earlier asset-pass measurements, 18 strokes: [docs/assets.md](docs/assets.md#measurements-intel-uhd-620-headless-chrome-1280x720-high-tier)).
 
 ![Hole 4 before and after the 2026-11 redesign](docs/redesign-before-after.png)
+
+## Smoke test
+
+`test/duman.mjs` is a dependency-free smoke test (nothing is added to the repo). It needs `playwright` or `playwright-core` somewhere on disk and a Chromium-based browser:
+
+```bash
+PW_DIR=/path/to/node_modules PW_CHROMIUM=/path/to/chrome node test/duman.mjs
+node test/duman.mjs --root /path/to/other/checkout --label base   # same test on another copy, e.g. origin/main
+```
+
+It checks that the page loads with no console or network errors, a stroke is counted, pause works, an old save still opens, nothing overflows at 390x844 on a touch phone, and the v2.1 windows work.
 
 ## Running locally
 
