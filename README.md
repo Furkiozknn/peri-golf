@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://furkiozknn.github.io/peri-golf/">
-    <img src="docs/card.jpg" width="100%" alt="Peri Golf: 3D physics mini-golf among the fairy chimneys of Cappadocia. Click to play in your browser.">
+    <img src="docs/card-3d.jpg" width="100%" alt="Peri Golf: 3D physics mini-golf among the fairy chimneys of Cappadocia. Click to play in your browser.">
   </a>
 </p>
 
@@ -33,6 +33,13 @@
 
 ## Features
 
+<p align="center">
+  <img src="docs/features.jpg" width="100%" alt="Peri Golf scorecard listing five features: twelve holes with par 40, living hazards such as a pottery wheel and a donkey, three stars per hole, a ghost line of your best shot, and a single-file 60 fps build, beside a boy golfer and a fairy.">
+</p>
+
+<details>
+<summary><b>Feature details</b></summary>
+
 - **Twelve holes, par 40:** From Pigeon Terrace to Sunrise Ridge across terraces between fairy chimneys, cave houses, an underground-city tunnel, a pottery workshop, a vineyard road, a stone bridge, and a pigeon valley.
 - **Dynamic diorama hazards:** A turning pottery wheel, a rolling stone door, swinging lanterns, and a donkey crossing the path all push the ball with real slope, bump, ramp, and wall-bounce physics across grass, sand, and stone.
 - **Three stars per hole:** Finish under par, find the hidden grape, and land the hole's trick shot (a hole-in-one, a bank off a wall, a long putt) guided by a ghost line showing your best shot.
@@ -40,7 +47,16 @@
 - **Achievements and what's new (v2.1):** Nine local achievements computed from your existing save, a version tag, a "Yenilikler" (What's new) window and a link to the other games. See [CHANGELOG.md](CHANGELOG.md) (Turkish).
 - **Ultra-lean web performance:** A single `index.html` running Three.js r170 delivering 60 fps at 16–22 draw calls on an Intel UHD 620 at 1280x720 on High tier (60 fps at 26 draw calls on phone Low tier).
 
+</details>
+
 ## How to play
+
+<p align="center">
+  <img src="docs/how-to-play.jpg" width="100%" alt="How to play Peri Golf: three numbered hole flags on a winding mini-golf course explain aim and charge, release to strike, and survey and orbit, with a controls panel of keys and mouse actions.">
+</p>
+
+<details>
+<summary><b>Goal and steps</b></summary>
 
 > [!TIP]
 > **Goal:** Sink the ball on all 12 holes in as few strokes as you can. The course par is 40; holes unlock one by one.
@@ -48,6 +64,8 @@
 1. **Aim and charge:** Press on the ball and drag back, or use `Left` / `Right` arrows and hold `Space` to charge. The white line previews the shot up to the first bounce.
 2. **Release to strike:** Release the drag or `Space` to shoot the ball. Ball velocity scales with drag distance or charge duration.
 3. **Survey and orbit:** Drag on empty ground to orbit the camera, scroll the wheel or use `Up` / `Down` arrows to zoom, and tap the eye button (or `V`) for a top-down overview.
+
+</details>
 
 <details>
 <summary><b>Rules and hazards</b></summary>
