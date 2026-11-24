@@ -1065,6 +1065,8 @@ table.card .ace { color: var(--gold); font-weight: 800; }
 }
 #dbg .err { color: #ff6b6b; font-weight: 700; }
 #loadmsg { color: var(--ink-mid); font-size: 14px; font-weight: 600; margin: 8px 0; }
+#ov-title.nogl #b-settings, #ov-title.nogl .row.two, #ov-title.nogl .lbl, #ov-title.nogl .footer.ver, #ov-title.nogl .best, #ov-title.nogl .holes, #ov-title.nogl .sc-line, #ov-title.nogl .gallery { display: none !important; }
+#ov-title.nogl .btn:disabled { opacity: .55; filter: grayscale(.35); }
 #loadmsg.glerr { color: #8a2f1f; background: #fbe3dc; border: 1px solid #e3a899; border-radius: 12px; padding: 10px 12px; line-height: 1.35; }
 
 /* ==========================================================================
@@ -2556,12 +2558,14 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
 window.__errs = [];
 window.addEventListener('error', e => { window.__errs.push(String(e.message || e)); });
 window.addEventListener('unhandledrejection', e => { window.__errs.push('Promise: ' + String(e.reason && e.reason.message || e.reason)); });
-const __tr = (navigator.language || '').toLowerCase().startsWith('tr');
+let __tr = (navigator.language || '').toLowerCase().startsWith('tr');
 document.getElementById('loadmsg').textContent = __tr ? 'Yükleniyor… 0/1' : 'Loading… 0/1';
 const __lm = document.getElementById('loadmsg');
-const __cdnFail = () => { if (window.__loaded || window.__glfail) return; __lm.textContent = __tr ? 'Three.js yüklenemedi; internet bağlantısını kontrol et.' : 'Three.js could not load; check your connection.'; __lm.className = 'glerr';
-  const F = __tr ? { subtitle: 'Kapadokya peribacaları arasında minyatür diorama golfü', play: 'Oyna' } : { subtitle: '3D physics mini golf among the fairy chimneys of Cappadocia', play: 'Play' };
-  document.querySelectorAll('#ov-title [data-t]').forEach(el => { if (F[el.dataset.t]) el.textContent = F[el.dataset.t]; else if (!el.textContent) { const b = el.closest('button'); if (b) b.hidden = true; } }); };
+const __cdnFail = () => { if (window.__loaded || window.__glfail || window.__cdnDone) return; window.__cdnDone = true; const __msg = () => { __lm.textContent = __tr ? 'Three.js yüklenemedi; internet bağlantısını kontrol et.' : 'Three.js could not load; check your connection.'; document.querySelectorAll('#seg-lang button').forEach(b => b.classList.toggle('on', b.dataset.l === (__tr ? 'tr' : 'en'))); }; __msg(); __lm.className = 'glerr'; document.getElementById('ov-title').classList.add('nogl');
+  document.querySelectorAll('#seg-lang button').forEach(b => b.addEventListener('click', () => { __tr = b.dataset.l === 'tr'; __msg(); __txt(); }));
+  const __txt = () => { const F = __tr ? { subtitle: 'Kapadokya peribacaları arasında minyatür diorama golfü', play: 'Oyna' } : { subtitle: '3D physics mini golf among the fairy chimneys of Cappadocia', play: 'Play' };
+    document.querySelectorAll('#ov-title [data-t]').forEach(el => { if (F[el.dataset.t]) el.textContent = F[el.dataset.t]; else if (!el.textContent) { const b = el.closest('button'); if (b) b.hidden = true; } }); };
+  __txt(); };
 window.addEventListener('error', e => { if (e.target && e.target.tagName === 'SCRIPT') __cdnFail(); }, true); // blocked CDN: the module script fails at once
 setTimeout(__cdnFail, 12000);
 </script>
@@ -4022,7 +4026,7 @@ const canvas = document.getElementById('c');
 let renderer;
 try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); }
 catch (e) { // no WebGL: keep the menu texts, show a clear message, Play stays disabled
-  window.__glfail = true; window.__errs.push('WebGL: ' + e.message);
+  window.__glfail = true; window.__errs.push('WebGL: ' + e.message); document.getElementById('ov-title').classList.add('nogl'); ['b-settings','b-news','b-ach'].forEach(id => { const b = document.getElementById(id); if (b) { b.hidden = true; b.disabled = true; } });
   const apply = () => { document.documentElement.lang = LANG;
     document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
     document.querySelectorAll('#seg-lang button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
