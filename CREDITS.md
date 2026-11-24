@@ -19,3 +19,12 @@ the scripts in `assets/src/` by Claude Fable 5.1 and are MIT like the rest of th
 - **Fredoka** (Google Fonts, SIL Open Font License 1.1) by Milena Brandão, Jeff Kellem:
   https://fonts.google.com/specimen/Fredoka  
   files: assets/fonts/fredoka-latin.woff2, assets/fonts/fredoka-latin-ext.woff2 (variable 400-700, Google Fonts subsets; the UI type of the 2026-11 redesign)
+
+## Stil 3D (24.11.2026): the song video's chibi look
+
+- `assets/3d/golfcu-nisan.webp`, `golfcu-sevinc.webp`, `peri.webp`, `bayrak.webp`: one 2x2 sprite sheet made with the
+  Gemini app (Nano Banana) from a text prompt describing the Peri Golf song video's characters (kid golfer with the
+  pottery-pattern putter, the fairy, the red hole flag); white background removed and cut locally (PIL + scipy).
+- `assets/3d/kil-detay.webp`, `cimen-detay.webp`: detail maps cut from a frame of the game's own song video (fairy-chimney
+  clay and putting green), high-passed and mirrored into seamless tiles locally. They replace tuff_detail.jpg and
+  grass_detail.jpg in the game (those files stay in the repo, unused except the tuff normal map).
