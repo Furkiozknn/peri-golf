@@ -4034,7 +4034,7 @@ catch (e) { // no WebGL: keep the menu texts, show a clear message, Play stays d
   const $g = (id) => document.getElementById(id);
   document.querySelectorAll('#seg-lang button').forEach(b => b.addEventListener('click', () => { LANG = b.dataset.l; apply(); }));
   apply(); $g('b-play').disabled = true; $g('b-daily').disabled = true;
-  throw new Error('WebGL unavailable'); // stop the rest of the game (it needs a renderer)
+  await new Promise(function () {}); // stop the rest of the game quietly (it needs a renderer); no uncaught error
 }
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.type = THREE.PCFShadowMap;
