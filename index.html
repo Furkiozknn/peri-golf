@@ -4241,15 +4241,17 @@ function sakin(fn) {
   Math.random = () => { ST_RND = (ST_RND + 0x6D2B79F5) >>> 0; let t = ST_RND; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   try { return fn(); } finally { Math.random = r; }
 }
-const ST = { ready: 0, pose: 'aim', spot: new THREE.Vector3(), swing: 0, cheerT: 0, phoneK: 1 };
+const ST = { ready: 0, pose: 'aim', spot: new THREE.Vector3(), swing: 0, cheerT: 0, phoneK: 1, top: 0 };
 sakin(() => {
-  const spr = (cx, cy) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, alphaTest: 0.08, depthWrite: true })); s.center.set(cx, cy); s.visible = false; s.frustumCulled = false; scene.add(s); return s; };
+  const spr = (cx, cy) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, alphaTest: 0.3, depthWrite: true })); s.center.set(cx, cy); s.visible = false; s.frustumCulled = false; scene.add(s); return s; };
   ST.golfer = spr(0.1, 0.1); ST.fairy = spr(0.5, 0.5); ST.flag = spr(0.07, 0.0);
   ST.golfer.renderOrder = ST.fairy.renderOrder = ST.flag.renderOrder = 2;
+  // cila: the golfer is drawn after every wall and never depth-clipped by them (ball against the back wall), purely visual
+  ST.golfer.material.depthTest = false; ST.golfer.material.depthWrite = false; ST.golfer.renderOrder = 6;
   // soft contact shadow under the golfer's feet
   const sc = document.createElement('canvas'); sc.width = sc.height = 64;
   const x = sc.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-  gr.addColorStop(0, 'rgba(80,50,35,0.45)'); gr.addColorStop(0.6, 'rgba(80,50,35,0.18)'); gr.addColorStop(1, 'rgba(80,50,35,0)');
+  gr.addColorStop(0, 'rgba(70,42,30,0.62)'); gr.addColorStop(0.55, 'rgba(70,42,30,0.28)'); gr.addColorStop(1, 'rgba(80,50,35,0)');
   x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
   ST.shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
   ST.shadow.visible = false; scene.add(ST.shadow);
@@ -4274,7 +4276,8 @@ function stilSync(dt) {
   ST.golfer.visible = ST.fairy.visible = ST.flag.visible = ST.shadow.visible = !!on;
   if (!on) return;
   if (flagMesh) flagMesh.visible = false;
-  const b = game.ball, k = (Math.min(innerWidth, innerHeight) < 600 ? 1.45 : 1) * (holeGroup ? holeGroup.scale.x : 1);
+  ST.top += ((game.top ? 1 : 0) - ST.top) * Math.min(1, dt * 5); // eased bird's-eye factor: figures grow and ground themselves with a bigger shadow
+  const b = game.ball, k = (Math.min(innerWidth, innerHeight) < 600 ? 1.45 : 1) * (holeGroup ? holeGroup.scale.x : 1) * (1 + 0.5 * ST.top);
   _sr.setFromMatrixColumn(camera.matrixWorld, 0); _sr.y = 0; if (_sr.lengthSq() < 1e-6) _sr.set(1, 0, 0); _sr.normalize();
   const gy = (x, z, f) => course.height(x, z) ?? f;
   // golfer: stands at the ball while it rests, stays where he hit it while it rolls, cheers when it drops
@@ -4295,7 +4298,7 @@ function stilSync(dt) {
   G.scale.set(W, H, 1);
   const fx0 = aim ? (0.62 - 0.1) * W : 0; // feet: about 62 % across the aiming sprite
   const sx = G.position.x + _sr.x * fx0, sz = G.position.z + _sr.z * fx0;
-  ST.shadow.position.set(sx, gy(sx, sz, ST.spot.y) + 0.012, sz); ST.shadow.scale.set(W * 0.9, 1, W * 0.55);
+  ST.shadow.position.set(sx, gy(sx, sz, ST.spot.y) + 0.012, sz); ST.shadow.scale.set(W * (0.9 + 0.35 * ST.top), 1, W * (0.55 + 0.3 * ST.top));
   // flag over the cup, swaying with the wind like the old pennant
   const c = course.def.cup, ch = gy(c[0], c[1], 0), F = ST.flag, fh = ST_H.flag * Math.max(1, k * 0.85);
   F.scale.set(fh * (ST.tex.bayrak.userData.asp || 0.35), fh, 1); F.position.set(c[0], ch, c[1]);

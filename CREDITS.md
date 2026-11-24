@@ -28,3 +28,8 @@ the scripts in `assets/src/` by Claude Fable 5.1 and are MIT like the rest of th
 - `assets/3d/kil-detay.webp`, `cimen-detay.webp`: detail maps cut from a frame of the game's own song video (fairy-chimney
   clay and putting green), high-passed and mirrored into seamless tiles locally. They replace tuff_detail.jpg and
   grass_detail.jpg in the game (those files stay in the repo, unused except the tuff normal map).
+
+## Cila (24.11.2026)
+
+- The four sprite webps in `assets/3d/` were defringed locally (alpha matte eroded about 1 px and feathered, edge colour taken from the
+  nearest solid pixel; PIL + scipy). No new images were generated.
