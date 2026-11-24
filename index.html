@@ -1065,6 +1065,7 @@ table.card .ace { color: var(--gold); font-weight: 800; }
 }
 #dbg .err { color: #ff6b6b; font-weight: 700; }
 #loadmsg { color: var(--ink-mid); font-size: 14px; font-weight: 600; margin: 8px 0; }
+#loadmsg.glerr { color: #8a2f1f; background: #fbe3dc; border: 1px solid #e3a899; border-radius: 12px; padding: 10px 12px; line-height: 1.35; }
 
 /* ==========================================================================
    RESPONSIVE ADAPTATIONS & MOBILE POLISH
@@ -2557,7 +2558,12 @@ window.addEventListener('error', e => { window.__errs.push(String(e.message || e
 window.addEventListener('unhandledrejection', e => { window.__errs.push('Promise: ' + String(e.reason && e.reason.message || e.reason)); });
 const __tr = (navigator.language || '').toLowerCase().startsWith('tr');
 document.getElementById('loadmsg').textContent = __tr ? 'Yükleniyor… 0/1' : 'Loading… 0/1';
-setTimeout(() => { if (!window.__loaded) document.getElementById('loadmsg').textContent = __tr ? 'Three.js yüklenemedi; internet bağlantısını kontrol et.' : 'Three.js could not load; check your connection.'; }, 20000);
+const __lm = document.getElementById('loadmsg');
+const __cdnFail = () => { if (window.__loaded || window.__glfail) return; __lm.textContent = __tr ? 'Three.js yüklenemedi; internet bağlantısını kontrol et.' : 'Three.js could not load; check your connection.'; __lm.className = 'glerr';
+  const F = __tr ? { subtitle: 'Kapadokya peribacaları arasında minyatür diorama golfü', play: 'Oyna' } : { subtitle: '3D physics mini golf among the fairy chimneys of Cappadocia', play: 'Play' };
+  document.querySelectorAll('#ov-title [data-t]').forEach(el => { if (F[el.dataset.t]) el.textContent = F[el.dataset.t]; else if (!el.textContent) { const b = el.closest('button'); if (b) b.hidden = true; } }); };
+window.addEventListener('error', e => { if (e.target && e.target.tagName === 'SCRIPT') __cdnFail(); }, true); // blocked CDN: the module script fails at once
+setTimeout(__cdnFail, 12000);
 </script>
 
 <script type="module">
@@ -2593,7 +2599,7 @@ const I18N = {
     hintAim: 'Topa basıp geriye çek, bırakınca vur', hintCam: 'Boş alana sürükleyerek kamerayı döndür · V kuş bakışı', hintRelease: 'Bırak ve vur',
     howtoTouch: 'Topa basıp geriye sürükle, bırakınca vur. Boş alana sürükleyince kamera döner', badge: 'Kapadokya Parkuru', strokeOf: '{s} vuruş · Par {p}', builtBy: 'Claude Fable 5.1 ile yapıldı',
     skip: 'Kamera tanıtımını geçmek için dokun', nextHole: 'Sonraki Delik', finish: 'Sonuçları Gör', rewardUndo: 'Reklam izle, cezayı geri al', rewardDone: 'Ceza geri alındı', water: 'Suya düştü: +1 vuruş', oob: 'Saha dışı: +1 vuruş',
-    grape: 'Gizli üzüm bulundu!', locked: 'Kilitli', loading: 'Yükleniyor…', loadFail: 'Three.js yüklenemedi; internet bağlantısını kontrol et.',
+    grape: 'Gizli üzüm bulundu!', locked: 'Kilitli', loading: 'Yükleniyor…', loadFail: 'Three.js yüklenemedi; internet bağlantısını kontrol et.', glFail: 'WebGL kullanılamıyor: donanım hızlandırmayı aç ya da başka bir tarayıcı dene.',
     ace: 'Hole-in-One! (Tek Vuruş)', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Çift Bogey', over: '+{n}',
     star_under: 'Par Altı Başarı', star_grape: 'Gizli Kapadokya Üzümü', newRecord: '★ Yeni Parkur Rekoru! ★', musicOn: 'Müzik açık', musicOff: 'Müzik kapalı',
     sfxOn: 'Efektler açık', sfxOff: 'Efektler kapalı', strokesOf: '{s} vuruş · Par {p}', cardSaved: 'Kart kaydedildi', holeBest: 'Delik rekoru!',
@@ -2634,7 +2640,7 @@ const I18N = {
     hintAim: 'Press on ball and drag back, release to shoot', hintCam: 'Drag on empty ground to orbit · V for overview', hintRelease: 'Release to shoot',
     howtoTouch: 'Press on the ball and drag back to aim, release to shoot. Drag empty ground to orbit the camera', badge: 'Cappadocia Course', strokeOf: '{s} stroke · Par {p}', builtBy: 'built by Claude Fable 5.1',
     skip: 'Tap anywhere to skip flyover', nextHole: 'Next Hole', finish: 'See Results', rewardUndo: 'Watch an ad to undo the penalty', rewardDone: 'Penalty refunded', water: 'Water: +1 stroke', oob: 'Out of bounds: +1 stroke',
-    grape: 'Hidden grape found!', locked: 'Locked', loading: 'Loading…', loadFail: 'Three.js could not load; check your connection.',
+    grape: 'Hidden grape found!', locked: 'Locked', loading: 'Loading…', loadFail: 'Three.js could not load; check your connection.', glFail: 'WebGL is unavailable: enable hardware acceleration or try another browser.',
     ace: 'Hole in One!', eagle: 'Eagle!', birdie: 'Birdie!', parR: 'Par', bogey: 'Bogey', dbogey: 'Double Bogey', over: '+{n}',
     star_under: 'Under Par Finish', star_grape: 'Hidden Cappadocia Grape', newRecord: '★ New Course Record! ★', musicOn: 'Music on', musicOff: 'Music off',
     sfxOn: 'Effects on', sfxOff: 'Effects off', strokesOf: '{s} strokes · Par {p}', cardSaved: 'Card saved', holeBest: 'Hole record!',
@@ -4013,7 +4019,19 @@ function arenaAward(id, key) { if (window.Arena && !FLAG.auto && !FLAG.nosave) A
 // Renderer, scene, lights, static world
 // ---------------------------------------------------------------------------
 const canvas = document.getElementById('c');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); }
+catch (e) { // no WebGL: keep the menu texts, show a clear message, Play stays disabled
+  window.__glfail = true; window.__errs.push('WebGL: ' + e.message);
+  const apply = () => { document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+    document.querySelectorAll('#seg-lang button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
+    const m = $g('loadmsg'); m.textContent = t('glFail'); m.className = 'glerr'; };
+  const $g = (id) => document.getElementById(id);
+  document.querySelectorAll('#seg-lang button').forEach(b => b.addEventListener('click', () => { LANG = b.dataset.l; apply(); }));
+  apply(); $g('b-play').disabled = true; $g('b-daily').disabled = true;
+  throw new Error('WebGL unavailable'); // stop the rest of the game (it needs a renderer)
+}
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 const scene = new THREE.Scene();
@@ -4558,6 +4576,7 @@ function cameraUpdate(dt) {
     tx = course.bbox.cx; ty = (course.bbox.ymin + course.bbox.ymax) / 2; tz = course.bbox.cz; pitch = 1.5;
     const w = course.bbox.x1 - course.bbox.x0, d = course.bbox.z1 - course.bbox.z0, asp = camera.aspect;
     dist = Math.max(d / asp, w, d, w / asp) * 0.62 + 3.5;
+    dist = dist * (1 / (1 - Math.min(0.4, (camera.aspect < 1 ? 210 : 150) / Math.max(400, innerHeight)))) + 0.8; // keep the figures clear of the HUD bar and the hint (camera only)
   } else { tx = b.x; ty = b.y; tz = b.z; pitch = cam.pitch; dist = cam.dist * (camera.aspect < 1 ? 1.5 : 1); }
   const k = cam.init ? Math.min(1, dt * 5) : 1; cam.init = true;
   cam.tx += (tx - cam.tx) * k; cam.ty += (ty - cam.ty) * k; cam.tz += (tz - cam.tz) * k;
