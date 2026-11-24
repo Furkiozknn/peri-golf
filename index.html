@@ -685,6 +685,31 @@ input[type=range] {
   filter: drop-shadow(0 6px 12px rgba(45, 26, 15, 0.28));
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+/* Stil 3D: the song video's fairy and golfer flank the logo (same row height, so the card does not grow) */
+.title .hero { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin-bottom: 8px; }
+.title .hero .logo { margin: 0; }
+.fig { height: 112px; width: auto; filter: drop-shadow(0 6px 8px rgba(70, 40, 25, 0.28)); pointer-events: none; user-select: none; }
+.fig-peri { animation: figHover 3.2s ease-in-out infinite; }
+.fig-golf { animation: figHop 2.4s ease-in-out infinite; }
+@keyframes figHover { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-7px) rotate(3deg); } }
+@keyframes figHop { 0%, 70%, 100% { transform: translateY(0); } 80% { transform: translateY(-6px); } }
+.fig-h { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.fig-h h2 { margin: 0 0 4px; }
+.fig-s { height: 58px; width: auto; flex: none; filter: drop-shadow(0 4px 6px rgba(70, 40, 25, 0.25)); pointer-events: none; }
+h2.fig-h { margin-bottom: 12px; }
+@media (max-height: 800px) { .fig { height: 72px; } .title .hero .logo { width: 68px; height: 68px; } .fig-s { height: 44px; }
+  /* short desktop (1280x720, 1366x768): the whole title card, hole grid included, fits on screen */
+  .title .how { display: none; } .title h1 { font-size: 40px; } .title .hero { margin-bottom: 2px; } }
+/* phone: the title card's twelve hole buttons fit on one screen (the in-game hint teaches the putt) */
+@media (max-width: 500px) { .title .how { display: none; } .fig { height: 80px; } .title .hero .logo { width: 76px; height: 76px; }
+  .title .holes { grid-template-columns: repeat(4, 1fr); } }
+/* end card: its buttons stay in view at the bottom of the card while the scorecard scrolls under them */
+.end-btns { position: sticky; bottom: -24px; margin: 4px -26px -24px; padding: 10px 26px 16px; gap: 8px;
+  background: linear-gradient(rgba(249, 242, 230, 0.88), var(--parchment-2) 30%); border-top: 1px solid var(--line); border-radius: 0 0 17px 17px; z-index: 2; }
+@media (max-width: 500px) { .end-btns { margin: 4px -16px -18px; padding: 10px 16px 14px; bottom: -18px; } }
+@media (max-height: 600px) { .end-btns { margin: 4px -18px -14px; padding: 8px 18px 10px; bottom: -14px; } }
+@media (max-height: 600px) { .fig { height: 70px; } .title .hero .logo { width: 68px; height: 68px; } .fig-s { height: 40px; } }
+@media (prefers-reduced-motion: reduce) { .fig-peri, .fig-golf { animation: none; } }
 .title .logo:hover {
   transform: scale(1.05) rotate(2deg);
 }
@@ -2399,7 +2424,7 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
   <!-- Title Screen -->
   <div class="overlay" id="ov-title">
     <div class="panel glass title">
-      <svg class="logo"><use href="#i-logo"/></svg>
+      <div class="hero"><img class="fig fig-peri" src="assets/3d/peri.webp" alt="" aria-hidden="true"><svg class="logo"><use href="#i-logo"/></svg><img class="fig fig-golf" src="assets/3d/golfcu-sevinc.webp" alt="" aria-hidden="true"></div>
       <h1>Peri Golf</h1>
       <p class="sub" data-t="subtitle"></p>
       <p class="how" data-t="howto"></p>
@@ -2430,7 +2455,7 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
   <!-- Pause Menu -->
   <div class="overlay" id="ov-pause" hidden>
     <div class="panel glass col">
-      <h2 data-t="paused"></h2>
+      <h2 class="fig-h"><img class="fig-s" src="assets/3d/peri.webp" alt="" aria-hidden="true"><span data-t="paused"></span><img class="fig-s" src="assets/3d/golfcu-nisan.webp" alt="" aria-hidden="true"></h2>
       <button class="btn primary w" id="b-resume"><svg><use href="#i-play"/></svg><span data-t="resume"></span></button>
       <button class="btn w lemon" id="b-restart"><svg><use href="#i-restart"/></svg><span data-t="restartHole"></span></button>
       <button class="btn w sky" id="b-psettings"><svg><use href="#i-gear"/></svg><span data-t="settings"></span></button>
@@ -2489,7 +2514,7 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
   <!-- Hole Result Celebration -->
   <div class="overlay" id="ov-hole" hidden>
     <div class="panel glass col" style="text-align:center">
-      <h2 id="hr-title"></h2>
+      <div class="fig-h"><img class="fig-s" src="assets/3d/golfcu-sevinc.webp" alt="" aria-hidden="true"><h2 id="hr-title"></h2><img class="fig-s" src="assets/3d/peri.webp" alt="" aria-hidden="true"></div>
       <div id="hr-sub" style="color:var(--ink-mid);font-weight:700"></div>
       <div class="bigstars" id="hr-stars"></div>
       <ul class="starlist" id="hr-list"></ul>
@@ -2503,7 +2528,7 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
   <!-- Course Complete / End of Course -->
   <div class="overlay" id="ov-end" hidden>
     <div class="panel glass col" style="text-align:center">
-      <div style="display:flex;justify-content:center;margin-bottom:4px"><svg width="52" height="52" style="color:var(--gold)"><use href="#i-trophy"/></svg></div>
+      <div class="fig-h" style="margin-bottom:4px"><img class="fig-s" src="assets/3d/peri.webp" alt="" aria-hidden="true"><svg width="52" height="52" style="color:var(--gold)"><use href="#i-trophy"/></svg><img class="fig-s" src="assets/3d/golfcu-sevinc.webp" alt="" aria-hidden="true"></div>
       <h2 data-t="endTitle"></h2>
       <div class="rec" id="end-rec" hidden></div>
       <div class="kv">
@@ -2515,10 +2540,12 @@ window.ArenaCore = { version: VERSION, kalite, render, kabuk, his, kamera, test,
       <div class="sc-line" id="end-sc"></div>
       <div class="gallery" id="end-gallery"></div>
       <div id="end-card"></div>
+      <div class="end-btns col">
       <button class="btn primary w" id="b-again"><svg><use href="#i-restart"/></svg><span data-t="playAgain"></span></button>
-      <button class="btn w blush" id="b-emenu"><svg><use href="#i-home"/></svg><span data-t="mainMenu"></span></button>
-      <button class="btn w lemon" id="b-eshare"><span data-t="share"></span></button>
+      <div class="row two"><button class="btn w blush" id="b-emenu"><svg><use href="#i-home"/></svg><span data-t="mainMenu"></span></button>
+      <button class="btn w lemon" id="b-eshare"><span data-t="share"></span></button></div>
       <a class="btn w sky" id="e-another" href="https://furkiozknn.github.io/" target="_blank" rel="noopener" style="text-decoration:none"><span data-t="another"></span></a>
+      </div>
     </div>
   </div>
 </div>
@@ -2535,7 +2562,7 @@ setTimeout(() => { if (!window.__loaded) document.getElementById('loadmsg').text
 
 <script type="module">
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 
 // ---------------------------------------------------------------------------
 // Query flags
@@ -3027,14 +3054,15 @@ function boxUV(geo, tile) {
 }
 // Materials come in two sets: Low = Lambert (as before), High = Standard so the HDRI environment lights
 // the scene. Meshes remember their kind in userData.mk and applyQuality() swaps the set.
-const MAT_KINDS = { flat: {}, ground: { fade: true }, smooth: { smooth: true }, water: { smooth: true, water: true }, rock: {}, grass: {}, sand: {}, lantern: { emissive: 0x6a3a10 }, wing: { smooth: true, side: THREE.DoubleSide } };
+// Stil 3D (song video look): every surface is smooth-shaded soft clay, no faceted low-poly rock
+const MAT_KINDS = { flat: { smooth: true }, ground: { fade: true, smooth: true }, smooth: { smooth: true }, water: { smooth: true, water: true }, rock: { smooth: true }, grass: { smooth: true }, sand: { smooth: true }, lantern: { emissive: 0x6a3a10 }, wing: { smooth: true, side: THREE.DoubleSide } };
 const MATSET = { lo: {}, hi: {} };
 function makeMat(kind, hi) {
   const d = MAT_KINDS[kind], o = { vertexColors: true, flatShading: !d.smooth };
   if (d.water) { o.transparent = true; o.opacity = 0.82; }
   if (d.side) o.side = d.side;
   if (d.emissive) o.emissive = d.emissive;
-  const m = hi ? new THREE.MeshStandardMaterial(Object.assign(o, { roughness: d.water ? 0.35 : 1.0, metalness: 0, envMapIntensity: 1 })) : new THREE.MeshLambertMaterial(o);
+  const m = hi ? new THREE.MeshStandardMaterial(Object.assign(o, { roughness: d.water ? 0.35 : 0.82, metalness: 0, envMapIntensity: 1 })) : new THREE.MeshLambertMaterial(o);
   if (d.fade) { // terrain: the detail map fades to its mean grey beyond 10 m so the far ground does not read as one tiled texture
     m.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>', `#ifdef USE_MAP
       vec4 sampledDiffuseColor = texture2D( map, vMapUv );
@@ -3053,8 +3081,10 @@ function setMaterialSet(hi) {
   scene.traverse(n => { if (n.userData.mk && MAT[n.userData.mk]) n.material = MAT[n.userData.mk]; });
 }
 // Redesign palette (2026-11, "fantasy miniature diorama"): tuff #E8C9A0, rose rock #C98B7A, moss #7FA36B, sky #9AD1F5, flag red #E53935
-const COL = { grass: 0x7FA36B, sand: 0xEBD6A6, stone: 0xDCCBAE, water: 0x6CC3E8, tuff: 0xE8C9A0, tuffDark: 0xC98B7A, cap: 0xA86E60, wall: 0xF4E4C8, cupDark: 0x2A1F1A, accent: 0xE53935, wood: 0x8B5A3C, vine: 0x5E8F4A,
-  moss: 0x7FA36B, rose: 0xC98B7A, roseLight: 0xDDA894, sky: 0x9AD1F5, cream: 0xFFF4E3, mint: 0xBFE8C8, blush: 0xF6C3C3, lemon: 0xFFE7A3, lilac: 0xC9B8E8 };
+// Stil 3D: tuff, caps, rose rock, moss and kerbs retinted to the song video's pastel clay (beige-pink chimneys with
+// same-colour mushroom caps, soft sage green, pink-brown clay kerbs)
+const COL = { grass: 0x8DB27A, sand: 0xEFDDB8, stone: 0xE2D2BE, water: 0x7CC8E6, tuff: 0xE7CFB8, tuffDark: 0xC9A08E, cap: 0xD6B7A0, wall: 0xEED8C6, cupDark: 0x3A2A24, accent: 0xE53935, wood: 0x9A6A4C, vine: 0x6E9A5A,
+  moss: 0x8DB27A, rose: 0xCFA597, roseLight: 0xDDB8A8, sky: 0x9AD1F5, cream: 0xFFF4E3, mint: 0xBFE8C8, blush: 0xF6C3C3, lemon: 0xFFE7A3, lilac: 0xC9B8E8 };
 // vertical gradient vertex colours (bottom -> top between y0 and y1), used for the rose-to-tuff banding of the rocks
 const _c2 = new THREE.Color();
 function colorizeY(geo, cBottom, cTop, y0, y1, jitter = 0, rnd = Math.random) {
@@ -3088,7 +3118,7 @@ function padTop(course, p, rnd) {
 // skirt from the pad edge down to the course base (the carved tuff terrace side)
 // Redesign: the terrace side is layered tuff strata (each band bulges out a little), a mossy lip on top and a dark
 // contact-shadow apron where the terrace meets the diorama ground. Faces wind outward so the near side is lit, not culled.
-const SKIRT_BANDS = [[0, 0x6F9460, 0.0], [0.07, 0xF6E8CE, 0.05], [0.24, 0xE8C9A0, 0.0], [0.42, 0xDDA894, 0.07], [0.58, 0xE4C4A0, 0.02], [0.76, 0xC98B7A, 0.09], [1, 0xB0776A, 0.04]];
+const SKIRT_BANDS = [[0, 0x7FA36E, 0.0], [0.07, 0xF3E2D2, 0.05], [0.24, 0xE7CFB8, 0.0], [0.42, 0xDDBCAA, 0.07], [0.58, 0xE5CBB6, 0.02], [0.76, 0xCFA597, 0.09], [1, 0xBC9080, 0.04]]; // Stil 3D: soft clay layers
 function padSkirt(course, p, rnd) {
   const pos = [], col = [], base = course.base, corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]], gy = terrainY(p.x, p.z) + 0.015;
   const dark = new THREE.Color(0x8E7458), ground = new THREE.Color(COL.tuff);
@@ -3126,7 +3156,7 @@ function wallGeo(course, w, rnd) {
     // carved tuff kerb: rose at the foot, cream on top, with a rounded cap so the walls read as soft toy pieces
     list.push(colorizeY(box(w.len / n + 0.02, w.h + 0.12, 0.26, mx, gh + w.h / 2 - 0.06, mz, COL.wall, -ang), COL.roseLight, COL.wall, gh - 0.1, gh + w.h * 0.7, 0.04, rnd));
     const cap = new THREE.CylinderGeometry(0.135, 0.135, w.len / n + 0.02, 8); cap.rotateZ(Math.PI / 2); cap.rotateY(-ang); cap.translate(mx, gh + w.h + 0.02, mz);
-    list.push(colorize(cap, 0xf9efdc, 0.04, rnd));
+    list.push(colorize(cap, 0xE6C2AE, 0.04, rnd)); // Stil 3D: pink-brown clay kerb like the video's putting rails
   }
   return list;
 }
@@ -3195,6 +3225,8 @@ function buildCourseGeometry(course) {
   const ch = course.height(def.cup[0], def.cup[1]) || 0;
   flat.push(cyl(CUP_R, CUP_R, 0.02, 16, def.cup[0], ch + 0.004, def.cup[1], COL.cupDark));
   flat.push(cyl(CUP_R + 0.05, CUP_R + 0.05, 0.012, 16, def.cup[0], ch + 0.002, def.cup[1], 0xf3ead6));
+  { // Stil 3D: a round terracotta clay lip around the cup, as in the video (visual only, below the ball's radius)
+    const lip = new THREE.TorusGeometry(CUP_R + 0.05, 0.022, 8, 28); lip.rotateX(Math.PI / 2); lip.translate(def.cup[0], ch + 0.008, def.cup[1]); flat.push(colorize(lip, 0xC27E5C)); }
   // tee marker and a little wooden signpost beside the tee terrace
   const th = course.height(def.tee[0], def.tee[1]) || 0;
   flat.push(cyl(0.26, 0.26, 0.012, 12, def.tee[0], th + 0.004, def.tee[1], 0x98c26c));
@@ -3242,7 +3274,7 @@ function buildCourseGeometry(course) {
 // Chimneys and houses are also recorded as placements (pl) so the Blender models can replace them as instances.
 function chimneyGeo(x, z, s, rnd, yBase, pl) {
   const list = []; const h = (1.6 + rnd() * 2.6) * s, rb = (0.38 + rnd() * 0.25) * s, rt = rb * (0.45 + rnd() * 0.2);
-  const ti = Math.floor(rnd() * 4), tint = [COL.tuff, 0xf0d6b2, COL.roseLight, 0xe6c6ac][ti];
+  const ti = Math.floor(rnd() * 4), tint = [COL.tuff, 0xEFDACA, COL.roseLight, 0xE4C6B2][ti];
   const capH = (0.5 + rnd() * 0.5) * s;
   const side = rnd() < 0.35 ? { dx: (rnd() - 0.5) * rb * 1.6, dz: (rnd() - 0.5) * rb * 1.6 } : null;
   const win = rnd() < 0.5 ? { dx: (rnd() - 0.5) * rt, y: h * (0.3 + rnd() * 0.4) } : null;
@@ -3484,9 +3516,10 @@ function buildSky() {
 function tintSky(geo, progress, az = 0, el = 0.2) {
   const pos = geo.attributes.position, col = geo.attributes.color;
   // pastel diorama sky: peach dawn -> clear toy-sky blue; the fog colour sits between horizon and mid so the far field melts into the sky
-  const horizon = new THREE.Color().lerpColors(new THREE.Color(0xffe0c4), new THREE.Color(0xf9e6d2), progress);
-  const mid = new THREE.Color().lerpColors(new THREE.Color(0xc4def2), new THREE.Color(0x9ad1f5), progress);
-  const zenith = new THREE.Color().lerpColors(new THREE.Color(0x86b9e8), new THREE.Color(0x6aaae6), progress);
+  // Stil 3D: the video's sky, peach-cream at the horizon, pale periwinkle above
+  const horizon = new THREE.Color().lerpColors(new THREE.Color(0xfbe1cf), new THREE.Color(0xf7e8dc), progress);
+  const mid = new THREE.Color().lerpColors(new THREE.Color(0xdcd8ec), new THREE.Color(0xc8dcf0), progress);
+  const zenith = new THREE.Color().lerpColors(new THREE.Color(0xaebfe2), new THREE.Color(0x9cbfe8), progress);
   const tmp = new THREE.Color(), sx = Math.sin(az) * Math.cos(el), sy = Math.sin(el), sz = Math.cos(az) * Math.cos(el);
   for (let i = 0; i < pos.count; i++) {
     const y = pos.getY(i) / 90; let c;
@@ -4047,7 +4080,7 @@ balloons.frustumCulled = false; baskets.frustumCulled = false; scene.add(balloon
 let balloonModel = false; // true once the Blender balloon (basket geometry already hangs 3.1 m below the envelope) is in use
 const balloonState = [];
 {
-  const r = mulberry(42); const palette = [COL.accent, COL.mint, COL.lemon, COL.blush, COL.accent, COL.lilac, 0x7fc4ec, COL.lemon, COL.accent, COL.mint, COL.blush];
+  const r = mulberry(42); const palette = [0xF2DDB8, 0xD8C6EA, 0xC6E4D2, 0xF4CFC6, 0xF2DDB8, 0xD8C6EA, 0xBFD8EE, 0xF6E3B4, 0xF4CFC6, 0xC6E4D2, 0xE9C8DC]; // Stil 3D: the video's pastel balloons
   for (let i = 0; i < BALLOON_N; i++) {
     const a = r() * Math.PI * 2, d = 9 + r() * 26;
     balloonState.push({ x: Math.cos(a) * d, y: 3 + r() * 12, z: Math.sin(a) * d, s: 1.0 + r() * 0.7, ph: r() * 6, rise: 0.12 + r() * 0.18 });
@@ -4184,8 +4217,9 @@ function updateMotes() {
 // ---- ball, preview, ghost ----
 // toy ball: white with a sky-blue equator band and a red polar dot so the roll reads
 const ballMesh = new THREE.Mesh((() => { const g = new THREE.SphereGeometry(BALL_R, 18, 12), p = g.attributes.position, col = new Float32Array(p.count * 3);
-  for (let i = 0; i < p.count; i++) { const y = p.getY(i) / BALL_R; _c.set(Math.abs(y) < 0.2 ? 0x7fc4ec : (y > 0.93 ? COL.accent : 0xffffff)); col[i * 3] = _c.r; col[i * 3 + 1] = _c.g; col[i * 3 + 2] = _c.b; }
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g; })(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, metalness: 0 }));
+  // Stil 3D: the video's white dimpled golf ball; two small terracotta pottery dots at the poles keep the roll readable
+  for (let i = 0; i < p.count; i++) { const y = p.getY(i) / BALL_R; _c.set(Math.abs(y) > 0.9 ? 0xC27E5C : 0xffffff); col[i * 3] = _c.r; col[i * 3 + 1] = _c.g; col[i * 3 + 2] = _c.b; }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g; })(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.38, metalness: 0, emissive: 0x2a2622 }));
 ballMesh.castShadow = true; scene.add(ballMesh);
 const ballShadowRing = new THREE.Mesh(new THREE.CircleGeometry(BALL_R * 0.9, 12), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25, depthWrite: false }));
 ballShadowRing.rotation.x = -Math.PI / 2; scene.add(ballShadowRing);
@@ -4196,6 +4230,82 @@ const pullLine = new THREE.Line(pullGeo, new THREE.LineBasicMaterial({ color: CO
 const hitRing = new THREE.Mesh(new THREE.RingGeometry(0.09, 0.15, 18), new THREE.MeshBasicMaterial({ color: COL.lemon, side: THREE.DoubleSide, transparent: true, opacity: 0.9 }));
 hitRing.rotation.x = -Math.PI / 2; hitRing.visible = false; scene.add(hitRing);
 let ghostLine = null;
+
+// ---- Stil 3D: the song video's chibi golfer, fairy and red flag as camera-facing sprites ----
+// Visual only: nothing here reads or writes the ball, the course or the bot. three.js draws a UUID from Math.random for
+// every texture/material/object, so all of them are made once at boot inside sakin(), which lends three a private
+// random stream and gives Math.random back untouched (the sim never sees an extra draw). No new three objects later.
+let ST_RND = 0x9e7160f1;
+function sakin(fn) {
+  const r = Math.random;
+  Math.random = () => { ST_RND = (ST_RND + 0x6D2B79F5) >>> 0; let t = ST_RND; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  try { return fn(); } finally { Math.random = r; }
+}
+const ST = { ready: 0, pose: 'aim', spot: new THREE.Vector3(), swing: 0, cheerT: 0, phoneK: 1 };
+sakin(() => {
+  const spr = (cx, cy) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, alphaTest: 0.08, depthWrite: true })); s.center.set(cx, cy); s.visible = false; s.frustumCulled = false; scene.add(s); return s; };
+  ST.golfer = spr(0.1, 0.1); ST.fairy = spr(0.5, 0.5); ST.flag = spr(0.07, 0.0);
+  ST.golfer.renderOrder = ST.fairy.renderOrder = ST.flag.renderOrder = 2;
+  // soft contact shadow under the golfer's feet
+  const sc = document.createElement('canvas'); sc.width = sc.height = 64;
+  const x = sc.getContext('2d'), gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(80,50,35,0.45)'); gr.addColorStop(0.6, 'rgba(80,50,35,0.18)'); gr.addColorStop(1, 'rgba(80,50,35,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
+  ST.shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+  ST.shadow.visible = false; scene.add(ST.shadow);
+  // dimpled ball: a grid of soft grey dimples multiplied over the white clay (UV sphere map, no randomness)
+  const dc = document.createElement('canvas'); dc.width = 256; dc.height = 128; const d = dc.getContext('2d');
+  d.fillStyle = '#ffffff'; d.fillRect(0, 0, 256, 128);
+  for (let j = 0; j < 9; j++) for (let i = 0; i < 18; i++) { const px = (i + (j % 2) * 0.5) * 256 / 18, py = 7 + j * 14;
+    const g2 = d.createRadialGradient(px, py, 0, px, py, 5.5); g2.addColorStop(0, 'rgba(150,140,135,0.55)'); g2.addColorStop(1, 'rgba(150,140,135,0)'); d.fillStyle = g2; d.fillRect(px - 6, py - 6, 12, 12); }
+  const dt = new THREE.CanvasTexture(dc); dt.colorSpace = THREE.SRGBColorSpace; ballMesh.material.map = dt; ballMesh.material.needsUpdate = true;
+  if (FLAG.noassets) return;
+  const L = new THREE.TextureLoader(), tex = {};
+  const load = (k, onl) => { tex[k] = L.load(ASSETS.base + '3d/' + k + '.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; t.userData.asp = t.image.width / t.image.height; ST.ready++; onl && onl(t); }, undefined, () => { }); };
+  for (const k of ['golfcu-nisan', 'golfcu-sevinc', 'peri', 'bayrak']) load(k);
+  ST.tex = tex;
+  ST.golfer.material.map = tex['golfcu-nisan']; ST.fairy.material.map = tex.peri; ST.flag.material.map = tex.bayrak;
+});
+const _sr = new THREE.Vector3();
+// sprite heights in metres (the ball is 0.24 m across): telephone views get them 1.45x bigger so they read in frame
+const ST_H = { aim: 1.0, cheer: 1.05, fairy: 0.62, flag: 1.2 };
+function stilSync(dt) {
+  const course = game.course, on = ST.ready >= 4 && course && game.phase !== 'title' && game.phase !== 'end';
+  ST.golfer.visible = ST.fairy.visible = ST.flag.visible = ST.shadow.visible = !!on;
+  if (!on) return;
+  if (flagMesh) flagMesh.visible = false;
+  const b = game.ball, k = (Math.min(innerWidth, innerHeight) < 600 ? 1.45 : 1) * (holeGroup ? holeGroup.scale.x : 1);
+  _sr.setFromMatrixColumn(camera.matrixWorld, 0); _sr.y = 0; if (_sr.lengthSq() < 1e-6) _sr.set(1, 0, 0); _sr.normalize();
+  const gy = (x, z, f) => course.height(x, z) ?? f;
+  // golfer: stands at the ball while it rests, stays where he hit it while it rolls, cheers when it drops
+  if (b.sunk) { if (ST.pose !== 'cheer') { ST.pose = 'cheer'; ST.cheerT = 0; } }
+  else if (b.rest) { if (ST.pose !== 'aim') ST.pose = 'aim'; ST.spot.set(b.x, b.y - BALL_R, b.z); }
+  ST.cheerT += dt; ST.swing = Math.max(0, ST.swing - dt * 2.2);
+  const G = ST.golfer, m = G.material, aim = ST.pose === 'aim', tx = ST.tex[aim ? 'golfcu-nisan' : 'golfcu-sevinc'];
+  if (m.map !== tx) { m.map = tx; m.needsUpdate = true; }
+  const H = (aim ? ST_H.aim : ST_H.cheer) * k, W = H * (tx.userData.asp || 0.6);
+  if (aim) { // putter head next to the ball (anchor 10 % in, 10 % up), the body to the right on screen
+    G.center.set(0.1, 0.1);
+    G.position.set(ST.spot.x + _sr.x * BALL_R * 1.3, ST.spot.y + H * 0.1, ST.spot.z + _sr.z * BALL_R * 1.3);
+    const sw = ST.swing; m.rotation = sw > 0 ? Math.sin(sw * Math.PI) * 0.22 : 0; // a quick putt: tip back and through
+  } else { // jumps for joy beside the spot he putted from
+    G.center.set(0.5, 0.0); const hop = Math.abs(Math.sin(ST.cheerT * 7)) * 0.08 * k;
+    G.position.set(ST.spot.x + _sr.x * W * 0.5, ST.spot.y + hop, ST.spot.z + _sr.z * W * 0.5); m.rotation = Math.sin(ST.cheerT * 5) * 0.05;
+  }
+  G.scale.set(W, H, 1);
+  const fx0 = aim ? (0.62 - 0.1) * W : 0; // feet: about 62 % across the aiming sprite
+  const sx = G.position.x + _sr.x * fx0, sz = G.position.z + _sr.z * fx0;
+  ST.shadow.position.set(sx, gy(sx, sz, ST.spot.y) + 0.012, sz); ST.shadow.scale.set(W * 0.9, 1, W * 0.55);
+  // flag over the cup, swaying with the wind like the old pennant
+  const c = course.def.cup, ch = gy(c[0], c[1], 0), F = ST.flag, fh = ST_H.flag * Math.max(1, k * 0.85);
+  F.scale.set(fh * (ST.tex.bayrak.userData.asp || 0.35), fh, 1); F.position.set(c[0], ch, c[1]);
+  F.material.rotation = Math.sin(game.time * 1.7) * 0.03 + game.wind[0] * 0.02;
+  // fairy: hovers beside the flag, giggling; circles the cup when the ball drops
+  const P = ST.fairy, ph = P.scale.y = ST_H.fairy * k; P.scale.x = ph * (ST.tex.peri.userData.asp || 0.65);
+  const a = b.sunk ? ST.cheerT * 3 : 0, rr = b.sunk ? 0.7 * k : 0.55 * k;
+  P.position.set(c[0] - _sr.x * rr * Math.cos(a) + (b.sunk ? Math.sin(a) * rr * 0.6 : 0), ch + fh * 0.75 + Math.sin(game.time * 2.2) * 0.08, c[1] - _sr.z * rr * Math.cos(a));
+  P.material.rotation = Math.sin(game.time * 1.6) * 0.06;
+}
 
 // ---- per-hole objects ----
 let holeGroup = null, sceneryGroup = null, holeScenery = null, obstacleMeshes = [], flagMesh = null, grapeMesh = null, waterMesh = null;
@@ -4279,7 +4389,7 @@ view.onHole = function () {
   buildShortcut(course);
   setPigeons(course); setMotes(course);
   applySun();
-  cam.yaw = game.aim.angle; cam.cyaw = cam.yaw; cam.pitch = cam.cpitch = 0.45; cam.dist = cam.cdist = 4.8; game.top = false; ui.topBtn(); // a flatter tee camera shows the hero chimneys and the sky
+  cam.yaw = game.aim.angle; cam.cyaw = cam.yaw; cam.pitch = cam.cpitch = camera.aspect < 1 ? 0.72 : 0.45; cam.dist = cam.cdist = 4.8; game.top = false; ui.topBtn(); // a flatter tee camera shows the hero chimneys and the sky
   ballMesh.visible = true; ballMesh.position.set(game.ball.x, game.ball.y, game.ball.z);
 };
 
@@ -4340,7 +4450,10 @@ function fillInstances() {
   h.instanceMatrix.needsUpdate = true;
 }
 // merges every primitive under a glTF node into one vertex-coloured geometry (node space, or scene space with world=true)
-function bakeNode(node, world, tile) {
+// Stil 3D: the chimneys and cave houses take the song video's clay colours (light mushroom caps the colour of the body,
+// warm lit windows and doors instead of black holes); other models keep their own colours
+const CLAY_REMAP = { tuff: 0xE7CFB8, tuff_dark: 0xDDBBA8, stone: 0xE7CFB8, stone_dark: 0xDDBBA8, basalt: 0xDCC0AA, dark: 0xF0B872, wood: 0xA8765A };
+function bakeNode(node, world, tile, remap) {
   node.updateMatrixWorld(true);
   const inv = world ? null : node.matrixWorld.clone().invert(), list = [], mm = new THREE.Matrix4();
   node.traverse(ch => {
@@ -4348,14 +4461,16 @@ function bakeNode(node, world, tile) {
     const g = ch.geometry.index ? ch.geometry.toNonIndexed() : ch.geometry.clone();
     for (const a of Object.keys(g.attributes)) if (a !== 'position' && a !== 'normal') g.deleteAttribute(a);
     g.applyMatrix4(world ? ch.matrixWorld : mm.copy(inv).multiply(ch.matrixWorld));
-    colorize(g, ch.material.color); list.push(g);
+    const rc = remap && remap[ch.material.name]; colorize(g, rc !== undefined ? rc : ch.material.color); list.push(g);
   });
-  const g = merged(list); g.userData.shared = true; if (tile) boxUV(g, tile); return g;
+  let g = merged(list);
+  if (remap) { g.deleteAttribute('normal'); g.deleteAttribute('uv'); const m2 = mergeVertices(g, 1e-3); m2.computeVertexNormals(); g.dispose(); g = m2.toNonIndexed(); m2.dispose(); } // soft clay: smooth normals across facets
+  g.userData.shared = true; if (tile) boxUV(g, tile); return g;
 }
 function onModelsLoaded(gl) {
   const M = {};
-  M.chimney = ['chimney_a', 'chimney_b', 'chimney_c'].map(n => bakeNode(gl[n].scene.getObjectByName(n), true, 2.2));
-  M.house = bakeNode(gl.cave_house.scene.getObjectByName('cave_house'), true, 2.2);
+  M.chimney = ['chimney_a', 'chimney_b', 'chimney_c'].map(n => bakeNode(gl[n].scene.getObjectByName(n), true, 2.2, CLAY_REMAP));
+  M.house = bakeNode(gl.cave_house.scene.getObjectByName('cave_house'), true, 2.2, CLAY_REMAP);
   M.envelope = bakeNode(gl.balloon.scene.getObjectByName('envelope'), true); M.basket = bakeNode(gl.balloon.scene.getObjectByName('basket'), true);
   M.wheel = bakeNode(gl.pottery_wheel.scene.getObjectByName('wheel'), true); M.housing = bakeNode(gl.pottery_wheel.scene.getObjectByName('housing'), true);
   M.lantern = bakeNode(gl.lantern.scene.getObjectByName('lantern'), true);
@@ -4372,7 +4487,7 @@ function applyTextures(t) {
   for (const tx of Object.values(t)) { tx.wrapS = tx.wrapT = THREE.RepeatWrapping; tx.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); }
   // detail maps are light grey (mean 0.89) multiplied over the vertex colours: a touch darker and richer than the flat colour
   for (const set of [MATSET.lo, MATSET.hi]) for (const [k, tx] of [['rock', t.tuff], ['ground', t.tuff], ['grass', t.grass], ['sand', t.sand]]) { set[k].map = tx; set[k].needsUpdate = true; }
-  MATSET.hi.rock.normalMap = t.tuffN; MATSET.hi.rock.normalScale.set(0.45, 0.45); MATSET.hi.rock.needsUpdate = true; // relief only on High
+  MATSET.hi.rock.normalMap = t.tuffN; MATSET.hi.rock.normalScale.set(0.12, 0.12); MATSET.hi.rock.needsUpdate = true; // relief only on High (Stil 3D: barely there, smooth clay)
   ASSETS.tex = t;
 }
 async function loadAssets() {
@@ -4380,8 +4495,9 @@ async function loadAssets() {
   const done = (k, v) => { ASSETS.status[k] = v; ASSETS.pending--; };
   ASSETS.pending = 4;
   (async () => { try {
-    const L = new THREE.TextureLoader(), names = { tuff: 'tuff_detail', grass: 'grass_detail', sand: 'sand_detail', tuffN: 'tuff_normal' }, t = {};
-    await Promise.all(Object.keys(names).map(async k => { t[k] = await L.loadAsync(ASSETS.base + 'textures/' + names[k] + '.jpg'); }));
+    // Stil 3D: rock and grass detail maps come from the song video's clay chimney and putting green (assets/3d)
+    const L = new THREE.TextureLoader(), names = { tuff: '3d/kil-detay.webp', grass: '3d/cimen-detay.webp', sand: 'textures/sand_detail.jpg', tuffN: 'textures/tuff_normal.jpg' }, t = {};
+    await Promise.all(Object.keys(names).map(async k => { t[k] = await L.loadAsync(ASSETS.base + names[k]); }));
     applyTextures(t); done('textures', 'ok');
   } catch (e) { done('textures', 'fail'); } })();
   (async () => { try {
@@ -4402,7 +4518,7 @@ async function loadAssets() {
     done('sfx', 'ok');
   } catch (e) { done('sfx', 'fail'); } })();
 }
-view.onShot = (power) => { audio.putt(power); };
+view.onShot = (power) => { audio.putt(power); ST.swing = 1; };
 view.onSink = () => { const c = game.course.def.cup; fx('confetti', c[0], (game.course.height(c[0], c[1]) || 0) + 0.55, c[1], 36);
   if (!FLAG.auto) { try { navigator.vibrate && navigator.vibrate(30); } catch (e) { } }   // haptic: the ball drops into the cup (30 ms; the kit's vibration switch wraps navigator.vibrate)
 };
@@ -4786,7 +4902,7 @@ view.sync = function (dt = 0) {
   if (grapeMesh && grapeMesh.visible) { grapeMesh.rotation.y = game.time * 1.4; grapeMesh.position.y = (course.height(grapeMesh.position.x, grapeMesh.position.z) ?? 0) + 0.08 + Math.sin(game.time * 2.5) * 0.04; }
   if (waterMesh) waterMesh.position.y = Math.sin(game.time * 1.3) * 0.012;
   syncShortcut(dt);
-  updateBalloons(dt); updatePigeons(dt); updateParticles(dt); updateClouds(dt); updateMotes();
+  updateBalloons(dt); updatePigeons(dt); updateParticles(dt); updateClouds(dt); updateMotes(); stilSync(dt);
   if (game.time - lastBurner > 6 + Math.random() * 5 && audio.ok()) { lastBurner = game.time; const k = Math.floor(Math.random() * BALLOON_N), s = balloonState[k]; audio.burner(camera.position.distanceTo(_p.set(s.x, s.y, s.z))); }
 };
 
@@ -4796,7 +4912,7 @@ if (FLAG.debug) {
   dbg.hidden = false;
   try { const gl = renderer.getContext(); const ext = gl.getExtension('WEBGL_debug_renderer_info'); gpuName = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : ''; } catch (e) { gpuName = ''; }
 }
-window.periGolfDebug = { shortcuts: { SHORTCUTS, found, aces, Course, HOLES, makeBall, simulateShot, botPlan, BALL_R }, get fps() { return fps; }, get calls() { return callsNow; }, get errors() { return window.__errs; }, gpu: () => gpuName, ballScreen, mats: MATSET, scene, lights: { sun, hemi }, renderer, THREE };
+window.periGolfDebug = { shortcuts: { SHORTCUTS, found, aces, Course, HOLES, makeBall, simulateShot, botPlan, BALL_R }, get fps() { return fps; }, get calls() { return callsNow; }, get errors() { return window.__errs; }, gpu: () => gpuName, ballScreen, mats: MATSET, scene, lights: { sun, hemi }, renderer, THREE, stil: ST, assets: ASSETS };
 function updateDebug() {
   if (!FLAG.debug) return;
   const i = renderer.info.render;
